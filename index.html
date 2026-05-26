@@ -3278,7 +3278,7 @@ let currentCheckoutData = {
 };
 
 // Variable para tu cuenta de contacto en Telegram (reemplázala por tu alias de Telegram sin el @)
-const ADMIN_TELEGRAM_USERNAME = "TuUsuarioTelegram"; 
+const ADMIN_TELEGRAM_USERNAME = "Airdayz"; 
 
 // ==========================================================================
 // CONTROLADORES DE INTERFAZ MODAL Y CLICKS EN "DESTACAR"
@@ -3449,36 +3449,69 @@ function checkFirstSessionFeaturedCeleb() {
 
 // Simulador integrado de explosión de fuegos artificiales/confeti sin dependencias externas pesadas
 function triggerConfetiParticlesExplosion() {
-    for (let i = 0; i < 60; i++) {
+    // 1. Inyectamos los estilos de animación CSS nativos de forma dinámica 
+    // Esto hace que el procesador gráfico (GPU) del móvil mueva el confeti a 60 FPS
+    if (!document.getElementById("confeti-core-styles")) {
+        const styleSheet = document.createElement("style");
+        styleSheet.id = "confeti-core-styles";
+        styleSheet.innerText = `
+            @keyframes caidaConfeti {
+                0% {
+                    transform: translate3d(0, 0, 0) rotate(0deg);
+                    opacity: 1;
+                }
+                100% {
+                    transform: translate3d(var(--drift-x), 110vh, 0) rotate(var(--rotation-end));
+                    opacity: 0.4;
+                }
+            }
+            .particula-confeti {
+                position: fixed;
+                top: -5vh;
+                z-index: 99999;
+                will-change: transform; /* Avisa al navegador para usar aceleración por hardware */
+                animation: caidaConfeti var(--duration) linear forwards;
+            }
+        `;
+        document.head.appendChild(styleSheet);
+    }
+
+    const totalParticulas = 60;
+
+    for (let i = 0; i < totalParticulas; i++) {
         const confeti = document.createElement('div');
-        confeti.style.position = 'fixed';
-        confeti.style.width = Math.random() * 8 + 4 + 'px';
-        confeti.style.height = Math.random() * 10 + 6 + 'px';
-        confeti.style.backgroundColor = ['#fbbf24','#f59e0b','#ec4899','#a855f7','#3b82f6'][Math.floor(Math.random() * 5)];
-        confeti.style.left = Math.random() * 100 + 'vw';
-        confeti.style.top = '-5vh';
-        confeti.style.zIndex = '99999';
+        confeti.className = 'particula-confeti';
+        
+        // Propiedades físicas aleatorias básicas
+        const ancho = Math.random() * 8 + 5;
+        const alto = Math.random() * 10 + 6;
+        const color = ['#fbbf24', '#f59e0b', '#ec4899', '#a855f7', '#3b82f6'][Math.floor(Math.random() * 5)];
+        const inicioX = Math.random() * 100;
+
+        // Variables CSS dinámicas individuales para cada pedazo de confeti
+        const duracion = (Math.random() * 2 + 2.5).toFixed(2) + 's'; // Entre 2.5 y 4.5 segundos
+        const desplazamientoLateral = (Math.random() * 30 - 15) + 'vw'; // Desplazamiento de caída hacia los lados
+        const rotacionFinal = Math.floor(Math.random() * 720 - 360) + 'deg'; // Giros en el aire
+
+        // Aplicamos los estilos iniciales rápidos
+        confeti.style.width = ancho + 'px';
+        confeti.style.height = alto + 'px';
+        confeti.style.backgroundColor = color;
+        confeti.style.left = inicioX + 'vw';
         confeti.style.borderRadius = '2px';
-        confeti.style.transform = `rotate(${Math.random() * 360}deg)`;
+
+        // Pasamos los cálculos matemáticos como variables controladas por CSS
+        confeti.style.setProperty('--duration', duracion);
+        confeti.style.setProperty('--drift-x', desplazamientoLateral);
+        confeti.style.setProperty('--rotation-end', rotacionFinal);
         
         document.body.appendChild(confeti);
 
-        let positionY = -5;
-        let positionX = parseFloat(confeti.style.left);
-        const speedY = Math.random() * 4 + 3;
-        const driftX = Math.random() * 2 - 1;
-
-        const animation = setInterval(() => {
-            positionY += speedY;
-            positionX += driftX;
-            confeti.style.top = positionY + 'vh';
-            confeti.style.left = positionX + 'vw';
-
-            if (positionY > 105) {
-                clearInterval(animation);
-                confeti.remove();
-            }
-        }, 20);
+        // En lugar de usar un clearInterval que consume recursos en bucle,
+        // dejamos que el propio navegador elimine el nodo del HTML cuando termine de caer de forma limpia
+        confeti.addEventListener('animationend', () => {
+            confeti.remove();
+        });
     }
 }
 
