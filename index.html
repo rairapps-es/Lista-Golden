@@ -1086,6 +1086,68 @@
     transform: scale(1.05);
     filter: drop-shadow(0 0 4px rgba(147, 51, 234, 0.5));
 }
+        /* Banner Elegante GPlus */
+.gplus-banner {
+    background: linear-gradient(135deg, #1e1b4b 0%, #311042 50%, #4c1d95 100%);
+    border: 2px solid #a855f7;
+    border-radius: 16px;
+    padding: 20px;
+    margin: 20px 0;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(168, 85, 247, 0.25);
+}
+.gplus-banner::before {
+    content: '';
+    position: absolute;
+    top: -50%; left: -50%;
+    width: 200%; height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    animation: rotateBg 12s linear infinite;
+}
+@keyframes rotateBg { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+/* Modales e Interfaces de Pedidos */
+.ads-modal {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.85);
+    backdrop-filter: blur(8px);
+    display: none; align-items: center; justify-content: center;
+    z-index: 9999; padding: 16px;
+}
+.ads-modal-content {
+    background: #111827;
+    border: 1px solid #374151;
+    border-radius: 16px;
+    width: 100%; max-width: 480px;
+    padding: 24px; max-height: 90vh; overflow-y: auto;
+}
+.selector-pill-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 12px 0;
+}
+.pay-pill-grid {
+    display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 12px 0;
+}
+.select-pill {
+    background: #1f2937; border: 2px solid #374151; padding: 12px 6px;
+    border-radius: 10px; text-align: center; cursor: pointer; transition: 0.2s;
+}
+.select-pill.active {
+    background: rgba(59, 130, 246, 0.15); border-color: #3b82f6; color: #fff;
+}
+.select-pill.active-vip {
+    background: rgba(168, 85, 247, 0.15); border-color: #a855f7; color: #fff;
+}
+
+/* Tarjeta Potenciada con Enhorabuena */
+.potentiated-card-wrap {
+    background: linear-gradient(90deg, #ec4899, #8b5cf6, #3b82f6);
+    background-size: 200% 200%;
+    animation: gradientBorder 3s ease infinite;
+    padding: 4px; border-radius: 16px; margin: 16px 0;
+}
+@keyframes gradientBorder { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
     </style>
 </head>
 <body>
@@ -1340,6 +1402,87 @@
         </table>
 
         <div id="my-owned-channels-list" class="directory-grid" style="margin-top: 20px;"></div>
+        <div class="gplus-banner" style="position:relative; z-index: 1;">
+    <div style="position:relative; z-index:2;">
+        <span style="background:#a855f7; color:#fff; font-size:0.65rem; font-weight:900; padding:3px 8px; border-radius:20px; text-transform:uppercase; letter-spacing:1px;">Suscripción GPlus</span>
+        <h3 style="font-size:1.3rem; font-weight:800; margin: 8px 0 4px 0; color:#fff;">⚡ El Plan Todo en Uno para Propietarios</h3>
+        <p style="font-size:0.8rem; color:#cbd5e1; margin-bottom:14px;">Multiplica por x10 el alcance de tus canales, sin límites y con privilegios exclusivos de la Golden List.</p>
+        <button onclick="openGPlusPanel()" style="background:#fff; color:#000; font-weight:800; border:none; padding:10px 16px; border-radius:8px; font-size:0.8rem; cursor:pointer; display:flex; align-items:center; gap:6px;">
+            <i data-lucide="sparkles" style="width:14px; height:14px;"></i> Ver Beneficios GPlus
+        </button>
+    </div>
+</div>
+
+<div id="modal-feature-ads" class="ads-modal">
+    <div class="ads-modal-content">
+        <h3 style="font-size:1.2rem; font-weight:800; margin-bottom:6px; color:#fff;">🚀 Destacar tu Canal</h3>
+        <p style="font-size:0.78rem; color:#9ca3af; margin-bottom:16px;">Consigue tráfico orgánico masivo apareciendo en las posiciones más cotizadas.</p>
+        
+        <div style="background:#1f2937; padding:12px; border-radius:10px; font-size:0.75rem; color:#d1d5db; line-height:1.4; margin-bottom:16px;">
+            ✨ <strong>Beneficios:</strong> Destaca tu canal en el directorio principal, llama la atención con un borde de colores animados, incluye la insignia dorada junto a tu nombre y sé indexado automáticamente en el filtro de destacados de la WebApp.
+        </div>
+
+        <label style="font-size:0.75rem; font-weight:700; color:#9ca3af;">1. Selecciona la Duración:</label>
+        <div class="selector-pill-grid">
+            <div class="select-pill active" id="pill-d1" onclick="selectDuration(7, 15, 'pill-d1')"><span style="font-size:0.85rem; font-weight:800;">7 Días</span><br><span style="font-size:0.7rem; color:#9ca3af;">15$</span></div>
+            <div class="select-pill" id="pill-d2" onclick="selectDuration(15, 25, 'pill-d2')"><span style="font-size:0.85rem; font-weight:800;">15 Días</span><br><span style="font-size:0.7rem; color:#9ca3af;">25$</span></div>
+            <div class="select-pill" id="pill-d3" onclick="selectDuration(30, 40, 'pill-d3')"><span style="font-size:0.85rem; font-weight:800;">1 Mes</span><br><span style="font-size:0.7rem; color:#9ca3af;">40$</span></div>
+        </div>
+
+        <label style="font-size:0.75rem; font-weight:700; color:#9ca3af;">2. Método de Pago:</label>
+        <div class="pay-pill-grid">
+            <div class="select-pill active" id="pay-p1" onclick="selectPayment('PayPal', 'pay-p1')"><span style="font-size:0.8rem; font-weight:700;">💳 PayPal</span></div>
+            <div class="select-pill" id="pay-p2" onclick="selectPayment('USDT', 'pay-p2')"><span style="font-size:0.8rem; font-weight:700;">🟢 USDT (TRC20)</span></div>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; background:#111827; padding:14px; border-radius:10px; border:1px solid #374151; margin:16px 0;">
+            <span style="font-size:0.8rem; color:#9ca3af;">Total a Pagar:</span>
+            <span id="ad-total-checkout" style="font-size:1.3rem; font-weight:900; color:#3b82f6;">15.00 USD</span>
+        </div>
+
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+            <button onclick="closeAdsModal('modal-feature-ads')" style="background:#374151; border:none; padding:12px; border-radius:10px; color:#fff; font-weight:700; cursor:pointer;">Cancelar</button>
+            <button onclick="executeOrderCheckout()" style="background:#3b82f6; border:none; padding:12px; border-radius:10px; color:#fff; font-weight:700; cursor:pointer;">Hacer Pedido 🚀</button>
+        </div>
+    </div>
+</div>
+
+<div id="modal-gplus-ads" class="ads-modal">
+    <div class="ads-modal-content" style="border-color:#a855f7;">
+        <h3 style="font-size:1.2rem; font-weight:800; margin-bottom:6px; color:#fff;">⚡ Suscripción GPlus VIP</h3>
+        <p style="font-size:0.78rem; color:#9ca3af; margin-bottom:16px;">Domina el directorio completo con la membresía todo en uno.</p>
+
+        <div style="display:flex; flex-direction:column; gap:10px; margin-bottom:20px;">
+            <div style="background:#1f2937; padding:10px 14px; border-radius:8px; font-size:0.78rem; display:flex; align-items:center; gap:10px;"><span style="font-size:1.2rem;">🚀</span> <span>Destaca tu canal principal en el directorio de forma continua.</span></div>
+            <div style="background:#1f2937; padding:10px 14px; border-radius:8px; font-size:0.78rem; display:flex; align-items:center; gap:10px;"><span style="font-size:1.2rem;">➕</span> <span>Agrega y verifica hasta 3 canales en tu cuenta.</span></div>
+            <div style="background:#1f2937; padding:10px 14px; border-radius:8px; font-size:0.78rem; display:flex; align-items:center; gap:10px;"><span style="font-size:1.2rem;">📂</span> <span>Muestra tu canal hasta en 3 categorías simultáneas.</span></div>
+            <div style="background:#1f2937; padding:10px 14px; border-radius:8px; font-size:0.78rem; display:flex; align-items:center; gap:10px;"><span style="font-size:1.2rem;">🏆</span> <span>Multi-lista de promoción en Golden List (+100, +500 y +1000 subs).</span></div>
+            <div style="background:#1f2937; padding:10px 14px; border-radius:8px; font-size:0.78rem; display:flex; align-items:center; gap:10px;"><span style="font-size:1.2rem;">🔓</span> <span>Sin límite de acceso por mínimo de suscriptores exigido.</span></div>
+        </div>
+
+        <div style="background:#1f2937; border:1px dashed #a855f7; padding:14px; border-radius:10px; text-align:center; margin-bottom:16px;">
+            <span style="font-size:0.75rem; color:#a855f7; font-weight:800; display:block; text-transform:uppercase;">Inversión del Plan Único</span>
+            <span style="font-size:1.6rem; font-weight:900; color:#fff;">59.00 USD <span style="font-size:0.8rem; font-weight:400; color:#9ca3af;">/mes</span></span>
+        </div>
+
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+            <button onclick="closeAdsModal('modal-gplus-ads')" style="background:#374151; border:none; padding:12px; border-radius:10px; color:#fff; font-weight:700; cursor:pointer;">Cerrar</button>
+            <button onclick="executeGPlusOrder()" style="background:#a855f7; border:none; padding:12px; border-radius:10px; color:#fff; font-weight:700; cursor:pointer;">Contratar GPlus ⚡</button>
+        </div>
+    </div>
+</div>
+
+<div id="modal-congrats-vip" class="ads-modal">
+    <div class="ads-modal-content" style="max-width:440px; text-align:center; border-color:#fbbf24;">
+        <span style="font-size:3rem; display:block; animation: shake-anim 0.5s infinite;">🎉</span>
+        <h2 style="font-size:1.4rem; font-weight:900; color:#fbbf24; margin:10px 0 4px 0;">¡ENHORABUENA!</h2>
+        <p style="font-size:0.8rem; color:#cbd5e1; margin-bottom:16px;">Tu canal ha verificado el Destacado Activo correctamente.</p>
+        
+        <div id="congrats-card-target"></div>
+
+        <button onclick="closeAdsModal('modal-congrats-vip')" style="background:linear-gradient(90deg, #fbbf24, #f59e0b); border:none; padding:12px; width:100%; border-radius:10px; color:#000; font-weight:900; cursor:pointer; margin-top:14px; box-shadow:0 4px 14px rgba(251,191,36,0.3);">¡Excelente, gracias! ✨</button>
+    </div>
+</div>
     </main>
 
     <main id="view-history" class="app-view">
@@ -2374,6 +2517,10 @@ function renderMyOwnedChannelsList() {
         `;
     }).join('');
 
+    // =========================================================================
+    // BUSCA ESTA LÍNEA EXACTA EN TU CÓDIGO Y REEMPLAZA DE AQUÍ EN ADELANTE:
+    // =========================================================================
+    
     // Renderizar abajo las tarjetas de los canales
     container.innerHTML = myOwned.map(c => {
         // Si el usuario envió la solicitud de borrado pero sigue en la vista, inyectamos el mensaje arriba de la tarjeta
@@ -2385,9 +2532,37 @@ function renderMyOwnedChannelsList() {
                 ${buildChannelCardHtml(c)}
             `;
         }
+        
         // Solo mostramos de forma estándar en el contenedor público si sigue "Publicado"
         if (c.status === "Publicado") {
-            return buildChannelCardHtml(c);
+            // 1. Obtenemos el HTML de la tarjeta que ya tienes funcionando
+            const cardHtml = buildChannelCardHtml(c);
+            
+            // 2. Comprobamos si ya está destacado para cambiar el diseño del botón
+            const isFeatured = c.isVip || c.isFeatured ? true : false;
+            
+            // 3. Creamos el botón dinámico acoplado al sistema de pagos por separado
+            const featureButtonHtml = `
+                <div class="owner-actions-wrapper" style="margin: 10px 0; padding: 0 4px;">
+                    <button class="mini-action-btn" 
+                            style="width: 100%; padding: 10px; border-radius: 8px; font-weight: 800; font-size: 0.78rem; text-transform: uppercase; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 6px;
+                            ${isFeatured 
+                                ? 'background: rgba(251, 191, 36, 0.15); border: 1px dashed #fbbf24; color: #fbbf24;' 
+                                : 'background: linear-gradient(90deg, #3b82f6, #2563eb); border: none; color: #fff; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);'}"
+                            onclick="handleFeatureButtonClick(${c.id}, ${isFeatured}, '${c.name.replace(/'/g, "\\'")}')">
+                        <i data-lucide="${isFeatured ? 'sparkles' : 'rocket'}" style="width:14px; height:14px;"></i>
+                        ${isFeatured ? 'Tu Canal ya está Destacado ✨' : 'Destacar Canal 🚀'}
+                    </button>
+                </div>
+            `;
+            
+            // 4. Inyectamos el botón pegado debajo de la tarjeta
+            return `
+                <div class="my-owned-card-container" style="margin-bottom: 20px;">
+                    ${cardHtml}
+                    ${featureButtonHtml}
+                </div>
+            `;
         }
         return '';
     }).join('');
@@ -2405,6 +2580,9 @@ function handleReSendChannel(id) {
         if (typeof renderDirectoryList === "function") renderDirectoryList();
     }
 }
+// =========================================================================
+// AQUÍ TERMINA EL REEMPLAZO. El resto de tu código hacia abajo se queda igual.
+// =========================================================================
 
         // LÓGICAS INTERNAS DE SEGURIDAD OPERATIVA PARA CANALES
         function openAddChannelModal() {
@@ -3087,7 +3265,231 @@ function executeShareAction(network) {
     }
 }
     </script>
+    <script>
+    // ==========================================================================
+// VARIABLES DE CONTROL DE ESTADO INTERNO DE PEDIDOS
+// ==========================================================================
+let currentCheckoutData = {
+    channelId: null,
+    channelName: '',
+    durationDays: 7,
+    price: 15,
+    paymentMethod: 'PayPal'
+};
+
+// Variable para tu cuenta de contacto en Telegram (reemplázala por tu alias de Telegram sin el @)
+const ADMIN_TELEGRAM_USERNAME = "TuUsuarioTelegram"; 
+
+// ==========================================================================
+// CONTROLADORES DE INTERFAZ MODAL Y CLICKS EN "DESTACAR"
+// ==========================================================================
+function handleFeatureButtonClick(channelId, isAlreadyFeatured, channelName) {
+    if (isAlreadyFeatured) {
+        showToast("🛑 TU CANAL YA ESTÁ DESTACADO", "gold");
+        return;
+    }
     
+    // Si no está destacado, configuramos los datos base y abrimos la pasarela
+    currentCheckoutData.channelId = channelId;
+    currentCheckoutData.channelName = channelName;
+    currentCheckoutData.durationDays = 7;
+    currentCheckoutData.price = 15;
+    currentCheckoutData.paymentMethod = 'PayPal';
+    
+    // Reseteamos estilos visuales de los botones de opciones del modal
+    document.querySelectorAll('.select-pill').forEach(el => el.classList.remove('active'));
+    document.getElementById('pill-d1')?.classList.add('active');
+    document.getElementById('pay-p1')?.classList.add('active');
+    
+    document.getElementById("ad-total-checkout").innerText = "15.00 USD";
+    document.getElementById("modal-feature-ads").style.display = "flex";
+}
+
+function openGPlusPanel() {
+    document.getElementById("modal-gplus-ads").style.display = "flex";
+}
+
+function closeAdsModal(modalId) {
+    document.getElementById(modalId).style.display = "none";
+}
+
+function selectDuration(days, price, pillId) {
+    currentCheckoutData.durationDays = days;
+    currentCheckoutData.price = price;
+    
+    // Cambiar clases visuales de los selectores de días
+    document.getElementById('pill-d1').classList.remove('active');
+    document.getElementById('pill-d2').classList.remove('active');
+    document.getElementById('pill-d3').classList.remove('active');
+    document.getElementById(pillId).classList.add('active');
+    
+    document.getElementById("ad-total-checkout").innerText = `${price}.00 USD`;
+}
+
+function selectPayment(method, pillId) {
+    currentCheckoutData.paymentMethod = method;
+    document.getElementById('pay-p1').classList.remove('active');
+    document.getElementById('pay-p2').classList.remove('active');
+    document.getElementById(pillId).classList.add('active');
+}
+
+// ==========================================================================
+// REGISTRO DE PEDIDOS EN HISTORIAL Y LANZAMIENTO A TELEGRAM
+// ==========================================================================
+function executeOrderCheckout() {
+    const userTelegramId = (state.user && state.user.telegramId) ? state.user.telegramId : "No Identificado";
+    const userName = (state.user && state.user.name) ? state.user.name : "Usuario";
+
+    const pedidoLog = {
+        tipo: "Compra Destacado 🚀",
+        canal: currentCheckoutData.channelName,
+        detalles: `${currentCheckoutData.durationDays} Días contratados vía ${currentCheckoutData.paymentMethod}`,
+        monto: `${currentCheckoutData.price}.00 USD`,
+        fecha: new Date().toLocaleDateString()
+    };
+
+    // Guardar el pedido en las listas y registros internos que tienes en tu state
+    if (state.history) {
+        state.history.unshift({
+            title: `Pedido Realizado: ${pedidoLog.tipo}`,
+            desc: `Canal: ${pedidoLog.canal} - ${pedidoLog.detalles} (${pedidoLog.monto})`,
+            date: new Date().toLocaleTimeString()
+        });
+    }
+    
+    if (typeof saveToLocalStorage === "function") saveToLocalStorage();
+    if (typeof registerActionToHistory === "function") {
+        registerActionToHistory("Pedido de Compra", `Contratado Destacado para ${pedidoLog.canal}`, "success");
+    }
+
+    // Componer mensaje codificado de URL para Telegram privado
+    const txt = `✨ NUEVO PEDIDO DE DESTACADO ✨\n\n` +
+                `👤 Usuario: ${userName}\n` +
+                `🆔 TelegramID: ${userTelegramId}\n` +
+                `📺 Canal: ${pedidoLog.canal} (ID: ${currentCheckoutData.channelId})\n` +
+                `⏳ Duración: ${currentCheckoutData.durationDays} Días\n` +
+                `💵 Método de Pago: ${currentCheckoutData.paymentMethod}\n` +
+                `💰 Total a abonar: ${pedidoLog.monto}\n\n` +
+                `Por favor, envíame los datos de confirmación del pago.`;
+
+    closeAdsModal('modal-feature-ads');
+    showToast("¡Pedido guardado! Abriendo Telegram...", "success");
+
+    setTimeout(() => {
+        window.open(`https://t.me/${ADMIN_TELEGRAM_USERNAME}?text=${encodeURIComponent(txt)}`, '_blank');
+    }, 800);
+}
+
+function executeGPlusOrder() {
+    const userTelegramId = (state.user && state.user.telegramId) ? state.user.telegramId : "No Identificado";
+    const userName = (state.user && state.user.name) ? state.user.name : "Usuario";
+
+    if (state.history) {
+        state.history.unshift({
+            title: "Pedido Realizado: Membresía GPlus ⚡",
+            desc: "Plan Todo en Uno solicitado (59.00 USD)",
+            date: new Date().toLocaleTimeString()
+        });
+    }
+    
+    if (typeof saveToLocalStorage === "function") saveToLocalStorage();
+
+    const txt = `⚡ SOLICITUD DE SUSCRIPCIÓN GPLUS ⚡\n\n` +
+                `👤 Propietario: ${userName}\n` +
+                `🆔 TelegramID: ${userTelegramId}\n` +
+                `💎 Servicio: Membresía GPlus Todo en Uno\n` +
+                `💰 Valor Mensual: 59.00 USD`;
+
+    closeAdsModal('modal-gplus-ads');
+    showToast("¡Pedido GPlus Registrado! Abriendo chat privado...", "gold");
+
+    setTimeout(() => {
+        window.open(`https://t.me/${ADMIN_TELEGRAM_USERNAME}?text=${encodeURIComponent(txt)}`, '_blank');
+    }, 800);
+}
+
+// ==========================================================================
+// MOTOR DE VERIFICACIÓN PRIMERA SESIÓN Y CELEBRACIÓN DE CONFETI
+// ==========================================================================
+function checkFirstSessionFeaturedCeleb() {
+    // Buscamos si el usuario tiene un canal verificado y destacado en el dataset
+    // Filtra si coincide que el usuario es el dueño legítimo del canal verificado
+    if (typeof INITIAL_CHANNELS_DATASET === "undefined") return;
+
+    // Buscamos un canal que pertenezca al usuario verificado actual y tenga el flag isVip o isFeatured activo
+    const userVipChannel = INITIAL_CHANNELS_DATASET.find(c => c.isVip && c.isFeatured);
+
+    if (userVipChannel) {
+        const keyLocalStorage = `celeb_shown_${userVipChannel.id}`;
+        const alreadyShown = localStorage.getItem(keyLocalStorage);
+
+        // Si es la primera vez que se valida este canal en la sesión del ordenador
+        if (!alreadyShown) {
+            localStorage.setItem(keyLocalStorage, "true");
+
+            const targetBox = document.getElementById("congrats-card-target");
+            if (targetBox) {
+                // Inyectamos la tarjeta usando tu función exacta con un envoltorio súper iluminado
+                targetBox.innerHTML = `
+                    <div class="potentiated-card-wrap">
+                        ${buildChannelCardHtml(userVipChannel, 'congrats-')}
+                    </div>
+                `;
+            }
+
+            // Desplegar la ventana emergente con un leve delay de carga limpia
+            setTimeout(() => {
+                document.getElementById("modal-congrats-vip").style.display = "flex";
+                triggerConfetiParticlesExplosion();
+                if (typeof lucide !== 'undefined') lucide.createIcons();
+            }, 1200);
+        }
+    }
+}
+
+// Simulador integrado de explosión de fuegos artificiales/confeti sin dependencias externas pesadas
+function triggerConfetiParticlesExplosion() {
+    for (let i = 0; i < 60; i++) {
+        const confeti = document.createElement('div');
+        confeti.style.position = 'fixed';
+        confeti.style.width = Math.random() * 8 + 4 + 'px';
+        confeti.style.height = Math.random() * 10 + 6 + 'px';
+        confeti.style.backgroundColor = ['#fbbf24','#f59e0b','#ec4899','#a855f7','#3b82f6'][Math.floor(Math.random() * 5)];
+        confeti.style.left = Math.random() * 100 + 'vw';
+        confeti.style.top = '-5vh';
+        confeti.style.zIndex = '99999';
+        confeti.style.borderRadius = '2px';
+        confeti.style.transform = `rotate(${Math.random() * 360}deg)`;
+        
+        document.body.appendChild(confeti);
+
+        let positionY = -5;
+        let positionX = parseFloat(confeti.style.left);
+        const speedY = Math.random() * 4 + 3;
+        const driftX = Math.random() * 2 - 1;
+
+        const animation = setInterval(() => {
+            positionY += speedY;
+            positionX += driftX;
+            confeti.style.top = positionY + 'vh';
+            confeti.style.left = positionX + 'vw';
+
+            if (positionY > 105) {
+                clearInterval(animation);
+                confeti.remove();
+            }
+        }, 20);
+    }
+}
+
+// ==========================================================================
+// ENLACE NATIVO AL CARGADOR GENERAL DE TU WEB APP
+// ==========================================================================
+document.addEventListener("DOMContentLoaded", () => {
+    // Al arrancar la WebApp por primera vez, escanea si el usuario tiene derecho a la celebración
+    checkFirstSessionFeaturedCeleb();
+});
+        </script>
 <div id="share-modal-overlay" class="share-overlay" style="display: none !important; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(10, 15, 26, 0.85); backdrop-filter: blur(6px); align-items: center; justify-content: center; z-index: 10000; padding: 16px;" onclick="closeShareModal()">
     
     <div class="share-modal-card" style="background: #182232 !important; border: 1px solid #2d3748 !important; border-radius: 20px !important; width: 100% !important; max-width: 320px !important; padding: 24px !important; position: relative !important; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6) !important; display: block !important;" onclick="event.stopPropagation();">
