@@ -3336,76 +3336,70 @@ function selectPayment(method, pillId) {
 // ==========================================================================
 // REGISTRO DE PEDIDOS EN HISTORIAL Y LANZAMIENTO A TELEGRAM
 // ==========================================================================
+// EXECUTE: HACER PEDIDO DE CANAL DESTACADO (CORREGIDO)
 function executeOrderCheckout() {
-    const userTelegramId = (state.user && state.user.telegramId) ? state.user.telegramId : "No Identificado";
-    const userName = (state.user && state.user.name) ? state.user.name : "Usuario";
+    // 🔥 CORRECCIÓN: Usamos tus variables exactas del initTelegramContext
+    const username = state.user.username || "@Desconocido";
+    const idTelegram = state.user.idTelegram || "No Identificado";
 
-    const pedidoLog = {
-        tipo: "Compra Destacado 🚀",
-        canal: currentCheckoutData.channelName,
-        detalles: `${currentCheckoutData.durationDays} Días contratados vía ${currentCheckoutData.paymentMethod}`,
-        monto: `${currentCheckoutData.price}.00 USD`,
-        fecha: new Date().toLocaleDateString()
-    };
+    const servicioTipo = "Compra Destacado 🚀";
+    const tituloLog = `Pedido Realizado: ${servicioTipo}`;
+    const descLog = `Canal: ${currentCheckoutData.channelName} | ${currentCheckoutData.durationDays} Días vía ${currentCheckoutData.paymentMethod} (${currentCheckoutData.price}.00 USD)`;
 
-    // Guardar el pedido en las listas y registros internos que tienes en tu state
-    if (state.history) {
-        state.history.unshift({
-            title: `Pedido Realizado: ${pedidoLog.tipo}`,
-            desc: `Canal: ${pedidoLog.canal} - ${pedidoLog.detalles} (${pedidoLog.monto})`,
-            date: new Date().toLocaleTimeString()
-        });
+    // Guardamos localmente en Compras, Acciones y Pedidos utilizando la función auxiliar
+    if (typeof registerOrderInStateHistory === "function") {
+        registerOrderInStateHistory(servicioTipo, tituloLog, descLog);
     }
+
+    // Componemos el mensaje para el chat privado de Airdayz
+    const msg = `🚀 NUEVO PEDIDO DE DESTACADO 🚀\n\n• Emisor: ${username}\n• ID Telegram: ${idTelegram}\n• Canal: ${currentCheckoutData.channelName} (ID: ${currentCheckoutData.channelId})\n• Duración: ${currentCheckoutData.durationDays} Días\n• Método Elegido: ${currentCheckoutData.paymentMethod}\n• Total a abonar: ${currentCheckoutData.price}.00 USD\n• Estado: Esperando Pago`;
     
-    if (typeof saveToLocalStorage === "function") saveToLocalStorage();
-    if (typeof registerActionToHistory === "function") {
-        registerActionToHistory("Pedido de Compra", `Contratado Destacado para ${pedidoLog.canal}`, "success");
-    }
-
-    // Componer mensaje codificado de URL para Telegram privado
-    const txt = `✨ NUEVO PEDIDO DE DESTACADO ✨\n\n` +
-                `👤 Usuario: ${userName}\n` +
-                `🆔 TelegramID: ${userTelegramId}\n` +
-                `📺 Canal: ${pedidoLog.canal} (ID: ${currentCheckoutData.channelId})\n` +
-                `⏳ Duración: ${currentCheckoutData.durationDays} Días\n` +
-                `💵 Método de Pago: ${currentCheckoutData.paymentMethod}\n` +
-                `💰 Total a abonar: ${pedidoLog.monto}\n\n` +
-                `Por favor, envíame los datos de confirmación del pago.`;
-
+    const telegramUrl = `https://t.me/Airdayz?text=${encodeURIComponent(msg)}`;
+    
     closeAdsModal('modal-feature-ads');
-    showToast("¡Pedido guardado! Abriendo Telegram...", "success");
+    showToast("Pedido registrado. Abriendo chat privado...", "success");
 
+    // Despacho nativo usando el SDK oficial de tu WebApp
     setTimeout(() => {
-        window.open(`https://t.me/${ADMIN_TELEGRAM_USERNAME}?text=${encodeURIComponent(txt)}`, '_blank');
-    }, 800);
+        if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.openTelegramLink) {
+            window.Telegram.WebApp.openTelegramLink(telegramUrl);
+        } else {
+            window.open(telegramUrl, "_blank");
+        }
+    }, 600);
 }
 
+// EXECUTE: HACER PEDIDO DE MEMBRESÍA GPLUS (CORREGIDO)
 function executeGPlusOrder() {
-    const userTelegramId = (state.user && state.user.telegramId) ? state.user.telegramId : "No Identificado";
-    const userName = (state.user && state.user.name) ? state.user.name : "Usuario";
+    // 🔥 CORRECCIÓN: Usamos tus variables exactas del initTelegramContext
+    const username = state.user.username || "@Desconocido";
+    const idTelegram = state.user.idTelegram || "No Identificado";
 
-    if (state.history) {
-        state.history.unshift({
-            title: "Pedido Realizado: Membresía GPlus ⚡",
-            desc: "Plan Todo en Uno solicitado (59.00 USD)",
-            date: new Date().toLocaleTimeString()
-        });
+    const servicioTipo = "Membresía GPlus ⚡";
+    const tituloLog = `Pedido Realizado: ${servicioTipo}`;
+    const descLog = `Plan Todo en Uno Solicitado (59.00 USD / mes)`;
+
+    // Guardamos localmente en Compras, Acciones y Pedidos utilizando la función auxiliar
+    if (typeof registerOrderInStateHistory === "function") {
+        registerOrderInStateHistory(servicioTipo, tituloLog, descLog);
     }
+
+    // Componemos el mensaje para el chat privado de Airdayz
+    const msg = `⚡ NUEVA SOLICITUD GPLUS ⚡\n\n• Emisor: ${username}\n• ID Telegram: ${idTelegram}\n• Servicio: Suscripción GPlus Todo en Uno\n• Total Mensual: 59.00 USD\n• Estado: Esperando Pago`;
     
-    if (typeof saveToLocalStorage === "function") saveToLocalStorage();
-
-    const txt = `⚡ SOLICITUD DE SUSCRIPCIÓN GPLUS ⚡\n\n` +
-                `👤 Propietario: ${userName}\n` +
-                `🆔 TelegramID: ${userTelegramId}\n` +
-                `💎 Servicio: Membresía GPlus Todo en Uno\n` +
-                `💰 Valor Mensual: 59.00 USD`;
-
+    const telegramUrl = `https://t.me/Airdayz?text=${encodeURIComponent(msg)}`;
+    
     closeAdsModal('modal-gplus-ads');
-    showToast("¡Pedido GPlus Registrado! Abriendo chat privado...", "gold");
+    showToast("¡Pedido GPlus Registrado con éxito!", "gold");
 
+    // Despacho nativo usando el SDK oficial de tu WebApp
     setTimeout(() => {
-        window.open(`https://t.me/${ADMIN_TELEGRAM_USERNAME}?text=${encodeURIComponent(txt)}`, '_blank');
-    }, 800);
+        if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.openTelegramLink) {
+            window.Telegram.WebApp.openTelegramLink(telegramUrl);
+        } else {
+            window.open(telegramUrl, "_blank");
+        }
+    }, 600);
 }
 
 // ==========================================================================
