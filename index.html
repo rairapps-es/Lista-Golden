@@ -1017,6 +1017,12 @@
             opacity: 0.5 !important;
             cursor: not-allowed !important;
         }
+
+        #vip-slider .channel-card {
+    min-width: 280px; /* Evita que las tarjetas se aplasten en el carrusel horizontal */
+    flex-shrink: 0;
+}
+
     </style>
 </head>
 <body>
@@ -1436,12 +1442,12 @@
     <script>
         // DATASET EXTENDIDO CON SOPORTE PARA ESTADOS OPERATIVOS
         const INITIAL_CHANNELS_DATASET = [
-            { id: 1, name: "BetMasters VIP", user: "@BetMastersVIP", category: "apuestas", subs: 45200, lang: "Español", status: "Publicado", isVip: true, logo: "🎯", description: "Pronósticos de alta fidelidad deportivos analizados por expertos.", isPopular: true, isNew: false, isTrending: true, telegramUserId: 12345678 },
-            { id: 2, name: "Green Pickers", user: "@GreenPickers", category: "apuestas", subs: 18400, lang: "Español", status: "En Revisión", isVip: false, logo: "⚽", description: "Estadísticas y picks de fútbol hispano en vivo.", isPopular: false, isNew: true, isTrending: false, telegramUserId: 12345678 },
-            { id: 3, name: "Emprende Academy", user: "@EmprendeAcademy", category: "marketing", subs: 89600, lang: "Español", status: "Publicado", isVip: true, logo: "💼", description: "Estrategias de monetización digital y negocios escalables.", isPopular: true, isNew: false, isTrending: true, telegramUserId: 11112222 },
-            { id: 4, name: "CryptoWhales Alert", user: "@CryptoWhalesAlert", category: "cripto", subs: 112000, lang: "Inglés", status: "Publicado", isVip: true, logo: "🐋", description: "Alertas institucionales del mercado blockchain en tiempo real.", isPopular: true, isNew: false, isTrending: false, telegramUserId: 33334444 },
+            { id: 1, name: "BetMasters VIP", user: "@BetMastersVIP", category: "apuestas", subs: 45200, lang: "Español", status: "Publicado", isVip: false, logo: "🎯", description: "Pronósticos de alta fidelidad deportivos analizados por expertos.", isPopular: true, isNew: false, isTrending: true, telegramUserId: 12345678 },
+            { id: 2, name: "Green Pickers", user: "@GreenPickers", category: "apuestas", subs: 18400, lang: "Español", status: "Publicado", isVip: false, logo: "⚽", description: "Estadísticas y picks de fútbol hispano en vivo.", isPopular: false, isNew: true, isTrending: false, telegramUserId: 12345678 },
+            { id: 3, name: "Emprende Academy", user: "@EmprendeAcademy", category: "marketing", subs: 89600, lang: "Español", status: "Publicado", isVip: false, logo: "💼", description: "Estrategias de monetización digital y negocios escalables.", isPopular: true, isNew: false, isTrending: false, telegramUserId: 11112222 },
+            { id: 4, name: "CryptoWhales Alert", user: "@CryptoWhalesAlert", category: "cripto", subs: 112000, lang: "Inglés", status: "Publicado", isVip: false, logo: "🐋", description: "Alertas institucionales del mercado blockchain en tiempo real.", isPopular: true, isNew: false, isTrending: false, telegramUserId: 33334444 },
             { id: 5, name: "IA Revolucionaria", user: "@IaRevolucionaria", category: "tecnologia", subs: 67400, lang: "Español", status: "Publicado", isVip: true, logo: "🧠", description: "Aprende prompts avanzados y automatizaciones con Inteligencia Artificial.", isPopular: false, isNew: true, isTrending: true, telegramUserId: 99999999 },
-            { id: 6, name: "Coloring Books PDF", user: "@ColoringBooksPDF", category: "tecnologia", subs: 32100, lang: "Español", status: "En Revisión", isVip: false, logo: "🎨", description: "Libros artísticos listos para descargar e imprimir en alta resolución.", isPopular: false, isNew: true, isTrending: false, telegramUserId: 55556666 },
+            { id: 6, name: "Coloring Books PDF", user: "@ColoringBooksPDF", category: "tecnologia", subs: 32100, lang: "Español", status: "Publicado", isVip: false, logo: "🎨", description: "Libros artísticos listos para descargar e imprimir en alta resolución.", isPopular: false, isNew: true, isTrending: false, telegramUserId: 55556666 },
             { id: 7, name: "Lista Golden Official", user: "@ListaGolden", category: "marketing", subs: 68400, lang: "Español", status: "Publicado", isVip: true, logo: "👑", description: "El canal publicitario oficial de nuestra MiniApp de Telegram.", isPopular: true, isNew: false, isTrending: true, telegramUserId: 1320417199 }
         ];
 
@@ -2113,24 +2119,22 @@ function checkVipInternalRegistration() {
         }
 
         function renderVipSlider() {
-            const container = document.getElementById("vip-slider");
-            if (!container) return;
-            const vips = INITIAL_CHANNELS_DATASET.filter(c => c.isVip);
-            container.innerHTML = vips.map(c => `
-                <div class="vip-slide-card" onclick="registerChannelAccess(${c.id})">
-                    <div style="display:flex; align-items:center; gap:10px;">
-                        <span class="channel-thumb" style="border:none; background:none; font-size:1.6rem;">${c.logo}</span>
-                        <div>
-                            <h4 style="font-size:0.85rem; font-weight:700;">${c.name}</h4>
-                            <p style="font-size:0.7rem; color:var(--text-muted);">${c.user}</p>
-                            <span class="live-traffic-badge" style="font-size:0.6rem; padding:2px 6px;"><i data-lucide="eye" style="width:10px;height:10px;"></i> ${getDynamicDailyViews(c.id)}</span>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
-            lucide.createIcons();
-        }
-
+    const container = document.getElementById("vip-slider");
+    if (!container) return;
+    
+    // Filtramos solo los canales marcados como VIP
+    const vips = INITIAL_CHANNELS_DATASET.filter(c => c.isVip);
+    
+    // 🔥 MEJORA: Usamos la función reutilizable con el contexto 'vip-'
+    // Esto genera IDs únicos como id="accordion-vip-123" para que no choquen con nadie
+    container.innerHTML = vips.map(c => buildChannelCardHtml(c, 'vip-')).join('');
+    
+    // Forzamos el refresco de los iconos de Lucide cargados dinámicamente
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
+}
+        
         function scrollSlider(dir) {
             document.getElementById("vip-slider").scrollLeft += (dir * 220);
         }
