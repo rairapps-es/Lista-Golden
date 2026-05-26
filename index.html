@@ -3541,25 +3541,14 @@ function renderDynamicGPlusBanner() {
     const container = document.getElementById("gplus-dynamic-banner-container");
     if (!container) return;
 
-    // Validamos exactamente igual que en tu función toggleBenefitsSection
+    // Evaluamos exactamente igual que en tu función toggleBenefitsSection
     const isVip = state.user && (state.user.isVipMember === true || state.user.isVipMember === "true");
 
     if (isVip) {
-        // DISEÑO A: El usuario YA es VIP (Estética Premium de agradecimiento)
-        container.innerHTML = `
-            <div class="gplus-banner" style="position:relative; z-index: 1; border-color: #10b981; background: linear-gradient(135deg, #064e3b 0%, #111827 100%);">
-                <div style="position:relative; z-index:2;">
-                    <span style="background:#10b981; color:#fff; font-size:0.65rem; font-weight:900; padding:3px 8px; border-radius:20px; text-transform:uppercase; letter-spacing:1px;">Suscripción Activa ✔</span>
-                    <h3 style="font-size:1.3rem; font-weight:800; margin: 8px 0 4px 0; color:#fff;">⚡ Gracias por ser miembro GPlus</h3>
-                    <p style="font-size:0.8rem; color:#a7f3d0; margin-bottom:14px;">Tienes todos los privilegios desbloqueados: Multi-categorías, multi-listas y visibilidad máxima garantizada.</p>
-                    <button disabled style="background:#374151; color:#9ca3af; font-weight:800; border:none; padding:10px 16px; border-radius:8px; font-size:0.8rem; cursor:not-allowed; display:flex; align-items:center; gap:6px;">
-                        <i data-lucide="check-circle" style="width:14px; height:14px;"></i> Ya estás Suscrito (GPlus Activo)
-                    </button>
-                </div>
-            </div>
-        `;
+        // 🔥 SI ES VIP: Vaciamos el contenedor para que el anuncio DESAPAREZCA por completo de la pantalla
+        container.innerHTML = '';
     } else {
-        // DISEÑO B: El usuario NO es VIP (Muestra el botón para contratar)
+        // SI NO ES VIP: Mostramos el banner completo con el botón para contratar
         container.innerHTML = `
             <div class="gplus-banner" style="position:relative; z-index: 1;">
                 <div style="position:relative; z-index:2;">
@@ -3572,9 +3561,10 @@ function renderDynamicGPlusBanner() {
                 </div>
             </div>
         `;
+        
+        // Refrescamos los iconos de Lucide solo si el banner se va a mostrar
+        if (typeof lucide !== 'undefined') lucide.createIcons();
     }
-
-    if (typeof lucide !== 'undefined') lucide.createIcons();
 }
         
         </script>
