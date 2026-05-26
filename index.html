@@ -1602,6 +1602,7 @@
             renderTopPodium();
             renderShopCarrousels();
             updateAdminToggleUI();
+            renderCategorySliders();
             lucide.createIcons();
             addLog("Ecosistema unificado bajo ID único de Telegram.");
         });
@@ -3057,18 +3058,26 @@ function executeShareAction(network) {
     // 1. Filtrar e Inyectar canales de Tecnología
     const techContainer = document.getElementById("tech-slider");
     if (techContainer && typeof INITIAL_CHANNELS_DATASET !== "undefined") {
-        const techChannels = INITIAL_CHANNELS_DATASET.filter(c => c.category === "tecnologia");
+        // Buscamos cualquier variante: "Tecnología", "tecnologia", "TECNOLOGÍA", etc.
+        const techChannels = INITIAL_CHANNELS_DATASET.filter(c => {
+            if (!c.category) return false;
+            const catLimpia = c.category.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            return catLimpia === "tecnologia";
+        });
         
-        // Reutiliza tu función tal y como está hoy en tu código
         techContainer.innerHTML = techChannels.map(c => buildChannelCardHtml(c, 'tech-')).join('');
     }
 
-    // 2. Filtrar e Inyectar canales de Entretenimiento
+    // 2. Filtrar e Inyectar canales de Apuestas / Entretenimiento
     const funContainer = document.getElementById("fun-slider");
     if (funContainer && typeof INITIAL_CHANNELS_DATASET !== "undefined") {
-        const funChannels = INITIAL_CHANNELS_DATASET.filter(c => c.category === "apuestas");
+        // Buscamos cualquier variante: "Apuestas", "apuestas", "APUESTAS"
+        const funChannels = INITIAL_CHANNELS_DATASET.filter(c => {
+            if (!c.category) return false;
+            const catLimpia = c.category.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            return catLimpia === "apuestas";
+        });
         
-        // Reutiliza tu función tal y como está hoy en tu código
         funContainer.innerHTML = funChannels.map(c => buildChannelCardHtml(c, 'fun-')).join('');
     }
 
