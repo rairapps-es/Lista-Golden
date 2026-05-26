@@ -1,0 +1,2546 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Canales Top & Avatar RPG Shop</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* ==========================================================================
+           VARIABLES DE DISEÑO PREMIUM (TEMA OSCURO / CLARO FLUIDO)
+           ========================================================================== */
+        :root {
+            --bg-principal: #0f172a;       
+            --bg-tarjeta: #1e293b;         
+            --bg-tarjeta-hover: #334155;   
+            --glass-bg: rgba(30, 41, 59, 0.7); 
+            --border-color: #334155;       
+            --glass-border: rgba(255, 255, 255, 0.08);
+
+            --telegram-blue: #24A1DE;
+            --success-green: #2ecc71;
+            --mystic-purple: #a855f7;
+            --vip-gold: #f59e0b;
+            --vip-gold-gradient: linear-gradient(135deg, #f59e0b 0%, #eab308 100%);
+            --premium-gradient: linear-gradient(135deg, #24A1DE 0%, #a855f7 50%, #f59e0b 100%);
+
+            --text-main: #f8fafc;          
+            --text-muted: #94a3b8;         
+            
+            --shadow-neon: 0 0 25px rgba(36, 161, 222, 0.25);
+            --shadow-gold: 0 0 30px rgba(245, 158, 11, 0.35);
+            --transition-smooth: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        [data-theme="light"] {
+            --bg-principal: #eeeeee;
+            --bg-tarjeta: #ffffff;
+            --bg-tarjeta-hover: #eeeeee;
+            --glass-bg: rgba(238, 238, 238, 0.85);
+            --border-color: #e2e8f0;
+            --glass-border: rgba(15, 23, 42, 0.05);
+            --text-main: #0f172a;          
+            --text-muted: #64748b;         
+            --shadow-neon: 0 8px 20px rgba(36, 161, 222, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: '-apple-system', BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-principal);
+            color: var(--text-main);
+            overflow-x: hidden;
+            padding-bottom: 90px;
+            transition: var(--transition-smooth);
+            background-image: radial-gradient(circle at 50% 0%, rgba(36, 161, 222, 0.12), transparent 50%),
+                              radial-gradient(circle at 0% 100%, rgba(168, 85, 247, 0.08), transparent 40%);
+            background-attachment: fixed;
+        }
+
+        body:not(.role-admin) .admin-only { display: none !important; }
+        body.role-admin .user-only { display: none !important; }
+
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg-principal); }
+        ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 10px; }
+
+        .app-header {
+            position: fixed; top: 0; left: 0; width: 100%; height: 65px;
+            background: var(--glass-bg); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--glass-border); display: flex;
+            justify-content: space-between; align-items: center; padding: 0 20px; z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        }
+
+        .header-logo {
+            font-weight: 900; font-size: 1.3rem; letter-spacing: 1px;
+            background: var(--premium-gradient);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            animation: pulseGlow 3s infinite alternate;
+        }
+
+        @keyframes pulseGlow {
+            0% { filter: drop-shadow(0 0 2px rgba(36,161,222,0.3)); }
+            100% { filter: drop-shadow(0 0 8px rgba(168,85,247,0.6)); }
+        }
+
+        .header-center-icon { cursor: pointer; color: var(--text-muted); transition: var(--transition-smooth); display: flex; align-items: center; }
+        .header-center-icon:hover { color: var(--vip-gold); transform: scale(1.1) rotate(15deg); }
+
+        .avatar-container { width: 40px; height: 40px; position: relative; cursor: pointer; transition: var(--transition-smooth); }
+        .avatar-container:hover { transform: scale(1.05); }
+        .avatar-img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 2px solid transparent; }
+        
+        .profile-drawer {
+            position: fixed; top: -100%; left: 0; width: 100%; max-height: 95vh;
+            background: var(--bg-tarjeta); 
+            backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
+            border-bottom: 1px solid var(--glass-border); z-index: 999; padding: 85px 20px 25px 20px;
+            border-radius: 0 0 32px 32px; transition: top 0.6s cubic-bezier(0.19, 1, 0.22, 1);
+            overflow-y: auto; box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+        }
+        .profile-drawer.open { top: 0; }
+        .drawer-identity { display: flex; flex-direction: column; align-items: center; text-align: center; margin-bottom: 15px; }
+        .drawer-username-tag { font-size: 1.2rem; font-weight: 800; color: var(--text-main); display: flex; align-items: center; gap: 6px; flex-direction: column; }
+
+        .rpg-progress-container { width: 100%; margin: 5px 0 15px 0; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); padding: 12px; border-radius: 16px; }
+        .rpg-labels { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 6px; }
+
+        .premium-balance-box {
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.15) 0%, rgba(36, 161, 222, 0.15) 100%);
+            border: 1px solid rgba(36, 161, 222, 0.4); box-shadow: var(--shadow-neon); border-radius: 16px; padding: 14px; text-align: center; margin-bottom: 15px;
+            position: relative; overflow: hidden;
+        }
+        
+        .balance-title { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted); margin-bottom: 5px; }
+        .balance-amount { font-size: 1.8rem; font-weight: 900; color: #fff; display: flex; justify-content: center; align-items: center; gap: 8px; }
+
+        .role-switch-container { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.2); padding: 12px 16px; border-radius: 14px; margin-bottom: 15px; border: 1px solid var(--border-color); }
+        .switch-label { font-size: 0.9rem; font-weight: 600; }
+        .toggle-btn { position: relative; width: 54px; height: 28px; background-color: var(--border-color); border-radius: 50px; cursor: pointer; transition: var(--transition-smooth); }
+        .toggle-btn::after { content: ''; position: absolute; width: 22px; height: 22px; border-radius: 50%; background-color: #fff; top: 3px; left: 3px; transition: var(--transition-smooth); box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
+        .toggle-btn.active { background-color: var(--telegram-blue); box-shadow: var(--shadow-neon); }
+        .toggle-btn.active::after { left: 29px; }
+
+        .status-counters { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 15px; }
+        .counter-card { background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: 14px; padding: 12px 6px; text-align: center; display: flex; flex-direction: column; justify-content: center; cursor: pointer; transition: var(--transition-smooth); }
+        .counter-card:hover { background: rgba(255,255,255,0.05); border-color: var(--telegram-blue); transform: translateY(-2px); }
+        .counter-card span:first-child { font-size: 1.2rem; font-weight: 800; color: var(--text-main); }
+        .counter-card span:last-child { font-size: 0.7rem; color: var(--text-muted); margin-top: 4px; font-weight: 600; }
+
+        .drawer-links { display: flex; flex-direction: column; gap: 8px; }
+        .drawer-btn { width: 100%; background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); color: var(--text-main); padding: 14px 18px; border-radius: 14px; font-size: 0.95rem; font-weight: 600; display: flex; align-items: center; justify-content: space-between; cursor: pointer; transition: var(--transition-smooth); }
+        .drawer-btn:hover { background: rgba(255,255,255,0.06); border-color: var(--text-muted); transform: translateX(4px); }
+        .drawer-btn.locked { opacity: 0.5; background: rgba(0,0,0,0.4); border-color: transparent; cursor: not-allowed; }
+
+        .app-view { display: none; padding: 85px 16px 20px 16px; max-width: 600px; margin: 0 auto; }
+        .app-view.active-view { display: block; animation: slideUpView 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        @keyframes slideUpView { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .view-title { font-size: 1.5rem; font-weight: 900; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; letter-spacing: -0.5px; }
+
+        .tab-bar { position: fixed; bottom: 0; left: 0; width: 100%; height: 72px; background: var(--glass-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-top: 1px solid var(--glass-border); display: grid; grid-template-columns: repeat(5, 1fr); z-index: 1000; box-shadow: 0 -5px 25px rgba(0,0,0,0.3); }
+        .tab-item { display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-muted); cursor: pointer; transition: var(--transition-smooth); font-size: 0.7rem; font-weight: 600; gap: 5px; position: relative; }
+        .tab-item.active-tab { color: var(--telegram-blue); }
+        .tab-item.active-tab::before { content: ''; position: absolute; top: 0; width: 40%; height: 3px; background: var(--telegram-blue); border-radius: 0 0 4px 4px; box-shadow: var(--shadow-neon); }
+        .tab-item i { width: 22px; height: 22px; transition: var(--transition-smooth); }
+        .tab-item.active-tab i { transform: scale(1.15) translateY(-2px); }
+
+        /* TOASTS GIGANTES */
+        #toast-container { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%); z-index: 2200; width: calc(100% - 32px); max-width: 460px; pointer-events: none; display: flex; flex-direction: column; gap: 12px; }
+        .toast-card { background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); color: #ffffff; border-left: 6px solid var(--telegram-blue); padding: 20px 24px; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.5), var(--shadow-neon); display: flex; align-items: center; gap: 16px; font-size: 1.05rem; font-weight: 700; pointer-events: auto; border: 1px solid rgba(255,255,255,0.1); animation: toastBounceIn 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        .toast-card i { width: 26px; height: 26px; flex-shrink: 0; }
+        .toast-card.error { border-left-color: #ef4444; box-shadow: 0 20px 40px rgba(239, 68, 68, 0.2); }
+        .toast-card.success { border-left-color: var(--success-green); box-shadow: 0 20px 40px rgba(46, 204, 113, 0.2); }
+        .toast-card.gold { border-left-color: var(--vip-gold); box-shadow: var(--shadow-gold); }
+        @keyframes toastBounceIn { from { opacity: 0; transform: translateY(40px) scale(0.85); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        .toast-leave { animation: toastFadeOut 0.3s ease forwards; }
+        @keyframes toastFadeOut { to { opacity: 0; transform: scale(0.8) translateY(-20px); } }
+
+        .top-podium-section { margin-bottom: 28px; }
+        .podium-grid { display: flex; flex-direction: column; gap: 14px; position: relative; }
+        .podium-card { background: linear-gradient(145deg, #161f30 0%, var(--bg-tarjeta) 100%); border: 1px solid var(--border-color); border-radius: 20px; padding: 18px; position: relative; transition: var(--transition-smooth); overflow: hidden; display: flex; flex-direction: column; gap: 12px; box-shadow: 0 10px 20px rgba(0,0,0,0.15); }
+        .podium-card.rank-1 { border: 1.5px solid var(--vip-gold); box-shadow: var(--shadow-gold); background: linear-gradient(145deg, #241a08 0%, var(--bg-tarjeta) 100%); }
+        .podium-badge { position: absolute; top: 12px; right: 16px; font-weight: 900; font-size: 1.8rem; opacity: 0.8; font-style: italic; }
+        .rank-1 .podium-badge { color: var(--vip-gold); text-shadow: 0 0 10px rgba(245,158,11,0.5); }
+
+        .directory-filters-box { background: var(--bg-tarjeta); border: 1px solid var(--border-color); border-radius: 18px; padding: 14px; margin-bottom: 18px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .filter-select { background: rgba(0,0,0,0.3); color: var(--text-main); border: 1px solid var(--border-color); border-radius: 10px; padding: 10px; font-size: 0.85rem; outline: none; width: 100%; font-weight: 600; cursor: pointer; }
+
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
+        .stat-card { background: var(--bg-tarjeta); border: 1px solid var(--border-color); padding: 16px; border-radius: 18px; display: flex; align-items: center; gap: 14px; transition: var(--transition-smooth); cursor: pointer; }
+        .stat-icon { width: 44px; height: 44px; border-radius: 14px; background: rgba(36, 161, 222, 0.1); color: var(--telegram-blue); display: flex; align-items: center; justify-content: center; }
+
+        .slider-section { margin-bottom: 24px; }
+        .slider-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+        .slider-arrows { display: flex; gap: 8px; }
+        .arrow-btn { background: var(--bg-tarjeta); border: 1px solid var(--border-color); color: var(--text-main); width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .slider-container { display: flex; gap: 14px; overflow-x: auto; scroll-behavior: smooth; padding: 4px 4px 10px 4px; scrollbar-width: none; }
+        .slider-container::-webkit-scrollbar { display: none; }
+        .vip-slide-card { min-width: 260px; max-width: 260px; background: linear-gradient(145deg, #182235 0%, #121824 100%); border: 1px solid var(--vip-gold); border-radius: 18px; padding: 16px; cursor: pointer; }
+
+        .roulette-card { background: linear-gradient(135deg, #2d124d 0%, #121824 100%); border: 1px solid var(--mystic-purple); border-radius: 24px; padding: 22px; text-align: center; margin-bottom: 24px; }
+        .roulette-btn { background: var(--mystic-purple); color: white; border: none; padding: 14px 28px; border-radius: 14px; font-weight: 700; font-size: 0.95rem; cursor: pointer; margin-top: 14px; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 15px rgba(168,85,247,0.4); }
+        .shake-anim { animation: shake 0.5s ease-in-out; }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-8px); } 40%, 80% { transform: translateX(8px); } }
+
+        .creator-banner { background: linear-gradient(90deg, #1e293b 0%, #0f172a 100%); border: 1.5px dashed var(--vip-gold); border-radius: 20px; padding: 20px; text-align: center; margin-bottom: 24px; }
+
+        .search-wrapper { position: relative; margin-bottom: 18px; }
+        .search-input { width: 100%; background: var(--bg-tarjeta); border: 1px solid var(--border-color); color: var(--text-main); padding: 15px 16px 15px 48px; border-radius: 16px; font-size: 1rem; }
+        .search-icon { position: absolute; top: 15px; left: 16px; color: var(--text-muted); pointer-events: none; }
+
+        .categories-carousel { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 14px; margin-bottom: 12px; scrollbar-width: none; }
+        .categories-carousel::-webkit-scrollbar { display: none; }
+        .cat-chip { white-space: nowrap; background: var(--bg-tarjeta); border: 1px solid var(--border-color); padding: 10px 20px; border-radius: 50px; font-size: 0.85rem; font-weight: 700; color: var(--text-muted); cursor: pointer; }
+        .cat-chip.active-chip { background: var(--telegram-blue); color: #fff; border-color: var(--telegram-blue); box-shadow: var(--shadow-neon); }
+
+        .directory-grid { display: flex; flex-direction: column; gap: 14px; }
+        .channel-card { 
+            background: var(--bg-tarjeta); 
+            color: var(--text-main);        
+            border: 1px solid var(--border-color); 
+            border-radius: 20px; 
+            padding: 18px; 
+            overflow: hidden; 
+            transition: var(--transition-smooth); 
+            position: relative; 
+        }
+        .channel-card.vip-border { 
+            border: 1.5px solid var(--vip-gold); 
+            background: linear-gradient(180deg, var(--bg-tarjeta) 0%, rgba(245,158,11,0.05) 100%); 
+        }
+
+        .card-main-row { display: flex; align-items: center; justify-content: space-between; cursor: pointer; }
+        .card-identity-box { display: flex; align-items: center; gap: 14px; }
+        .channel-thumb { width: 52px; height: 52px; border-radius: 14px; object-fit: cover; background: rgba(36,161,222,0.08); border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
+        
+        .live-traffic-badge { display: inline-flex; align-items: center; gap: 4px; background: rgba(36,161,222,0.08); color: var(--telegram-blue); font-size: 0.72rem; font-weight: 700; padding: 4px 10px; border-radius: 8px; margin-top: 6px; border: 1px solid rgba(36,161,222,0.15); }
+        .animated-vip-badge { background: var(--vip-gold-gradient); color: #000; font-size: 0.65rem; font-weight: 900; padding: 2px 8px; border-radius: 6px; }
+
+        .fav-star-icon { color: var(--text-muted); cursor: pointer; transition: var(--transition-smooth); padding: 5px; }
+        .fav-star-icon.is-fav { color: var(--vip-gold); fill: var(--vip-gold); transform: scale(1.2); }
+
+        .card-accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.4s cubic-bezier(0.16, 1, 0.3, 1), padding 0.4s ease; margin-top: 0; }
+        .channel-card.expanded .card-accordion-content { max-height: 380px; border-top: 1px solid var(--border-color); margin-top: 14px; padding-top: 14px; }
+        .extended-data-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 0.82rem; color: var(--text-muted); margin-bottom: 14px; }
+        
+        .btn-subscribe-trigger { width: 100%; background: var(--telegram-blue); color: white; border: none; padding: 12px; border-radius: 12px; font-size: 0.9rem; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer; }
+        .btn-delete-channel { width: 100%; background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2); padding: 10px; border-radius: 12px; font-size: 0.85rem; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer; margin-top: 8px; }
+
+        .form-group { margin-bottom: 16px; text-align: left; }
+        .form-group label { display: block; font-size: 0.8rem; font-weight: 700; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; }
+        .form-control { width: 100%; background: rgba(0,0,0,0.2); border: 1px solid var(--border-color); border-radius: 10px; padding: 12px; color: var(--text-main); font-size: 0.9rem; }
+
+        .energy-table { width: 100%; border-collapse: collapse; background: var(--bg-tarjeta); border-radius: 18px; overflow: hidden; border: 1px solid var(--border-color); font-size: 0.85rem; }
+        .energy-table th, .energy-table td { padding: 14px 16px; text-align: left; }
+        .energy-table th { background: rgba(255,255,255,0.02); color: var(--text-muted); font-weight: 700; }
+        .energy-table tr:not(:last-child) { border-bottom: 1px solid var(--border-color); }
+
+        .fullscreen-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(5, 7, 11, 0.9); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); z-index: 2000; display: none; align-items: center; justify-content: center; padding: 20px; }
+        .modal-body-box { background: var(--bg-tarjeta); border: 1px solid var(--border-color); border-radius: 28px; padding: 26px; width: 100%; max-width: 440px; position: relative; animation: modalPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.15) forwards; box-shadow: 0 25px 50px rgba(0,0,0,0.5); text-align: center; color: var(--text-main); }
+        @keyframes modalPop { from { transform: scale(0.92) translateY(30px); opacity: 0; } to { transform: scale(1) translateY(0); opacity: 1; } }
+        
+        .logs-terminal { background: #04060a; border: 1px solid #141b26; border-radius: 12px; padding: 14px; max-height: 250px; overflow-y: auto; font-family: monospace; font-size: 0.75rem; color: #4ade80; text-align: left; }
+        .log-line { padding: 5px 0; border-bottom: 1px solid rgba(74,222,128,0.05); }
+
+        .history-item-card { background: var(--bg-tarjeta); border: 1px solid var(--border-color); padding: 14px 18px; border-radius: 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
+        .history-left-pane { display: flex; align-items: center; gap: 12px; }
+        .history-icon-badge { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.03); }
+        .history-timestamp { font-size: 0.75rem; color: var(--text-muted); font-family: monospace; }
+        .empty-state-notice { text-align: center; padding: 40px 20px; color: var(--text-muted); font-size: 0.95rem; }
+        
+        .btn-history-loadmore { background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); color: var(--text-main); font-weight: 700; width: 100%; padding: 12px; border-radius: 12px; cursor: pointer; margin-top: 5px; transition: var(--transition-smooth); }
+        .btn-history-loadmore:hover { background: rgba(255,255,255,0.1); }
+
+        /* ==========================================================================
+           ESTILOS REMASTERIZADOS TIENDA RPG (ESTILO JUEGO DE MÓVIL)
+           ========================================================================== */
+        .shop-layout { display: flex; flex-direction: column; gap: 24px; }
+        
+        .avatar-canvas-area { 
+            background: radial-gradient(circle, rgba(168,85,247,0.3) 0%, rgba(15,23,42,1) 100%); 
+            border: 2px solid var(--mystic-purple); 
+            border-radius: 24px; padding: 24px; text-align: center; position: relative; 
+            overflow: hidden; box-shadow: var(--shadow-neon);
+        }
+        .ia-avatar-frame { 
+            width: 130px; height: 130px; margin: 0 auto 12px auto; 
+            border-radius: 50%; border: 4px solid var(--vip-gold); 
+            box-shadow: var(--shadow-gold); background: #1e293b; 
+            overflow: hidden; display: flex; align-items: center; justify-content: center;
+            position: relative; transition: var(--transition-smooth);
+        }
+        .ia-avatar-frame img { width: 100%; height: 100%; object-fit: cover; }
+
+        .equipped-badges-container {
+            display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-top: 10px;
+        }
+        .equipped-chip {
+            background: rgba(168, 85, 247, 0.2); border: 1px solid var(--mystic-purple);
+            color: #fff; font-size: 0.72rem; font-weight: 700; padding: 4px 10px;
+            border-radius: 50px; display: inline-flex; align-items: center; gap: 6px;
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .btn-unequip {
+            background: none; border: none; color: #ef4444; cursor: pointer;
+            display: flex; align-items: center; padding: 2px;
+        }
+
+        .shop-nav-menu {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+            background: rgba(0,0,0,0.2); padding: 6px; border-radius: 14px;
+            border: 1px solid var(--border-color);
+        }
+        .shop-nav-btn {
+            background: transparent; border: none; color: var(--text-muted);
+            padding: 10px; font-weight: 700; font-size: 0.8rem; border-radius: 10px;
+            cursor: pointer; transition: var(--transition-smooth); display: flex;
+            align-items: center; justify-content: center; gap: 6px;
+        }
+        .shop-nav-btn.active {
+            background: var(--mystic-purple); color: white;
+            box-shadow: 0 4px 12px rgba(168,85,247,0.3);
+        }
+
+        .shop-panel { display: none; animation: slideUpView 0.4s ease; }
+        .shop-panel.active { display: block; }
+
+        .shop-grid {
+            display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;
+        }
+        
+        .item-shop-card { 
+            background: var(--bg-tarjeta); border: 1px solid var(--border-color); 
+            border-radius: 20px; padding: 16px; text-align: center; cursor: pointer; 
+            display: flex; flex-direction: column; justify-content: space-between; 
+            align-items: center; gap: 8px; transition: var(--transition-smooth);
+            position: relative; overflow: hidden;
+        }
+        .item-shop-card:hover {
+            transform: translateY(-4px) scale(1.02); border-color: var(--mystic-purple);
+            box-shadow: 0 8px 20px rgba(168,85,247,0.15);
+        }
+        .item-shop-card.locked-item { opacity: 0.6; background: rgba(15,23,42,0.4); }
+        
+        .btn-shop-buy { 
+            width: 100%; border: none; padding: 10px; border-radius: 12px; 
+            font-weight: 800; font-size: 0.8rem; cursor: pointer; 
+            display: flex; align-items: center; justify-content: center; gap: 6px;
+            transition: var(--transition-smooth);
+        }
+        .btn-shop-buy.state-locked { background: #334155; color: var(--text-muted); cursor: not-allowed; }
+        .btn-shop-buy.state-insufficient { background: rgba(239,68,68,0.1); color: #ef4444; border: 1px solid rgba(239,68,68,0.3); }
+        .btn-shop-buy.state-ready { background: var(--vip-gold-gradient); color: #000; box-shadow: 0 4px 10px rgba(245,158,11,0.2); }
+        .btn-shop-buy.state-equipped { background: var(--mystic-purple); color: white; }
+        .btn-shop-buy.state-unequipped { background: rgba(255,255,255,0.08); color: var(--text-main); border: 1px solid var(--border-color); }
+
+        .epic-pack-card {
+            background: linear-gradient(135deg, #1e1b4b 0%, #311042 50%, #1e293b 100%);
+            border: 2px dashed var(--vip-gold); border-radius: 24px; padding: 20px;
+            position: relative; overflow: hidden; box-shadow: var(--shadow-gold);
+            transition: var(--transition-smooth); text-align: left;
+            animation: pulsePack 4s infinite alternate;
+        }
+        @keyframes pulsePack {
+            0% { border-color: var(--vip-gold); box-shadow: 0 0 15px rgba(245,158,11,0.2); }
+            100% { border-color: var(--mystic-purple); box-shadow: 0 0 25px rgba(168,85,247,0.4); }
+        }
+        .pack-badge {
+            position: absolute; top: 12px; right: -30px; background: #ef4444;
+            color: white; font-size: 0.65rem; font-weight: 900; padding: 4px 30px;
+            transform: rotate(45deg); letter-spacing: 1px;
+        }
+        .pack-grid-preview {
+            display: flex; gap: 8px; margin: 14px 0;
+        }
+        .pack-preview-item {
+            width: 45px; height: 45px; background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1); border-radius: 10px;
+            padding: 4px; display: flex; align-items: center; justify-content: center;
+        }
+
+        @keyframes popIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .confetti-particle { position: fixed; width: 10px; height: 10px; border-radius: 30%; pointer-events: none; animation: explodeConfetti 1.2s cubic-bezier(0.1, 0.8, 0.3, 1) forwards; z-index: 9999; }
+        @keyframes explodeConfetti {
+            0% { transform: translate(0, 0) scale(1.5) rotate(0deg); opacity: 1; }
+            100% { transform: translate(var(--x), var(--y)) scale(0.2) rotate(720deg); opacity: 0; }
+        }
+
+        /* NÚCLEO NUEVO DE AGREGADOS */
+        .user-badge-status { display: inline-flex; padding: 4px 10px; border-radius: 50px; font-size: 0.75rem; font-weight: 800; cursor: pointer; align-items: center; gap: 4px; margin-top: 4px; transition: var(--transition-smooth); }
+        .badge-free { background: #64748b; color: white; animation: pulseFree 2s infinite; }
+        .badge-vip { background: var(--vip-gold-gradient); color: #000; box-shadow: var(--shadow-gold); }
+        @keyframes pulseFree { 0%, 100% { opacity: 0.9; } 50% { opacity: 0.6; } }
+
+        .hidden-benefits-panel { display: none; background: rgba(0,0,0,0.4); border: 1px solid var(--border-color); border-radius: 16px; padding: 14px; margin-top: 10px; text-align: left; width: 100%; box-shadow: inset 0 2px 10px rgba(0,0,0,0.5); }
+        .benefit-item { display: flex; align-items: center; gap: 8px; font-size: 0.8rem; margin-bottom: 6px; color: var(--text-main); }
+        
+        .floating-congrats-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(20px); z-index: 3000; display: none; align-items: center; justify-content: center; padding: 20px; }
+        .congrats-card { background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%); border: 2px solid var(--vip-gold); box-shadow: var(--shadow-gold); padding: 32px; border-radius: 24px; text-align: center; max-width: 400px; animation: scaleUpPopup 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        @keyframes scaleUpPopup { from { transform: scale(0.7); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+        .carousel-wrapper { margin-top: 15px; }
+        .carousel-title { font-size: 0.9rem; font-weight: 800; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; text-align: left; letter-spacing: 0.5px; }
+        .carousel-track { display: flex; gap: 12px; overflow-x: auto; padding: 6px 2px; scrollbar-width: none; }
+        .carousel-track::-webkit-scrollbar { display: none; }
+        .carousel-item-avatar { min-width: 80px; background: var(--bg-tarjeta); border: 1px solid var(--border-color); border-radius: 16px; padding: 10px; text-align: center; cursor: pointer; transition: var(--transition-smooth); }
+        .carousel-item-avatar:hover { border-color: var(--mystic-purple); transform: translateY(-2px); }
+
+        .action-grid-buttons { display: grid; grid-template-columns: 1fr; gap: 10px; margin-bottom: 20px; }
+        .channels-control-table { width: 100%; border-collapse: collapse; margin-top: 15px; background: rgba(0,0,0,0.2); border-radius: 12px; overflow: hidden; font-size: 0.8rem; }
+        .channels-control-table th { background: rgba(255,255,255,0.05); padding: 10px; text-align: left; color: var(--text-muted); }
+        .channels-control-table td { padding: 10px; border-bottom: 1px solid var(--border-color); }
+        .badge-status-pill { padding: 3px 8px; border-radius: 6px; font-size: 0.68rem; font-weight: 800; display: inline-block; }
+        .status-review { background: #eab308; color: #000; }
+        .status-published { background: var(--success-green); color: #fff; }
+        
+        .action-row-buttons { display: flex; gap: 6px; margin-top: 4px; }
+        .mini-action-btn { background: var(--bg-tarjeta); border: 1px solid var(--border-color); color: var(--text-main); padding: 5px 8px; border-radius: 6px; cursor: pointer; font-size: 0.72rem; display: flex; align-items: center; gap: 4px; transition: var(--transition-smooth); }
+        .mini-action-btn:hover { background: var(--bg-tarjeta-hover); }
+    /* CAPA OSCURA DE FONDO */
+.premium-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    padding: 20px;
+}
+
+/* TARJETA ANIMADA FLOTANTE */
+.premium-modal-card {
+    background: #1c2434; /* Se adapta a la estética oscura de Telegram */
+    border: 2px solid #eab308; /* Borde dorado VIP */
+    border-radius: 16px;
+    width: 100%;
+    max-width: 340px;
+    padding: 20px;
+    position: relative;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 0 30px rgba(234, 179, 8, 0.2);
+    
+    /* Animación de entrada llamativa con efecto elástico */
+    animation: popupElastic 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes popupElastic {
+    0% { transform: scale(0.5); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+/* BOTÓN DE CIERRE */
+.close-premium-btn {
+    position: absolute;
+    top: 10px;
+    right: 14px;
+    background: none;
+    border: none;
+    color: #a0aec0;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+.close-premium-btn:hover { color: #fff; }
+
+/* ENCABEZADO */
+.premium-modal-header { text-align: center; margin-bottom: 15px; }
+.premium-badge-icon { font-size: 2rem; display: block; animation: pulseGold 2s infinite; }
+#benefits-box-title { color: #eab308; font-size: 1.1rem; font-weight: bold; margin-top: 5px; }
+
+@keyframes pulseGold {
+    0% { transform: scale(1); filter: drop-shadow(0 0 2px rgba(234,179,8,0.4)); }
+    50% { transform: scale(1.1); filter: drop-shadow(0 0 12px rgba(234,179,8,0.8)); }
+    100% { transform: scale(1); filter: drop-shadow(0 0 2px rgba(234,179,8,0.4)); }
+}
+
+/* ELEMENTOS DE BENEFICIOS */
+.benefit-item { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; font-size: 0.85rem; color: #edf2f7; }
+
+/* FORMULARIO Y SELECT */
+.premium-modal-footer { margin-top: 15px; border-top: 1px solid #2d3748; padding-top: 15px; }
+.form-group-premium label { display: block; font-size: 0.7rem; color: #a0aec0; margin-bottom: 4px; }
+.form-control-premium { width: 100%; background: #2d3748; border: 1px solid #4a5568; color: #fff; padding: 8px; border-radius: 8px; font-size: 0.85rem; margin-bottom: 12px; }
+
+/* BOTÓN PREMIUM CON SPINNER INTERNO */
+.btn-subscribe-trigger-premium { width: 100%; background: #22c55e; border: none; color: white; padding: 10px; font-size: 0.9rem; font-weight: bold; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: background 0.2s; }
+.btn-subscribe-trigger-premium:disabled { background: #166534; cursor: not-allowed; }
+
+/* SPINNER CSS NATIVO */
+.loading-spinner {
+    width: 14px;
+    height: 14px;
+    border: 2px solid #ffffff;
+    border-bottom-color: transparent;
+    border-radius: 50%;
+    display: inline-block;
+    animation: rotation 1s linear infinite;
+}
+@keyframes rotation { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+       /* AJUSTES DE MAQUETACIÓN EN LA TARJETA */
+.card-actions-column {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px; /* Separación vertical idónea */
+    padding-left: 10px;
+}
+.share-channel-icon {
+    width: 18px;
+    height: 18px;
+    color: #a0aec0;
+    cursor: pointer;
+    transition: transform 0.2s, color 0.2s;
+}
+.share-channel-icon:hover {
+    color: var(--telegram-blue, #24a1de);
+    transform: scale(1.15);
+}
+
+/* OVERLAY CON DESFOCADO */
+.share-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(10, 15, 26, 0.75);
+    backdrop-filter: blur(6px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    padding: 16px;
+}
+
+/* TARJETA DEL MODAL CON REBOTE */
+.share-modal-card {
+    background: #182232;
+    border: 1px solid #2d3748;
+    border-radius: 20px;
+    width: 100%;
+    max-width: 320px;
+    padding: 24px;
+    position: relative;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+    animation: sharePopupEntrance 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes sharePopupEntrance {
+    0% { transform: scale(0.6) translateY(30px); opacity: 0; }
+    100% { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+.share-close-btn {
+    position: absolute;
+    top: 12px;
+    right: 16px;
+    background: none;
+    border: none;
+    color: #718096;
+    font-size: 1.6rem;
+    cursor: pointer;
+    line-height: 1;
+}
+.share-close-btn:hover { color: #fff; }
+
+.share-modal-header h3 { font-size: 1.15rem; font-weight: bold; color: #fff; }
+
+/* REJILLA DINÁMICA */
+.share-grid-networks {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin: 20px 0 16px 0;
+}
+
+.share-net-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px;
+    border: none;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #fff;
+    cursor: pointer;
+    transition: transform 0.2s, filter 0.2s;
+}
+.share-net-btn:hover { transform: translateY(-2px); filter: brightness(1.15); }
+.net-icon { font-size: 1rem; }
+
+/* PALETA DE REDES */
+.share-net-btn.telegram { background: #24a1de; }
+.share-net-btn.whatsapp { background: #22c55e; }
+.share-net-btn.x-twitter { background: #0f1419; border: 1px solid #2d3748; }
+.share-net-btn.facebook { background: #1877f2; }
+.share-net-btn.reddit { background: #ff4500; }
+.share-net-btn.email { background: #4a5568; }
+
+.share-modal-footer {
+    border-top: 1px solid #2d3748;
+    padding-top: 14px;
+}
+.share-copy-link-btn {
+    width: 100%;
+    background: #2d3748;
+    border: 1px solid #4a5568;
+    color: #edf2f7;
+    padding: 10px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    border-radius: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: background 0.2s;
+}
+.share-copy-link-btn:hover { background: #3a4a63; color: #fff; } 
+    </style>
+</head>
+<body>
+
+    <div id="toast-container"></div>
+
+    <div id="premium-congrats-modal" class="floating-congrats-modal">
+        <div class="congrats-card">
+            <div style="font-size: 3.5rem; margin-bottom: 10px; animation: pulseGlow 1.5s infinite alternate;">👑</div>
+            <h2 style="color: var(--vip-gold); font-weight: 900; margin-bottom: 12px; font-size: 1.6rem;">¡ENHORABUENA!</h2>
+            <p style="color: #fff; font-size: 1rem; margin-bottom: 20px; line-height: 1.5;">Tu ID coincide con el registro interno.<br><strong style="color: var(--telegram-blue);">¡Ya eres miembro Premium!</strong></p>
+            <button class="btn-subscribe-trigger" style="background: var(--vip-gold-gradient); color: #000;" onclick="closeCongratsPremiumModal()">Comenzar Experiencia VIP</button>
+        </div>
+    </div>
+
+    <header class="app-header">
+        <div class="header-logo">CANALES TOP</div>
+        <div class="header-center-icon" onclick="switchView('shop')">
+            <i data-lucide="shopping-bag"></i>
+        </div>
+        <div class="avatar-container" onclick="toggleProfileDrawer()">
+            <img src="" id="header-avatar" class="avatar-img" alt="Avatar">
+        </div>
+    </header>
+
+    <div id="profile-drawer" class="profile-drawer">
+        <div class="drawer-identity">
+            <div class="ia-avatar-frame" style="width: 80px; height: 80px; margin-bottom: 8px;">
+                <img id="drawer-avatar-render" src="" alt="Avatar Realtime">
+            </div>
+            <div class="drawer-username-tag">
+                <span id="drawer-username">@Anónimo</span>
+                <div id="user-premium-tag" class="user-badge-status badge-free" onclick="toggleBenefitsSection()">
+                    <i data-lucide="award" style="width:14px; height:14px;"></i> <span id="tag-label-text">GRATIS</span>
+                </div>
+                
+                <div id="hidden-benefits-box" class="premium-modal-overlay" style="display: none;">
+    <div class="premium-modal-card">
+        <button class="close-premium-btn" onclick="toggleBenefitsSection()">&times;</button>
+        
+        <div class="premium-modal-header">
+            <span class="premium-badge-icon">👑</span>
+            <h5 id="benefits-box-title">Beneficios Premium</h5>
+        </div>
+
+        <div class="premium-modal-body">
+            <div class="benefit-item">✨ <span>Pago único para siempre</span></div>
+            <div class="benefit-item">🚀 <span>Publica hasta 3 canales</span></div>
+            <div class="benefit-item">🗂️ <span>Tus canales en 3 categorías</span></div>
+            <div class="benefit-item">⭐ <span>Destacado prioritario en el directorio</span></div>
+        </div>
+        
+        <div id="premium-order-form" class="premium-modal-footer">
+            <div class="form-group-premium">
+                <label>Método de Pago</label>
+                <select id="pay-method" class="form-control-premium">
+                    <option value="PayPal">PayPal</option>
+                    <option value="USDT">USDT (Crypto)</option>
+                </select>
+            </div>
+            <button id="btn-submit-order" class="btn-subscribe-trigger-premium" onclick="sendOrderToTelegram()">
+                <span id="btn-text-content">Hacer Pedido 🛒</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+                <span id="drawer-range" style="color: var(--vip-gold); font-size: 0.85rem; font-weight: 800; margin-top: 6px;">[ Rango ]</span>
+            </div>
+        </div>
+
+        <div class="rpg-progress-container">
+            <div class="rpg-labels">
+                <span>Progreso RPG: <strong id="rpg-current-pts">0</strong>/100 Pts</span>
+                <span id="rpg-status-badge">Nivel Inicial</span>
+            </div>
+            <div style="width:100%; height:6px; background:var(--border-color); border-radius:10px; overflow:hidden;">
+                <div id="rpg-bar-fill" style="width: 20%; height:100%; background:linear-gradient(90deg, var(--telegram-blue), var(--mystic-purple)); transition: var(--transition-smooth);"></div>
+            </div>
+        </div>
+
+        <div class="premium-balance-box">
+            <div class="balance-title">Saldo Acumulado</div>
+            <div class="balance-amount"><span id="profile-balance">0</span> <span style="color: var(--vip-gold)">✨ Pts</span></div>
+        </div>
+
+        <div class="role-switch-container">
+            <div class="switch-label">Modo Vista Administrador</div>
+            <div id="role-toggle" class="toggle-btn" onclick="toggleAdminRole()"></div>
+        </div>
+
+        <div class="status-counters">
+            <div class="counter-card" onclick="toggleProfileDrawer(); switchView('directory')">
+                <span id="cnt-channels">0</span>
+                <span>Directorio</span>
+            </div>
+            <div class="counter-card" onclick="toggleProfileDrawer(); switchView('favorites')">
+                <span id="cnt-favs">0</span>
+                <span>Favoritos ⭐</span>
+            </div>
+            <div class="counter-card" onclick="toggleProfileDrawer(); switchView('history')">
+                <span id="cnt-purchases">0</span>
+                <span>Mis Compras</span>
+            </div>
+        </div>
+
+        <div class="admin-only" style="margin-bottom: 12px;">
+            <button class="drawer-btn" style="border-color: var(--telegram-blue); background: rgba(36,161,222,0.05);" onclick="toggleProfileDrawer(); switchView('my-channels');">
+                <span>🗂️ Ver Mis Canales Creados (<strong id="cnt-my-owned-channels">0</strong>)</span> <i data-lucide="arrow-right"></i>
+            </button>
+        </div>
+
+        <div class="drawer-links">
+            <button class="drawer-btn" onclick="toggleProfileDrawer(); switchView('shop')">
+                <span>🛍️ Tienda de Recompensas e IA</span> <i data-lucide="chevron-right"></i>
+            </button>
+            <button class="drawer-btn" onclick="toggleProfileDrawer(); switchView('energy')">
+                <span>⚡ Cómo Ganar Puntos</span> <i data-lucide="chevron-right"></i>
+            </button>
+            <button id="epic-avatar-link" class="drawer-btn locked" onclick="handlePremiumDrawerAccess()">
+                <span id="drawer-locked-text">🔒 Avatar IA Premium (Requiere Rango 5)</span> <i data-lucide="lock" id="drawer-locked-icon"></i>
+            </button>
+            <button class="drawer-btn" onclick="toggleProfileDrawer(); openLogsModal()">
+                <span>📊 Historial de Logs</span> <i data-lucide="file-text"></i>
+            </button>
+        </div>
+    </div>
+
+    <main id="view-home" class="app-view active-view">
+        <div class="stats-grid">
+            <div class="stat-card" onclick="switchView('directory')">
+                <div class="stat-icon"><i data-lucide="layers"></i></div>
+                <div class="stat-info"><h4 id="stat-total-channels">0</h4><p>Canales Activos</p></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="color:var(--success-green); background:rgba(46,204,113,0.1);"><i data-lucide="users"></i></div>
+                <div class="stat-info"><h4>1,240</h4><p>Usuarios Online</p></div>
+            </div>
+        </div>
+
+        <section class="top-podium-section">
+            <h3 style="font-size:1.1rem; font-weight:800; margin-bottom:14px; display:flex; align-items:center; gap:8px;">🔥 Canales del Top 3 Histórico</h3>
+            <div id="top-podium-container" class="podium-grid"></div>
+        </section>
+
+        <section class="slider-section">
+            <div class="slider-header">
+                <h3 style="font-size:1rem; font-weight:800; display:flex; align-items:center; gap:6px;"><span style="color:var(--vip-gold)">🚀</span> Canales Destacados VIP</h3>
+                <div class="slider-arrows">
+                    <button class="arrow-btn" onclick="scrollSlider(-1)" style="margin-right:4px;"><i data-lucide="chevron-left" style="width:16px;height:16px;"></i></button>
+                    <button class="arrow-btn" onclick="scrollSlider(1)"><i data-lucide="chevron-right" style="width:16px;height:16px;"></i></button>
+                </div>
+            </div>
+            <div id="vip-slider" class="slider-container"></div>
+        </section>
+
+        <section class="roulette-card">
+            <h3 style="font-size:1.1rem; font-weight:800; margin-bottom:4px;">🎰 Ruleta Sorpresa Aleatoria</h3>
+            <p style="font-size:0.78rem; color:var(--text-muted);">¿No sabes qué leer? Descubre un canal al azar del directorio.</p>
+            <div id="roulette-display" style="margin: 12px 0; font-size:1.2rem; font-weight:bold; color: var(--vip-gold);">- - -</div>
+            <button class="roulette-btn" onclick="spinRoulette()">
+                <i data-lucide="dices" style="width:18px; height:18px;"></i> Probar Suerte [-5 Pts]
+            </button>
+        </section>
+
+        <div id="creator-ad-banner" class="creator-banner admin-only">
+            <h4 style="color:var(--vip-gold); font-size:0.95rem; font-weight:800; margin-bottom:4px;">📣 Panel Avanzado de Administrador</h4>
+            <p style="font-size:0.75rem; color:var(--text-muted); margin-bottom:12px;">Estás viendo este banner porque tu rol actual es ADMIN.</p>
+            <button class="btn-subscribe-trigger" style="background:var(--vip-gold); color:black; width:auto; margin:0 auto; padding:8px 16px;" onclick="showToast('Abriendo Consola Maestra...','gold')">Configurar Espacios VIP</button>
+        </div>
+    </main>
+
+    <main id="view-directory" class="app-view">
+        <h2 class="view-title"><i data-lucide="compass" style="color:var(--telegram-blue)"></i> Explorar Directorio</h2>
+        
+        <div class="search-wrapper">
+            <i data-lucide="search" class="search-icon"></i>
+            <input type="text" id="directory-search" class="search-input" placeholder="Buscar por palabra clave..." oninput="filterDirectory()">
+        </div>
+
+        <div id="categories-bar" class="categories-carousel"></div>
+
+        <div class="directory-filters-box">
+            <div>
+                <label style="font-size:0.68rem; color:var(--text-muted); display:block; margin-bottom:4px;">Filtrado Avanzado</label>
+                <select id="filter-sorting" class="filter-select" onchange="filterDirectory()">
+                    <option value="all">⚡ Todos los Canales</option>
+                    <option value="popular">🔥 Canales Populares</option>
+                    <option value="new">🆕 Nuevos Canales</option>
+                    <option value="trend">📈 Canales en Tendencia</option>
+                </select>
+            </div>
+            <div>
+                <label style="font-size:0.68rem; color:var(--text-muted); display:block; margin-bottom:4px;">Estatus del Canal</label>
+                <select id="filter-status" class="filter-select" onchange="filterDirectory()">
+                    <option value="all">💎 Cualquier Estatus</option>
+                    <option value="Destacado">Destacados VIP</option>
+                    <option value="Público">Públicos Estándar</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="directory-list" class="directory-grid"></div>
+    </main>
+
+    <main id="view-favorites" class="app-view">
+        <h2 class="view-title"><i data-lucide="star" style="color:var(--vip-gold)"></i> Mis Favoritos</h2>
+        <div id="favorites-list" class="directory-grid"></div>
+    </main>
+
+    <main id="view-my-channels" class="app-view">
+        <h2 class="view-title"><i data-lucide="folder-user" style="color:var(--telegram-blue)"></i> Mis Canales Guardados</h2>
+        
+        <div class="premium-balance-box" style="background: rgba(0,0,0,0.2); border-color: var(--border-color); display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 12px; box-shadow: none;">
+            <div>
+                <div style="font-size: 1.2rem; font-weight: 800;" id="panel-cnt-total">0</div>
+                <div style="font-size: 0.65rem; color: var(--text-muted);">Total Canales</div>
+            </div>
+            <div>
+                <div style="font-size: 1.2rem; font-weight: 800; color: #eab308;" id="panel-cnt-review">0</div>
+                <div style="font-size: 0.65rem; color: var(--text-muted);">En Revisión</div>
+            </div>
+            <div>
+                <div style="font-size: 1.2rem; font-weight: 800; color: var(--success-green);" id="panel-cnt-published">0</div>
+                <div style="font-size: 0.65rem; color: var(--text-muted);">Publicados</div>
+            </div>
+        </div>
+
+        <div class="action-grid-buttons">
+            <button class="btn-subscribe-trigger" style="background: var(--telegram-blue);" onclick="openAddChannelModal()">
+                <i data-lucide="plus-circle"></i> Enviar Nuevo Canal a Telegram
+            </button>
+        </div>
+
+        <h3 style="font-size: 1rem; font-weight: 800; margin-bottom: 8px;">📋 Estado Operativo de Canales</h3>
+        <table class="channels-control-table">
+            <thead>
+                <tr>
+                    <th>Canal / User</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="user-channels-table-body">
+                </tbody>
+        </table>
+
+        <div id="my-owned-channels-list" class="directory-grid" style="margin-top: 20px;"></div>
+    </main>
+
+    <main id="view-history" class="app-view">
+        <h2 class="view-title"><i data-lucide="history" style="color:var(--success-green)"></i> Historial de Compras y Accesos</h2>
+        <div id="history-list" class="directory-grid"></div>
+        <div id="history-pagination-container"></div>
+    </main>
+
+    <main id="view-shop" class="app-view">
+        <h2 class="view-title"><i data-lucide="shopping-bag" style="color:var(--mystic-purple)"></i> Forja de Avatar RPG & Personalización</h2>
+        <div class="shop-layout">
+            
+            <div class="avatar-canvas-area" id="canvas-area-wrapper">
+                <div class="ia-avatar-frame">
+                    <img id="shop-ia-avatar-preview" src="" alt="Preview Avatar">
+                </div>
+                <div style="font-weight:800; font-size:1.1rem; color:#fff; text-shadow:0 2px 4px rgba(0,0,0,0.5);">Tu Avatar Actual</div>
+                <div class="equipped-badges-container" id="equipped-items-list"></div>
+
+                <div class="carousel-wrapper">
+                    <div class="carousel-title">🏃 Carrusel Personajes Exploradores</div>
+                    <div class="carousel-track" id="track-explorers"></div>
+                </div>
+                <div class="carousel-wrapper">
+                    <div class="carousel-title">👑 Carrusel Admin Owners</div>
+                    <div class="carousel-track" id="track-owners"></div>
+                </div>
+            </div>
+
+            <nav class="shop-nav-menu">
+                <button class="shop-nav-btn active" id="shop-tab-clothes" onclick="switchShopPanel('clothes')"><i data-lucide="shirt" style="width:16px;"></i> Ropa</button>
+                <button class="shop-nav-btn" id="shop-tab-glasses" onclick="switchShopPanel('glasses')"><i data-lucide="glasses" style="width:16px;"></i> Gafas</button>
+                <button class="shop-nav-btn" id="shop-tab-combos" onclick="switchShopPanel('combos')"><i data-lucide="sparkles" style="width:16px;"></i> Combos Épicos</button>
+            </nav>
+
+            <div id="panel-shop-clothes" class="shop-panel active">
+                <div class="shop-grid" id="grid-clothes"></div>
+            </div>
+
+            <div id="panel-shop-glasses" class="shop-panel">
+                <div class="shop-grid" id="grid-glasses"></div>
+            </div>
+
+            <div id="panel-shop-combos" class="shop-panel">
+                <div style="display:flex; flex-direction:column; gap:16px;" id="grid-combos"></div>
+            </div>
+
+            <div class="roulette-card" style="background: linear-gradient(135deg, #112c24 0%, #121824 100%); border-color: var(--success-green);">
+                <div style="font-size: 2.2rem; margin-bottom: 6px;">🎁</div>
+                <h3 style="font-size:1rem; font-weight:800; margin-bottom:4px;">Caja de Energía Diaria</h3>
+                <p style="font-size:0.75rem; color:var(--text-muted); margin-bottom:10px;">Obtén entre 5 y 50 puntos gratis cada 24h para subir tu Rango.</p>
+                <button id="gacha-trigger-btn" class="btn-subscribe-trigger" style="background:var(--success-green); color:black; width:auto; margin:0 auto; padding:10px 24px;" onclick="claimDailyGacha()">Abrir Cofre Gratis</button>
+            </div>
+        </div>
+    </main>
+
+    <main id="view-energy" class="app-view">
+        <h2 class="view-title"><i data-lucide="zap" style="color:var(--vip-gold)"></i> Tabla Informativa de Energía</h2>
+        <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:14px;">Acumula puntos de energía para subir tu nivel RPG hasta el Rango 5 y desbloquear la personalización avanzada por IA.</p>
+        
+        <table class="energy-table">
+            <thead>
+                <tr><th>Acción del Usuario</th><th>Monto</th><th>Regla / Frecuencia</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>Check-In por Sesión</td><td style="color:var(--success-green);">+15 Pts</td><td>Diario automático</td></tr>
+                <tr><td>Cofre Diario Sorpresa</td><td style="color:var(--success-green);">+5 a +50 Pts</td><td>Cada 24 horas</td></tr>
+                <tr><td>Añadir Canal a Favoritos</td><td style="color:var(--success-green);">+5 Pts</td><td>Por canal único</td></tr>
+                <tr><td>Visitar Canales del Directorio</td><td style="color:var(--success-green);">+2 Pts</td><td>Sin límite diario</td></tr>
+                <tr><td>Ruleta Aleatoria Premium</td><td style="color:#e74c3c;">-5 Pts</td><td>Por intento</td></tr>
+            </tbody>
+        </table>
+    </main>
+
+    <div id="modal-add-channel" class="fullscreen-modal">
+        <div class="modal-body-box">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
+                <h3 style="font-size:1.1rem; font-weight:800; color:var(--telegram-blue);">Formulario de Alta de Canal</h3>
+                <button style="background:none; border:none; color:var(--text-muted);" onclick="closeAddChannelModal()"><i data-lucide="x"></i></button>
+            </div>
+            <div class="form-group">
+                <label>Nombre del Canal</label>
+                <input type="text" id="add-ch-name" class="form-control" placeholder="Ej: BetMasters VIP">
+            </div>
+            <div class="form-group">
+                <label>Usuario de Telegram (@)</label>
+                <input type="text" id="add-ch-user" class="form-control" placeholder="Ej: @MiCanalVIP">
+            </div>
+            <div class="form-group">
+                <label>Descripción Breve</label>
+                <textarea id="add-ch-desc" class="form-control" rows="2" placeholder="Describe los aportes del canal..."></textarea>
+            </div>
+            <button class="btn-subscribe-trigger" style="background: var(--telegram-blue);" onclick="submitChannelRegistrationForm()">
+                <i data-lucide="send"></i> Enviar Formulario a Soporte
+            </button>
+        </div>
+    </div>
+
+    <div id="modal-edit-channel" class="fullscreen-modal">
+        <div class="modal-body-box">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
+                <h3 style="font-size:1.1rem; font-weight:800; color:var(--vip-gold);">Editar Datos del Canal</h3>
+                <button style="background:none; border:none; color:var(--text-muted);" onclick="closeEditChannelModal()"><i data-lucide="x"></i></button>
+            </div>
+            <input type="hidden" id="edit-ch-id">
+            <div class="form-group">
+                <label>Nombre del Canal</label>
+                <input type="text" id="edit-ch-name" class="form-control">
+            </div>
+            <div class="form-group">
+                <label>Descripción</label>
+                <textarea id="edit-ch-desc" class="form-control" rows="3"></textarea>
+            </div>
+            <button class="btn-subscribe-trigger" style="background: var(--success-green); color: white;" onclick="saveChannelEditionChanges()">
+                <i data-lucide="save"></i> Guardar Cambios y Re-Verificar
+            </button>
+        </div>
+    </div>
+
+    <div id="modal-logs-view" class="fullscreen-modal">
+        <div class="modal-body-box">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+                <h3 style="font-size:1rem; font-weight:800;">Historial Local de Logs</h3>
+                <button style="background:none; border:none; color:var(--text-muted);" onclick="closeLogsModal()"><i data-lucide="x"></i></button>
+            </div>
+            <div id="logs-terminal-box" class="logs-terminal"></div>
+        </div>
+    </div>
+
+    <div id="modal-delete-request" class="fullscreen-modal">
+        <div class="modal-body-box">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
+                <h3 style="font-size:1.1rem; font-weight:800; color:#ef4444;">Formulario de Baja de Canal</h3>
+                <button style="background:none; border:none; color:var(--text-muted);" onclick="closeDeleteModal()"><i data-lucide="x"></i></button>
+            </div>
+            <input type="hidden" id="delete-channel-id">
+            <div class="form-group">
+                <label>Canal a remover</label>
+                <input type="text" id="delete-channel-name" class="form-control" readonly>
+            </div>
+            <div class="form-group">
+                <label>Razón de la baja o Comentarios adicionales</label>
+                <textarea id="delete-channel-reason" class="form-control" rows="3" placeholder="Escribe aquí el motivo para enviar al soporte..."></textarea>
+            </div>
+            <button class="btn-subscribe-trigger" style="background:#ef4444; color:white; margin-top:10px; box-shadow:0 4px 12px rgba(239,68,68,0.25);" onclick="sendDeleteRequestToTelegram()">
+                <i data-lucide="send"></i> Enviar Solicitud Privada
+            </button>
+        </div>
+    </div>
+
+    <nav class="tab-bar">
+        <div class="tab-item active-tab" id="tab-home" onclick="switchView('home')">
+            <i data-lucide="home"></i><span>Inicio</span>
+        </div>
+        <div class="tab-item" id="tab-directory" onclick="switchView('directory')">
+            <i data-lucide="compass"></i><span>Explorar</span>
+        </div>
+        <div class="tab-item" id="tab-favorites" onclick="switchView('favorites')">
+            <i data-lucide="star"></i><span>Favoritos</span>
+        </div>
+        <div class="tab-item" id="tab-history" onclick="switchView('history')">
+            <i data-lucide="history"></i><span>Historial</span>
+        </div>
+        <div class="tab-item" id="tab-energy" onclick="switchView('energy')">
+            <i data-lucide="zap"></i><span>Puntos</span>
+        </div>
+    </nav>
+
+    <script>
+        // DATASET EXTENDIDO CON SOPORTE PARA ESTADOS OPERATIVOS
+        const INITIAL_CHANNELS_DATASET = [
+            { id: 1, name: "BetMasters VIP", user: "@BetMastersVIP", category: "apuestas", subs: 45200, lang: "Español", status: "Publicado", isVip: true, logo: "🎯", description: "Pronósticos de alta fidelidad deportivos analizados por expertos.", isPopular: true, isNew: false, isTrending: true, telegramUserId: 12345678 },
+            { id: 2, name: "Green Pickers", user: "@GreenPickers", category: "apuestas", subs: 18400, lang: "Español", status: "En Revisión", isVip: false, logo: "⚽", description: "Estadísticas y picks de fútbol hispano en vivo.", isPopular: false, isNew: true, isTrending: false, telegramUserId: 12345678 },
+            { id: 3, name: "Emprende Academy", user: "@EmprendeAcademy", category: "marketing", subs: 89600, lang: "Español", status: "Publicado", isVip: true, logo: "💼", description: "Estrategias de monetización digital y negocios escalables.", isPopular: true, isNew: false, isTrending: true, telegramUserId: 11112222 },
+            { id: 4, name: "CryptoWhales Alert", user: "@CryptoWhalesAlert", category: "cripto", subs: 112000, lang: "Inglés", status: "Publicado", isVip: true, logo: "🐋", description: "Alertas institucionales del mercado blockchain en tiempo real.", isPopular: true, isNew: false, isTrending: false, telegramUserId: 33334444 },
+            { id: 5, name: "IA Revolucionaria", user: "@IaRevolucionaria", category: "tecnologia", subs: 67400, lang: "Español", status: "Publicado", isVip: true, logo: "🧠", description: "Aprende prompts avanzados y automatizaciones con Inteligencia Artificial.", isPopular: false, isNew: true, isTrending: true, telegramUserId: 99999999 },
+            { id: 6, name: "Coloring Books PDF", user: "@ColoringBooksPDF", category: "tecnologia", subs: 32100, lang: "Español", status: "En Revisión", isVip: false, logo: "🎨", description: "Libros artísticos listos para descargar e imprimir en alta resolución.", isPopular: false, isNew: true, isTrending: false, telegramUserId: 55556666 },
+            { id: 7, name: "Lista Golden Official", user: "@ListaGolden", category: "marketing", subs: 68400, lang: "Español", status: "Publicado", isVip: true, logo: "👑", description: "El canal publicitario oficial de nuestra MiniApp de Telegram.", isPopular: true, isNew: false, isTrending: true, telegramUserId: 1320417199 }
+        ];
+
+        const PREMIUM_SHOP_CATALOG = [
+            { id: "cloth_1", name: "Sudadera Hoodie", cost: 15, minRange: 1, value: "hoodie", type: "clothing", previewSeed: "b6e3f4" },
+            { id: "cloth_2", name: "Blazer & Camisa", cost: 25, minRange: 2, value: "blazerAndShirt", type: "clothing", previewSeed: "c0aede" },
+            { id: "cloth_3", name: "Camiseta Gráfica", cost: 35, minRange: 3, value: "graphicShirt", type: "clothing", previewSeed: "ffdfbf" },
+            { id: "cloth_4", name: "Traje Ejecutivo V", cost: 45, minRange: 4, value: "shirtVNeck", type: "clothing", previewSeed: "d1fae5" },
+            
+            { id: "glass_1", name: "Gafas de Lectura", cost: 10, minRange: 1, value: "prescription01", type: "glasses", previewSeed: "fef08a" },
+            { id: "glass_2", name: "Gafas Redondas Hipster", cost: 20, minRange: 2, value: "round", type: "glasses", previewSeed: "fed7aa" },
+            { id: "glass_3", name: "Gafas Wayfarer Classic", cost: 30, minRange: 3, value: "wayfarers", type: "glasses", previewSeed: "fbcfe8" },
+            { id: "glass_4", name: "Gafas de Sol Premium", cost: 50, minRange: 4, value: "sunglasses", type: "glasses", previewSeed: "c7d2fe" },
+
+            { 
+                id: "combo_epic_1", 
+                name: "Pack Hacker Cyberpunk", 
+                cost: 60, 
+                minRange: 1, 
+                type: "combos",
+                isPack: true,
+                itemsUnlocked: [
+                    { type: "clothing", value: "graphicShirt" },
+                    { type: "glasses", value: "sunglasses" }
+                ],
+                description: "Desbloquea instantáneamente el estilo épico de Sudadera Hacker y Gafas de Sol con un 30% de descuento incluido."
+            },
+            { 
+                id: "combo_epic_2", 
+                name: "Pack Elite Corporativo", 
+                cost: 85, 
+                minRange: 3, 
+                type: "combos",
+                isPack: true,
+                itemsUnlocked: [
+                    { type: "clothing", value: "blazerAndShirt" },
+                    { type: "glasses", value: "round" }
+                ],
+                description: "El pack definitivo para lucir como un Administrador de alto rango. Desbloquea el Blazer Ejecutivo y las Gafas Redondas."
+            }
+        ];
+
+        // MOCK BASE DE AVATARES ADICIONALES PARA CARRUSELES
+        const CAROUSEL_EXPLORERS_SEEDS = ["leo", "mia", "max", "zoe", "ian"];
+        const CAROUSEL_OWNERS_SEEDS = ["alex", "ruby", "sam", "eva", "boss"];
+
+        let state = {
+            user: { 
+                username: "Invitado Anónimo", 
+                idTelegram: 12345678,
+                balance: 100, 
+                role: "user", 
+                range: 1,
+                pointsProgress: 25,
+                seed: "carlos",
+                isVipMember: false, 
+                equipped: { clothing: "", glasses: "" }
+            },
+            favorites: [], 
+            history: [], 
+            systemLogs: [],
+            purchasedItems: [],
+            adminFilterOnly: false
+        };
+
+        let showFullHistory = false;
+
+        const CATEGORIES = [
+            { id: "all", name: "🌐 Todos" },
+            { id: "apuestas", name: "🎯 Apuestas" },
+            { id: "marketing", name: "💼 Negocios" },
+            { id: "cripto", name: "🪙 Cripto" },
+            { id: "tecnologia", name: "🧠 IA & Tec" }
+        ];
+        let activeCategoryFilter = "all";
+
+        document.addEventListener("DOMContentLoaded", () => {
+            loadFromLocalStorage();
+            initTelegramContext();
+            checkVipInternalRegistration();
+            executeDailyCheckIn();
+            renderAppUiComponents();
+            renderTopPodium();
+            renderShopCarrousels();
+            updateAdminToggleUI();
+            lucide.createIcons();
+            addLog("Ecosistema unificado bajo ID único de Telegram.");
+        });
+
+        function saveToLocalStorage() {
+            localStorage.setItem('canales_top_state_v3', JSON.stringify({
+                user: state.user,
+                favorites: state.favorites,
+                history: state.history,
+                systemLogs: state.systemLogs,
+                purchasedItems: state.purchasedItems
+            }));
+        }
+
+        function loadFromLocalStorage() {
+            const saved = localStorage.getItem('canales_top_state_v3');
+            if (saved) {
+                try {
+                    const parsed = JSON.parse(saved);
+                    state.user = parsed.user || state.user;
+                    state.favorites = parsed.favorites || state.favorites;
+                    state.history = parsed.history || state.history;
+                    state.systemLogs = parsed.systemLogs || state.systemLogs;
+                    state.purchasedItems = parsed.purchasedItems || state.purchasedItems;
+                } catch(e) {
+                    console.error("Error cargando localStorage", e);
+                }
+            }
+        }
+
+        // SISTEMA AUTOMÁTICO DE VERIFICACIÓN PREMIUM REQUERIDO
+function checkVipInternalRegistration() {
+    // Lista de IDs de Telegram autorizados como VIP
+    const vipTelegramIds = [12345678, 87654321, 55442211]; 
+    
+    // Si el id del usuario coincide con alguno de la lista, se activa VIP
+    if(vipTelegramIds.includes(state.user.idTelegram)) {
+        state.user.isVipMember = true;
+        
+        const alreadyShown = sessionStorage.getItem('premium_session_notified');
+        if(!alreadyShown) {
+            sessionStorage.setItem('premium_session_notified', 'true');
+            setTimeout(() => {
+                document.getElementById("premium-congrats-modal").style.display = "flex";
+                triggerConfettiExplosion();
+            }, 1000);
+        }
+    }
+    updatePremiumTagUI();
+}
+
+        function closeCongratsPremiumModal() {
+            document.getElementById("premium-congrats-modal").style.display = "none";
+        }
+
+        function updatePremiumTagUI() {
+            const tag = document.getElementById("user-premium-tag");
+            const label = document.getElementById("tag-label-text");
+            if(!tag) return;
+
+            if(state.user.isVipMember) {
+                tag.className = "user-badge-status badge-vip";
+                label.innerText = "VIP MEMBER";
+            } else {
+                tag.className = "user-badge-status badge-free";
+                label.innerText = "GRATIS";
+            }
+        }
+
+        function toggleBenefitsSection() {
+            const panel = document.getElementById("hidden-benefits-box");
+            const title = document.getElementById("benefits-box-title");
+            const form = document.getElementById("premium-order-form");
+
+            if(panel.style.display === "block") {
+                panel.style.display = "none";
+            } else {
+                panel.style.display = "block";
+                if(state.user.isVipMember) {
+                    title.innerText = "Tus Beneficios VIP Activos:";
+                    form.style.display = "none";
+                } else {
+                    title.innerText = "Beneficios de la Suscripción VIP:";
+                    form.style.display = "block";
+                }
+            }
+        }
+
+        function toggleBenefitsSection() {
+            const panel = document.getElementById("hidden-benefits-box");
+            const title = document.getElementById("benefits-box-title");
+            const form = document.getElementById("premium-order-form");
+
+            if(panel.style.display === "block") {
+                panel.style.display = "none";
+            } else {
+                panel.style.display = "block";
+                if(state.user.isVipMember) {
+                    title.innerText = "Tus Beneficios VIP Activos:";
+                    form.style.display = "none";
+                } else {
+                    title.innerText = "Beneficios de la Suscripción VIP:";
+                    form.style.display = "block";
+                }
+            }
+        }
+
+        function sendOrderToTelegram() {
+    const method = document.getElementById("pay-method").value;
+    const msg = `🛒 NUEVO PEDIDO VIP 🛒\n\n• Usuario: ${state.user.username}\n• ID Telegram: ${state.user.idTelegram}\n• Método Elegido: ${method}\n• Estado: Esperando Pago`;
+    
+    // Codificamos el mensaje para que sea válido dentro de una URL
+    const textEncoded = encodeURIComponent(msg);
+    
+    // REEMPLAZA "Airdayz" por tu nombre de usuario de Telegram (sin el @) o el alias de tu Bot
+    const telegramUrl = `https://t.me/Airdayz?text=${textEncoded}`;
+    
+    if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.openTelegramLink) {
+        // Abre el chat privado directamente con el mensaje predefinido en la barra de texto
+        window.Telegram.WebApp.openTelegramLink(telegramUrl);
+    } else {
+        // Alternativa de respaldo por si se prueba fuera de Telegram (navegador estándar)
+        window.open(telegramUrl, "_blank");
+    }
+    
+    showToast("Pedido enviado a Telegram privado", "success");
+    toggleBenefitsSection();
+}
+
+        function initTelegramContext() {
+            if (window.Telegram && window.Telegram.WebApp) {
+                const webApp = window.Telegram.WebApp;
+                webApp.ready();
+                webApp.expand();
+                if(webApp.colorScheme === 'light') document.documentElement.setAttribute('data-theme', 'light');
+                if (webApp.initDataUnsafe?.user) {
+                    const tgUser = webApp.initDataUnsafe.user;
+                    state.user.username = tgUser.username ? `@${tgUser.username}` : `${tgUser.first_name}`;
+                    state.user.idTelegram = tgUser.id;
+                    state.user.seed = tgUser.username || "player";
+                }
+            }
+            updateAvatarRenderers();
+            saveToLocalStorage();
+        }
+
+        function updateAvatarRenderers() {
+            let queryParams = `?seed=${state.user.seed}&radius=50&backgroundColor=1e293b`;
+            
+            if (state.user.equipped.clothing) queryParams += `&clothing=${state.user.equipped.clothing}`;
+            if (state.user.equipped.glasses) queryParams += `&accessoriesProbability=100&accessories=${state.user.equipped.glasses}`;
+
+            const finalUrl = `https://api.dicebear.com/9.x/avataaars/svg${queryParams}`;
+            
+            document.getElementById("header-avatar").src = finalUrl;
+            document.getElementById("shop-ia-avatar-preview").src = finalUrl;
+            document.getElementById("drawer-avatar-render").src = finalUrl;
+            
+            renderEquippedChipsList();
+        }
+
+        function renderShopCarrousels() {
+            const trackExplorers = document.getElementById("track-explorers");
+            const trackOwners = document.getElementById("track-owners");
+
+            trackExplorers.innerHTML = CAROUSEL_EXPLORERS_SEEDS.map(seed => `
+                <div class="carousel-item-avatar" onclick="selectCarouselSeed('${seed}')">
+                    <img src="https://api.dicebear.com/9.x/avataaars/svg?seed=${seed}&radius=50" style="width: 50px; height: 50px;" />
+                    <div style="font-size: 0.65rem; margin-top: 4px; color: var(--text-muted); font-weight:bold;">${seed}</div>
+                </div>
+            `).join('');
+
+            trackOwners.innerHTML = CAROUSEL_OWNERS_SEEDS.map(seed => `
+                <div class="carousel-item-avatar" onclick="selectCarouselSeed('${seed}')" style="border-color: var(--vip-gold);">
+                    <img src="https://api.dicebear.com/9.x/avataaars/svg?seed=${seed}&radius=50" style="width: 50px; height: 50px;" />
+                    <div style="font-size: 0.65rem; margin-top: 4px; color: var(--vip-gold); font-weight:bold;">${seed}</div>
+                </div>
+            `).join('');
+        }
+
+        function selectCarouselSeed(seed) {
+            state.user.seed = seed;
+            showToast(`Avatar base cambiado a: ${seed}`, "info");
+            updateAvatarRenderers();
+            saveToLocalStorage();
+        }
+
+        function renderEquippedChipsList() {
+            const container = document.getElementById("equipped-items-list");
+            if (!container) return;
+            container.innerHTML = "";
+
+            let hasAddons = false;
+
+            if (state.user.equipped.clothing) {
+                hasAddons = true;
+                const itemData = PREMIUM_SHOP_CATALOG.find(i => i.value === state.user.equipped.clothing);
+                container.innerHTML += `
+                    <div class="equipped-chip">
+                        <span>👕 ${itemData ? itemData.name : 'Ropa'}</span>
+                        <button class="btn-unequip" onclick="unequipItem('clothing')"><i data-lucide="x" style="width:12px; height:12px;"></i></button>
+                    </div>
+                `;
+            }
+            if (state.user.equipped.glasses) {
+                hasAddons = true;
+                const itemData = PREMIUM_SHOP_CATALOG.find(i => i.value === state.user.equipped.glasses);
+                container.innerHTML += `
+                    <div class="equipped-chip">
+                        <span>👓 ${itemData ? itemData.name : 'Gafas'}</span>
+                        <button class="btn-unequip" onclick="unequipItem('glasses')"><i data-lucide="x" style="width:12px; height:12px;"></i></button>
+                    </div>
+                `;
+            }
+
+            if(!hasAddons) {
+                container.innerHTML = `<span style="font-size:0.72rem; color:var(--text-muted);">Sin accesorios equipados</span>`;
+            }
+            lucide.createIcons();
+        }
+
+        function unequipItem(type) {
+            state.user.equipped[type] = "";
+            showToast("Accesorio removido del avatar", "info");
+            updateAvatarRenderers();
+            renderShopCatalog();
+            saveToLocalStorage();
+        }
+
+        function addLog(msg) {
+            const timestamp = new Date().toLocaleTimeString();
+            state.systemLogs.unshift(`[${timestamp}] ${msg}`);
+            const container = document.getElementById("logs-terminal-box");
+            if (container) container.innerHTML = state.systemLogs.map(l => `<div class="log-line">${l}</div>`).join('');
+            saveToLocalStorage();
+        }
+
+        function registerActionToHistory(title, detail, type = "info") {
+            const icons = { info: "info", success: "check-circle", gold: "star", error: "alert-triangle" };
+            const actionIcon = icons[type] || "activity";
+            const now = new Date();
+            const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            
+            state.history.unshift({ title, detail, time: timeString, icon: actionIcon, type });
+            document.getElementById("cnt-purchases").innerText = state.history.filter(h => h.type === 'gold').length;
+            saveToLocalStorage();
+        }
+
+        function showToast(text, type = "info") {
+            const container = document.getElementById("toast-container");
+            const toast = document.createElement("div");
+            toast.className = `toast-card ${type}`;
+            
+            let iconName = "info";
+            if(type === "success") iconName = "check-circle";
+            if(type === "error") iconName = "alert-circle";
+            if(type === "gold") iconName = "sparkles";
+
+            toast.innerHTML = `<i data-lucide="${iconName}"></i> <span>${text}</span>`;
+            container.appendChild(toast);
+            lucide.createIcons();
+
+            setTimeout(() => {
+                toast.classList.add("toast-leave");
+                toast.addEventListener("animationend", () => toast.remove());
+            }, 3800);
+        }
+
+        function getDynamicDailyViews(channelId) {
+            const todayTimestamp = Math.floor(new Date().setHours(0,0,0,0) / 86400000);
+            const seed = (channelId * 31) + todayTimestamp;
+            return Math.floor(Math.abs(Math.sin(seed)) * (50 - 5 + 1)) + 5;
+        }
+
+        function rewardPoints(amount, actionLabel) {
+            state.user.balance += amount;
+            state.user.pointsProgress += amount;
+            
+            const oldRange = state.user.range;
+            state.user.range = Math.min(5, Math.floor(state.user.pointsProgress / 20) + 1);
+            
+            if(state.user.range > oldRange) {
+                triggerConfettiExplosion();
+                showToast(`¡Felicidades! Has alcanzado el Rango ${state.user.range}.`, "gold");
+                registerActionToHistory("Evolución de Rango", `Alcanzaste el rango de usuario de nivel ${state.user.range}`, "gold");
+            }
+            
+            updateBalanceAndRpgUi();
+            renderShopCatalog();
+            saveToLocalStorage();
+        }
+
+        function executeDailyCheckIn() {
+            const today = new Date().toDateString();
+            if(localStorage.getItem('last_checkin_date') !== today) {
+                localStorage.setItem('last_checkin_date', today);
+                rewardPoints(15, "Check-In de Sesión Diario");
+                registerActionToHistory("Check-In Diario", "Recibiste +15 puntos de energía.", "success");
+            }
+        }
+
+        function claimDailyGacha() {
+            const prize = Math.floor(Math.random() * (50 - 5 + 1)) + 5;
+            rewardPoints(prize, "Apertura de Cofre Diario");
+            registerActionToHistory("Cofre Sorpresa", `Abriste el cofre y reclamaste +${prize} puntos.`, "success");
+            showToast(`¡Ganaste +${prize} puntos de energía!`, "success");
+            
+            const btn = document.getElementById("gacha-trigger-btn");
+            btn.disabled = true;
+            btn.innerText = "Cofre Reclamado";
+            btn.style.opacity = "0.5";
+        }
+
+        function switchView(viewId) {
+            state.adminFilterOnly = false; 
+            document.querySelectorAll('.app-view').forEach(v => v.classList.remove('active-view'));
+            document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active-tab'));
+            
+            const targetView = document.getElementById(`view-${viewId}`);
+            if (targetView) targetView.classList.add('active-view');
+            
+            const targetTab = document.getElementById(`tab-${viewId}`);
+            if (targetTab) targetTab.classList.add('active-tab');
+
+            if (viewId === 'directory') renderDirectoryList();
+            if (viewId === 'favorites') renderFavoritesList();
+            if (viewId === 'my-channels') renderMyOwnedChannelsList();
+            if (viewId === 'history') { showFullHistory = false; renderHistoryList(); }
+            if (viewId === 'home') { renderVipSlider(); renderTopPodium(); }
+            if (viewId === 'shop') renderShopCatalog();
+            lucide.createIcons();
+        }
+
+        function toggleProfileDrawer() {
+            document.getElementById("profile-drawer").classList.toggle("open");
+        }
+
+        function handlePremiumDrawerAccess() {
+            if(state.user.range < 5) {
+                showToast("Acceso Denegado. Se requiere Rango 5.", "error");
+            } else {
+                toggleProfileDrawer();
+                switchView('shop');
+            }
+        }
+
+        function toggleAdminRole() {
+            state.user.role = state.user.role === "admin" ? "user" : "admin";
+            updateAdminToggleUI();
+            
+            if(state.user.role === "admin") {
+                showToast("Vista Administrador Activada", "gold");
+            } else {
+                showToast("Vista Explorador Activada", "info");
+            }
+            
+            renderDirectoryList();
+            saveToLocalStorage();
+        }
+
+        function updateAdminToggleUI() {
+            const toggle = document.getElementById("role-toggle");
+            if (!toggle) return;
+
+            if(state.user.role === "admin") {
+                toggle.classList.add("active");
+                document.body.classList.add("role-admin");
+            } else {
+                toggle.classList.remove("active");
+                document.body.classList.remove("role-admin");
+            }
+        }
+
+        function switchShopPanel(panelId) {
+            document.querySelectorAll(".shop-panel").forEach(p => p.classList.remove("active"));
+            document.querySelectorAll(".shop-nav-btn").forEach(b => b.classList.remove("active"));
+
+            document.getElementById(`panel-shop-${panelId}`).classList.add("active");
+            
+            if(panelId === 'clothes') document.getElementById("shop-tab-clothes").classList.add("active");
+            if(panelId === 'glasses') document.getElementById("shop-tab-glasses").classList.add("active");
+            if(panelId === 'combos') document.getElementById("shop-tab-combos").classList.add("active");
+        }
+
+        function renderShopCatalog() {
+            const gridClothes = document.getElementById("grid-clothes");
+            const gridGlasses = document.getElementById("grid-glasses");
+            const gridCombos = document.getElementById("grid-combos");
+
+            if (!gridClothes || !gridGlasses || !gridCombos) return;
+
+            gridClothes.innerHTML = "";
+            gridGlasses.innerHTML = "";
+            gridCombos.innerHTML = "";
+
+            PREMIUM_SHOP_CATALOG.forEach(item => {
+                const hasRange = state.user.range >= item.minRange;
+                const hasBalance = state.user.balance >= item.cost;
+                const isPurchased = state.purchasedItems.includes(item.id);
+
+                if (item.isPack) {
+                    let packButtonHtml = '';
+                    if (isPurchased) {
+                        packButtonHtml = `<button class="btn-shop-buy state-equipped" onclick="equipPack('${item.id}')">⚡ Re-Equipar Pack</button>`;
+                    } else if (!hasBalance) {
+                        packButtonHtml = `<button class="btn-shop-buy state-insufficient">Falta Saldo (${item.cost} ✨)</button>`;
+                    } else {
+                        packButtonHtml = `<button class="btn-shop-buy state-ready" onclick="buyPack('${item.id}', ${item.cost})">Comprar Pack Especial</button>`;
+                    }
+
+                    gridCombos.innerHTML += `
+                        <div class="epic-pack-card">
+                            <div class="pack-badge">OFERTA</div>
+                            <h3 style="font-weight:900; color:var(--vip-gold); font-size:1.1rem; margin-bottom:4px;">${item.name}</h3>
+                            <p style="font-size:0.75rem; color:var(--text-muted); line-height:1.4;">${item.description}</p>
+                            
+                            <div class="pack-grid-preview">
+                                ${item.itemsUnlocked.map(unl => `
+                                    <div class="pack-preview-item">
+                                        <img src="https://api.dicebear.com/9.x/avataaars/svg?seed=preview&${unl.type}=${unl.value}" style="width:100%;" />
+                                    </div>
+                                `).join('')}
+                            </div>
+
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
+                                <div style="font-weight:800; font-size:1.2rem; color:#fff;">${item.cost} <span style="color:var(--vip-gold); font-size:0.8rem;">✨ Pts</span></div>
+                                <div style="width:60%;">${packButtonHtml}</div>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    const isEquipped = state.user.equipped[item.type] === item.value;
+                    let buttonHtml = '';
+                    let cardClass = 'item-shop-card';
+
+                    if (isEquipped) {
+                        buttonHtml = `<button class="btn-shop-buy state-equipped" onclick="unequipItem('${item.type}')">Quitar ❌</button>`;
+                    } else if (isPurchased) {
+                        buttonHtml = `<button class="btn-shop-buy state-unequipped" onclick="equipItem('${item.type}', '${item.value}')">Equipar</button>`;
+                    } else if (!hasRange) {
+                        cardClass += ' locked-item';
+                        buttonHtml = `<button class="btn-shop-buy state-locked">🔒 Rango ${item.minRange}</button>`;
+                    } else if (!hasBalance) {
+                        buttonHtml = `<button class="btn-shop-buy state-insufficient">Falta Saldo</button>`;
+                    } else {
+                        buttonHtml = `<button class="btn-shop-buy state-ready" onclick="buyItem('${item.id}', ${item.cost}, '${item.type}', '${item.value}')">Comprar</button>`;
+                    }
+
+                    const targetGrid = item.type === "clothing" ? gridClothes : gridGlasses;
+                    targetGrid.innerHTML += `
+                        <div class="${cardClass}">
+                            <div class="ia-avatar-frame" style="width:65px; height:65px; border-width:2px;">
+                                <img src="https://api.dicebear.com/9.x/avataaars/svg?seed=${item.previewSeed}&${item.type}=${item.value}" alt="Item Preview">
+                            </div>
+                            <div style="font-size:0.8rem; font-weight:800; color:#fff;">${item.name}</div>
+                            <div style="color:var(--vip-gold); font-size:0.85rem; font-weight:900;">${item.cost} ✨</div>
+                            ${buttonHtml}
+                        </div>
+                    `;
+                }
+            });
+        }
+
+        function buyItem(id, cost, type, value) {
+            state.user.balance -= cost;
+            state.purchasedItems.push(id);
+            state.user.equipped[type] = value;
+
+            triggerConfettiExplosion();
+            showToast("¡Artículo comprado y equipado!", "gold");
+            registerActionToHistory("Compra Tienda", `Compraste accesorio: ${value}`, "gold");
+
+            updateBalanceAndRpgUi();
+            updateAvatarRenderers();
+            renderShopCatalog();
+        }
+
+        function equipItem(type, value) {
+            state.user.equipped[type] = value;
+            showToast("Accesorio equipado", "success");
+            updateAvatarRenderers();
+            renderShopCatalog();
+            saveToLocalStorage();
+        }
+
+        function buyPack(id, cost) {
+            const pack = PREMIUM_SHOP_CATALOG.find(p => p.id === id);
+            state.user.balance -= cost;
+            state.purchasedItems.push(id);
+            
+            pack.itemsUnlocked.forEach(addon => {
+                state.user.equipped[addon.type] = addon.value;
+            });
+
+            triggerConfettiExplosion();
+            showToast("¡Pack Épico Adquirido!", "gold");
+            registerActionToHistory("Compra Combo Épico", `Adquiriste ${pack.name}`, "gold");
+
+            updateBalanceAndRpgUi();
+            updateAvatarRenderers();
+            renderShopCatalog();
+        }
+
+        function equipPack(id) {
+            const pack = PREMIUM_SHOP_CATALOG.find(p => p.id === id);
+            pack.itemsUnlocked.forEach(addon => {
+                state.user.equipped[addon.type] = addon.value;
+            });
+            showToast("Combo Completo Equipado", "success");
+            updateAvatarRenderers();
+            renderShopCatalog();
+            saveToLocalStorage();
+        }
+
+        function renderTopPodium() {
+            const container = document.getElementById("top-podium-container");
+            if (!container) return;
+            const sortedTop = [...INITIAL_CHANNELS_DATASET].sort((a, b) => b.subs - a.subs).slice(0, 3);
+            
+            container.innerHTML = sortedTop.map((c, index) => `
+                <div class="podium-card rank-${index + 1}">
+                    <div class="podium-badge">#${index + 1}</div>
+                    <div style="display:flex; align-items:center; gap:12px;">
+                        <span style="font-size:1.8rem;">${c.logo}</span>
+                        <div>
+                            <h4 style="font-weight:800; font-size:1.05rem;">${c.name}</h4>
+                            <p style="font-size:0.75rem; color:var(--text-muted);">${c.user}</p>
+                        </div>
+                    </div>
+                    <p style="font-size:0.8rem; color:var(--text-muted); line-height:1.4;">${c.description}</p>
+                    <div style="font-size:0.75rem; font-weight:700;">👥 Suscriptores: <span style="color:var(--telegram-blue);">${c.subs.toLocaleString()}</span></div>
+                    <button class="btn-subscribe-trigger" style="padding:10px; font-size:0.8rem;" onclick="registerChannelAccess(${c.id})">Visitar Canal Top</button>
+                </div>
+            `).join('');
+        }
+
+        function renderAppUiComponents() {
+            document.getElementById("drawer-username").innerText = state.user.username;
+            
+            const catBar = document.getElementById("categories-bar");
+            if (catBar) {
+                catBar.innerHTML = CATEGORIES.map(c => `
+                    <div class="cat-chip ${activeCategoryFilter === c.id ? 'active-chip' : ''}" onclick="selectCategoryFilter('${c.id}')">
+                        ${c.name}
+                    </div>
+                `).join('');
+            }
+            
+            const myOwnedIdCount = INITIAL_CHANNELS_DATASET.filter(c => c.telegramUserId === state.user.idTelegram).length;
+            
+            document.getElementById("cnt-my-owned-channels").innerText = myOwnedIdCount;
+            document.getElementById("cnt-channels").innerText = INITIAL_CHANNELS_DATASET.length;
+            document.getElementById("stat-total-channels").innerText = INITIAL_CHANNELS_DATASET.length;
+
+            renderVipSlider();
+            renderDirectoryList();
+            updateBalanceAndRpgUi();
+        }
+
+        function updateBalanceAndRpgUi() {
+            document.getElementById("profile-balance").innerText = state.user.balance;
+            document.getElementById("drawer-range").innerText = `[ Rango RPG Nivel ${state.user.range} ]`;
+            document.getElementById("cnt-favs").innerText = state.favorites.length;
+            document.getElementById("rpg-current-pts").innerText = state.user.pointsProgress;
+            
+            const percentage = Math.min(100, state.user.pointsProgress);
+            document.getElementById("rpg-bar-fill").style.width = `${percentage}%`;
+            
+            const badge = document.getElementById("rpg-status-badge");
+            const lockText = document.getElementById("drawer-locked-text");
+            const lockIcon = document.getElementById("drawer-locked-icon");
+            const drawerBtn = document.getElementById("epic-avatar-link");
+
+            if (state.user.range >= 5) {
+                badge.innerText = "Nivel Máximo (Rango 5)";
+                badge.style.color = "var(--vip-gold)";
+                lockText.innerText = "✨ Taller de Avatar IA (Desbloqueado)";
+                drawerBtn.classList.remove("locked");
+                if(lockIcon) lockIcon.style.display = "none";
+            } else {
+                badge.innerText = `Rango ${state.user.range}`;
+                badge.style.color = "var(--telegram-blue)";
+            }
+        }
+
+        function renderVipSlider() {
+            const container = document.getElementById("vip-slider");
+            if (!container) return;
+            const vips = INITIAL_CHANNELS_DATASET.filter(c => c.isVip);
+            container.innerHTML = vips.map(c => `
+                <div class="vip-slide-card" onclick="registerChannelAccess(${c.id})">
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <span class="channel-thumb" style="border:none; background:none; font-size:1.6rem;">${c.logo}</span>
+                        <div>
+                            <h4 style="font-size:0.85rem; font-weight:700;">${c.name}</h4>
+                            <p style="font-size:0.7rem; color:var(--text-muted);">${c.user}</p>
+                            <span class="live-traffic-badge" style="font-size:0.6rem; padding:2px 6px;"><i data-lucide="eye" style="width:10px;height:10px;"></i> ${getDynamicDailyViews(c.id)}</span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        function scrollSlider(dir) {
+            document.getElementById("vip-slider").scrollLeft += (dir * 220);
+        }
+
+        function selectCategoryFilter(catId) {
+            activeCategoryFilter = catId;
+            renderAppUiComponents();
+        }
+
+        function filterDirectory() {
+            renderDirectoryList();
+        }
+
+        function buildChannelCardHtml(c, isFavoritePage = false) {
+    const isFav = state.favorites.includes(c.id);
+    const badgeVip = c.isVip ? `<span class="animated-vip-badge">DESTACADO</span>` : '';
+    const liveViews = getDynamicDailyViews(c.id);
+    
+    // Creamos un prefijo único según la página: 'fav-' o vacío ''
+    const prefix = isFavoritePage ? 'fav-' : '';
+    
+    const safeName = (c.name || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+    const safeUser = (c.user || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+
+    return `
+        <div class="channel-card ${c.isVip ? 'vip-border' : ''}">
+            <div class="card-main-row" onclick="toggleAccordionEffect(${c.id}, '${prefix}')">
+                <div class="card-identity-box">
+                    <div class="channel-thumb">${c.logo}</div>
+                    <div class="channel-meta">
+                        <h4>${c.name} ${badgeVip}</h4>
+                        <p style="margin: 2px 0;">${c.user}</p>
+                        <div class="live-traffic-badge">
+                            <i data-lucide="eye" style="width:12px; height:12px;"></i>
+                            <span>${liveViews} visitas hoy</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card-actions-column" onclick="event.stopPropagation();" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; padding-left: 10px;">
+<i data-lucide="star" class="fav-star-icon ${isFav ? 'is-fav' : ''}" onclick="toggleFavoriteChannel(${c.id}, event)"></i>
+                    <div class="share-channel-icon" style="cursor: pointer; display: flex; align-items: center; justify-content: center; color: #a0aec0;" onclick="openShareModal(${c.id}, '${safeName}', '${safeUser}')">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="18" cy="5" r="3"></circle>
+                            <circle cx="6" cy="12" r="3"></circle>
+                            <circle cx="18" cy="19" r="3"></circle>
+                            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+            <div id="accordion-${prefix}${c.id}" class="card-accordion-content">
+                <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:10px; line-height:1.4;">${c.description}</p>
+                <div class="extended-data-row">
+                    <span>Idioma: <strong>${c.lang}</strong></span>
+                    <span>Subs: <strong>${c.subs.toLocaleString()}</strong></span>
+                </div>
+                <button class="btn-subscribe-trigger" onclick="registerChannelAccess(${c.id})">Visitar Canal en Telegram</button>
+            </div>
+        </div>
+    `;
+}
+// Función auxiliar de seguridad obligatoria para limpiar comillas o caracteres extraños en los parámetros inline
+function escapeHtml(text) {
+    return text.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+}
+
+        function renderDirectoryList() {
+            const list = document.getElementById("directory-list");
+            if (!list) return;
+            
+            const query = document.getElementById("directory-search")?.value.toLowerCase() || "";
+            const sortingFilter = document.getElementById("filter-sorting").value;
+            const statusFilter = document.getElementById("filter-status").value;
+
+            let filtered = INITIAL_CHANNELS_DATASET.filter(c => {
+                if (state.adminFilterOnly && c.telegramUserId !== state.user.idTelegram) return false;
+                
+                // Los canales en revisión no se listan en el directorio público
+                if (c.status === "En Revisión") return false;
+
+                const matchesCategory = (activeCategoryFilter === "all" || c.category === activeCategoryFilter);
+                const matchesQuery = (c.name.toLowerCase().includes(query) || c.user.toLowerCase().includes(query) || c.description.toLowerCase().includes(query));
+                
+                let matchesStatus = true;
+                if(statusFilter === "Destacado") matchesStatus = c.isVip;
+                if(statusFilter === "Público") matchesStatus = !c.isVip;
+
+                let matchesSorting = true;
+                if(sortingFilter === "popular") matchesSorting = c.isPopular;
+                if(sortingFilter === "new") matchesSorting = c.isNew;
+                if(sortingFilter === "trend") matchesSorting = c.isTrending;
+
+                return matchesCategory && matchesQuery && matchesStatus && matchesSorting;
+            });
+
+            list.innerHTML = filtered.map(c => buildChannelCardHtml(c)).join('');
+            lucide.createIcons();
+        }
+
+        // CONTROL EXCLUSIVO EN "MIS CANALES GUARDADOS"
+function renderMyOwnedChannelsList() {
+    const container = document.getElementById("my-owned-channels-list");
+    const tableBody = document.getElementById("user-channels-table-body");
+    if (!container || !tableBody) return;
+
+    // 1. VERIFICACIÓN DE SESIÓN / ESTADO CRÍTICO
+    // Si un canal tiene solicitud de baja activa (deleteRequested) pero pasa filtros de verificación o inicio
+    INITIAL_CHANNELS_DATASET.forEach(c => {
+        if (c.telegramUserId === state.user.idTelegram && c.deleteRequested && c.status === "Publicado") {
+            // Aquí puedes definir tu lógica de verificación de sesión: si deseas que cambie de estado inmediatamente
+            // pasamos de "Publicado" al estado "Sin Publicar" y limpiamos la alerta temporal
+            c.status = "Sin Publicar";
+            c.deleteRequested = false; 
+        }
+    });
+
+    const myOwned = INITIAL_CHANNELS_DATASET.filter(c => c.telegramUserId === state.user.idTelegram);
+    
+    // Recalcular contadores del panel superior incluyendo el nuevo estado
+    const total = myOwned.length;
+    const review = myOwned.filter(c => c.status === "En Revisión").length;
+    const published = myOwned.filter(c => c.status === "Publicado").length;
+    const unpublished = myOwned.filter(c => c.status === "Sin Publicar").length;
+
+    document.getElementById("panel-cnt-total").innerText = total;
+    document.getElementById("panel-cnt-review").innerText = review;
+    document.getElementById("panel-cnt-published").innerText = published;
+    // Si tienes un elemento visual para "Sin Publicar" puedes actualizarlo aquí, ej:
+    // document.getElementById("panel-cnt-unpublished").innerText = unpublished;
+
+    if (myOwned.length === 0) {
+        tableBody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:var(--text-muted);">No posees canales registrados.</td></tr>`;
+        container.innerHTML = `<div class="empty-state-notice">Tu Telegram ID (${state.user.idTelegram}) no posee canales asociados.</div>`;
+        return;
+    }
+
+    // Renderizar la tabla de control operativo con las reglas solicitadas
+    tableBody.innerHTML = myOwned.map(c => {
+        let badgeClass = "status-review";
+        if (c.status === "Publicado") badgeClass = "status-published";
+        if (c.status === "Sin Publicar") badgeClass = "status-free"; // O una clase gris que manejes
+
+        // Condicional para mostrar el botón de "Volver a enviar" si está sin publicar
+        const reSendButton = c.status === "Sin Publicar" ? `
+            <button class="mini-action-btn" style="color:var(--telegram-blue);" onclick="handleReSendChannel(${c.id})">
+                <i data-lucide="send" style="width:11px; height:11px;"></i> Re-Enviar
+            </button>
+        ` : '';
+
+        return `
+            <tr>
+                <td><strong>${c.name}</strong><br><span style="font-size:0.7rem; color:var(--text-muted);">${c.user}</span></td>
+                <td><span class="badge-status-pill ${badgeClass}">${c.status}</span></td>
+                <td>
+                    <div class="action-row-buttons">
+                        <button class="mini-action-btn" onclick="handleChannelEditAction(${c.id}, '${c.status}')">
+                            <i data-lucide="edit-3" style="width:11px; height:11px;"></i> Editar
+                        </button>
+                        ${reSendButton}
+                        <button class="mini-action-btn" style="color:#ef4444;" onclick="handleChannelDeleteAction(${c.id}, '${c.name}', '${c.status}')">
+                            <i data-lucide="trash-2" style="width:11px; height:11px;"></i> Borrar
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `;
+    }).join('');
+
+    // Renderizar abajo las tarjetas de los canales
+    container.innerHTML = myOwned.map(c => {
+        // Si el usuario envió la solicitud de borrado pero sigue en la vista, inyectamos el mensaje arriba de la tarjeta
+        if (c.deleteRequested) {
+            return `
+                <div class="delete-warning-box" style="background:#fffbeb; border:1px solid #fef3c7; color:#b45309; padding:10px; border-radius:8px; margin-bottom:8px; font-size:0.8rem; font-weight:bold;">
+                    ⚠️ Tu canal dejará de aparecer en el directo de canales públicamente en las próximas horas.
+                </div>
+                ${buildChannelCardHtml(c)}
+            `;
+        }
+        // Solo mostramos de forma estándar en el contenedor público si sigue "Publicado"
+        if (c.status === "Publicado") {
+            return buildChannelCardHtml(c);
+        }
+        return '';
+    }).join('');
+
+    lucide.createIcons();
+}
+
+// FUNCIÓN PARA EL BOTÓN DE VOLVER A ENVIAR EL CANAL
+function handleReSendChannel(id) {
+    const channel = INITIAL_CHANNELS_DATASET.find(c => c.id === id);
+    if (channel) {
+        channel.status = "En Revisión";
+        showToast("Canal enviado a revisión nuevamente", "success");
+        renderMyOwnedChannelsList();
+        if (typeof renderDirectoryList === "function") renderDirectoryList();
+    }
+}
+
+        // LÓGICAS INTERNAS DE SEGURIDAD OPERATIVA PARA CANALES
+        function openAddChannelModal() {
+            const myOwned = INITIAL_CHANNELS_DATASET.filter(c => c.telegramUserId === state.user.idTelegram);
+            
+            // Verificación del plan gratuito (Límite hasta 3 canales si es VIP)
+            if(!state.user.isVipMember && myOwned.length >= 1) {
+                showToast("Límite alcanzado. Plan GRATIS permite 1 canal. Compra VIP para expandir a 3.", "error");
+                return;
+            }
+            if(state.user.isVipMember && myOwned.length >= 3) {
+                showToast("Límite máximo alcanzado (3 Canales permitidos en VIP).", "error");
+                return;
+            }
+
+            document.getElementById("add-ch-name").value = "";
+            document.getElementById("add-ch-user").value = "";
+            document.getElementById("add-ch-desc").value = "";
+            document.getElementById("modal-add-channel").style.display = "flex";
+        }
+
+        function closeAddChannelModal() { document.getElementById("modal-add-channel").style.display = "none"; }
+
+        function submitChannelRegistrationForm() {
+            const name = document.getElementById("add-ch-name").value.trim();
+            const user = document.getElementById("add-ch-user").value.trim();
+            const desc = document.getElementById("add-ch-desc").value.trim();
+
+            if(!name || !user || !desc) {
+                showToast("Completa todos los campos obligatorios", "error");
+                return;
+            }
+
+            const nextId = INITIAL_CHANNELS_DATASET.length + 1;
+            const newChannelObj = {
+                id: nextId,
+                name: name,
+                user: user.startsWith("@") ? user : `@${user}`,
+                category: "tecnologia",
+                subs: 0,
+                lang: "Español",
+                status: "En Revisión", // Inicializado en revisión obligatoriamente
+                isVip: state.user.isVipMember,
+                logo: "📣",
+                description: desc,
+                isPopular: false, isNew: true, isTrending: false,
+                telegramUserId: state.user.idTelegram
+            };
+
+            INITIAL_CHANNELS_DATASET.push(newChannelObj);
+            
+            // Envío de Payload estructurado a Telegram Privado
+            const msgPayload = `📥 NUEVA SOLICITUD DE ALTA 📥\n\n• Canal ID: ${nextId}\n• Nombre: ${name}\n• User: ${user}\n• Creador ID: ${state.user.idTelegram}\n• Estado: En Revisión`;
+            if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.sendData) {
+                window.Telegram.WebApp.sendData(msgPayload);
+            }
+
+            closeAddChannelModal();
+            showToast("Canal en revisión. Solicitud enviada a soporte.", "gold");
+            renderMyOwnedChannelsList();
+            saveToLocalStorage();
+        }
+
+        function handleChannelEditAction(id, currentStatus) {
+            if(currentStatus === "En Revisión") {
+                showToast("Aviso: No se puede editar un canal en estado EN REVISIÓN.", "error");
+                return;
+            }
+            
+            const targetChannel = INITIAL_CHANNELS_DATASET.find(c => c.id === id);
+            document.getElementById("edit-ch-id").value = targetChannel.id;
+            document.getElementById("edit-ch-name").value = targetChannel.name;
+            document.getElementById("edit-ch-desc").value = targetChannel.description;
+            document.getElementById("modal-edit-channel").style.display = "flex";
+        }
+
+        function closeEditChannelModal() { document.getElementById("modal-edit-channel").style.display = "none"; }
+
+        function saveChannelEditionChanges() {
+            const id = parseInt(document.getElementById("edit-ch-id").value);
+            const name = document.getElementById("edit-ch-name").value.trim();
+            const desc = document.getElementById("edit-ch-desc").value.trim();
+
+            if(!name || !desc) {
+                showToast("Los campos no pueden quedar vacíos", "error");
+                return;
+            }
+
+            const target = INITIAL_CHANNELS_DATASET.find(c => c.id === id);
+            target.name = name;
+            target.description = desc;
+            target.status = "En Revisión"; // Regresa a revisión automáticamente al guardar
+
+            const msgPayload = `✏️ MODIFICACIÓN DE CANAL PUBLICADO ✏)\n\n• Canal ID: ${id}\n• Nuevo Nombre: ${name}\n• Estado: Regresa a Revisión`;
+            if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.sendData) {
+                window.Telegram.WebApp.sendData(msgPayload);
+            }
+
+            closeEditChannelModal();
+            showToast("Cambios guardados. El canal regresó a Revisión.", "gold");
+            renderMyOwnedChannelsList();
+            saveToLocalStorage();
+        }
+
+        function handleChannelDeleteAction(id, name, currentStatus) {
+    if(currentStatus === "En Revisión") {
+        showToast("Aviso: No se puede eliminar un canal en estado EN REVISIÓN.", "error");
+        return;
+    }
+
+    // Buscamos el canal en tu dataset para comprobar si tiene la solicitud de baja activa
+    const channel = INITIAL_CHANNELS_DATASET.find(c => c.id === id);
+    
+    // Si ya se solicitó la baja o está en estado "Sin Publicar", activamos el borrado definitivo con confirmación
+    if (channel && (channel.deleteRequested || currentStatus === "Sin Publicar")) {
+        
+        // Ventana de confirmación nativa (Aceptar = true / Cancelar = false)
+        const confirmDelete = confirm(`⚠️ ALERTA DE SEGURIDAD ⚠️\n\n¿Estás completamente seguro de que deseas eliminar permanentemente el canal "${name}" de tus registros? Esta acción borrará todos tus datos guardados.\n\nPresiona 'Aceptar' para eliminar o 'Cancelar' para cerrar el aviso.`);
+        
+        if (confirmDelete) {
+            // Eliminamos el canal por completo de la lista
+            const index = INITIAL_CHANNELS_DATASET.findIndex(c => c.id === id);
+            if (index > -1) {
+                INITIAL_CHANNELS_DATASET.splice(index, 1);
+                showToast("Canal eliminado definitivamente", "error");
+                
+                // Refrescamos tus listas y almacenamiento al instante
+                renderMyOwnedChannelsList();
+                if (typeof renderDirectoryList === "function") renderDirectoryList();
+                if (typeof saveToLocalStorage === "function") saveToLocalStorage();
+            }
+        } else {
+            // Si pulsa cancelar, se cierra el aviso automáticamente sin alterar nada
+            showToast("Eliminación cancelada", "info");
+        }
+        
+    } else {
+        // Si el canal está publicado de forma normal, abre tu modal habitual para rellenar la baja
+        openDeleteModal(id, name);
+    }
+}
+
+        function renderFavoritesList() {
+    // 1. Localizamos tu contenedor real en el HTML
+    const containerFavoritos = document.getElementById("favorites-list");
+    
+    if (!containerFavoritos) {
+        console.error("❌ ERROR: No se encontró el contenedor id='favorites-list' en el HTML.");
+        return;
+    }
+
+    // Limpiamos el contenedor para evitar duplicados
+    containerFavoritos.innerHTML = "";
+
+    // 2. Si el usuario no tiene favoritos, mostramos el mensaje de lista vacía
+    if (!state.favorites || state.favorites.length === 0) {
+        containerFavoritos.innerHTML = `<p style="text-align:center; color:var(--text-muted); padding:20px; grid-column: 1 / -1;">No tienes canales guardados en favoritos.</p>`;
+        return;
+    }
+
+    // 3. Recorremos los IDs de los favoritos guardados
+    state.favorites.forEach(favId => {
+        // Buscamos el canal en tu dataset (INITIAL_CHANNELS_DATASET) asegurando que coincidan como texto
+        const channelObj = INITIAL_CHANNELS_DATASET.find(c => {
+            if (!c.id) return false;
+            return c.id.toString().trim() === favId.toString().trim();
+        });
+        
+        if (channelObj) {
+            // Pasamos 'true' para activar el prefijo 'fav-' y que el acordeón sea independiente
+            containerFavoritos.innerHTML += buildChannelCardHtml(channelObj, true);
+        }
+    });
+
+    // 4. Forzamos a Lucide a renderizar las estrellas e iconos en la nueva lista
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
+}
+        function renderHistoryList() {
+            const container = document.getElementById("history-list");
+            const paginationContainer = document.getElementById("history-pagination-container");
+            if (!container) return;
+            
+            if (state.history.length === 0) {
+                container.innerHTML = `<div class="empty-state-notice">Aún no hay transacciones registradas.</div>`;
+                if(paginationContainer) paginationContainer.innerHTML = "";
+                return;
+            }
+            
+            const totalToConsider = state.history.slice(0, 20);
+            const displayedItems = showFullHistory ? totalToConsider : totalToConsider.slice(0, 10);
+            
+            container.innerHTML = displayedItems.map(item => `
+                <div class="history-item-card">
+                    <div class="history-left-pane">
+                        <div class="history-icon-badge">
+                            <i data-lucide="${item.icon}" style="width:16px; height:16px; color: ${item.type === 'gold' ? 'var(--vip-gold)' : 'var(--telegram-blue)'}"></i>
+                        </div>
+                        <div>
+                            <h4 style="font-size:0.88rem; font-weight:700;">${item.title}</h4>
+                            <p style="font-size:0.75rem; color:var(--text-muted);">${item.detail}</p>
+                        </div>
+                    </div>
+                    <div class="history-timestamp">${item.time}</div>
+                </div>
+            `).join('');
+
+            if (totalToConsider.length > 10) {
+                if (!showFullHistory) {
+                    paginationContainer.innerHTML = `<button class="btn-history-loadmore" onclick="expandHistoryView()">👇 Mostrar registros del 11 al ${totalToConsider.length}</button>`;
+                } else {
+                    paginationContainer.innerHTML = `<button class="btn-history-loadmore" onclick="collapseHistoryView()">👆 Ocultar y mostrar solo los primeros 10</button>`;
+                }
+            } else {
+                paginationContainer.innerHTML = "";
+            }
+            lucide.createIcons();
+        }
+
+        function expandHistoryView() { showFullHistory = true; renderHistoryList(); }
+        function collapseHistoryView() { showFullHistory = false; renderHistoryList(); }
+
+        function toggleAccordionEffect(id, prefix = '') {
+    // Busca id="accordion-123" o id="accordion-fav-123"
+    const accordion = document.getElementById(`accordion-${prefix}${id}`);
+    
+    if (!accordion) {
+        console.error(`❌ No se encontró el acordeón con ID: accordion-${prefix}${id}`);
+        return;
+    }
+
+    // Verificamos si ya está abierto calculando su altura actual
+    const isOpen = accordion.style.maxHeight && accordion.style.maxHeight !== "0px";
+
+    if (isOpen) {
+        // Si está abierto, lo cerramos volviendo su altura a 0
+        accordion.style.maxHeight = "0px";
+        accordion.classList.remove('open-accordion');
+    } else {
+        // Si está cerrado, calculamos su altura real exacta en píxeles y la forzamos
+        accordion.style.maxHeight = accordion.scrollHeight + "px";
+        accordion.classList.add('open-accordion');
+    }
+}
+        // BUSCA EN TU CÓDIGO la función que se ejecuta al pulsar la estrella. 
+// Debe ser muy parecida a esta. Asegúrate de agregar la línea que refresca la lista:
+function toggleFavoriteChannel(id, event) {
+    if (event) event.stopPropagation(); // Evita que se abra el acordeón
+    
+    const index = state.favorites.indexOf(id);
+    if (index > -1) {
+        state.favorites.splice(index, 1); // Aquí lo elimina del array
+        showToast("Quitado de tus favoritos", "info");
+    } else {
+        state.favorites.push(id);
+        showToast("¡Añadido a Favoritos!", "success");
+    }
+    
+    // ========================================================
+    // LA SOLUCIÓN: Agrega estas líneas al final de esa función
+    // ========================================================
+    if (typeof saveToLocalStorage === "function") saveToLocalStorage();
+    if (typeof updateBalanceAndRpgUi === "function") updateBalanceAndRpgUi();
+    
+    // Esto es lo que hace que la estrella desaparezca o la tarjeta se borre al instante:
+    renderFavoritesList(); 
+    
+    // Si también muestras los canales en la pestaña Directorio, re-renderízalo por si acaso:
+    if (typeof renderDirectoryList === "function") renderDirectoryList();
+}
+
+        function registerChannelAccess(id) {
+    // Buscamos el canal correspondiente en tu dataset original
+    const channel = INITIAL_CHANNELS_DATASET.find(c => c.id === id);
+    
+    if (!channel || !channel.user) {
+        showToast("No se pudo encontrar el alias de este canal", "error");
+        return;
+    }
+
+    // Limpiamos el '@' por si acaso viene con él, para formar un enlace limpio
+    const cleanUser = channel.user.replace('@', '');
+    const telegramUrl = `https://t.me/${cleanUser}`;
+
+    // Mostramos tu aviso original
+    showToast("Abriendo comunidad en Telegram...", "success");
+
+    // EJECUCIÓN REQUERIDA: Forzar la apertura del canal de forma nativa en Telegram
+    if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.openTelegramLink) {
+        // Método oficial y seguro dentro de las MiniApps
+        window.Telegram.WebApp.openTelegramLink(telegramUrl);
+    } else {
+        // Respaldo por si pruebas la app desde un navegador web común
+        window.open(telegramUrl, "_blank");
+    }
+
+    // Si manejas sistema RPG o de historial (como en los fragmentos anteriores), puedes dejar esto:
+    if (typeof rewardPoints === "function") rewardPoints(2, `Visitaste el canal: ${channel.name}`);
+    if (typeof registerActionToHistory === "function") registerActionToHistory("ACCIÓN", `Visitaste el canal ${channel.name}`, "info");
+}
+
+        function spinRoulette() {
+            if (state.user.balance < 5) {
+                showToast("Saldo de energía insuficiente", "error");
+                return;
+            }
+            state.user.balance -= 5;
+            const randomChannel = INITIAL_CHANNELS_DATASET[Math.floor(Math.random() * INITIAL_CHANNELS_DATASET.length)];
+            
+            const display = document.getElementById("roulette-display");
+            display.innerText = randomChannel.name;
+            display.classList.add("shake-anim");
+            setTimeout(() => display.classList.remove("shake-anim"), 500);
+            
+            updateBalanceAndRpgUi();
+            showToast(`¡Canal asignado: ${randomChannel.name}!`, "gold");
+            registerActionToHistory("Tirada de Ruleta", `Descubriste el canal ${randomChannel.name}`, "info");
+        }
+
+        function triggerConfettiExplosion() {
+            const colors = ['#f59e0b', '#24A1DE', '#a855f7', '#2ecc71', '#ef4444', '#f43f5e'];
+            for (let i = 0; i < 65; i++) {
+                const particle = document.createElement("div");
+                particle.className = "confetti-particle";
+                particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+                particle.style.left = `50%`; particle.style.top = `50%`;
+                const angle = Math.random() * Math.PI * 2;
+                const velocity = Math.random() * 260 + 80;
+                particle.style.setProperty('--x', `${Math.cos(angle) * velocity}px`);
+                particle.style.setProperty('--y', `${Math.sin(angle) * velocity}px`);
+                document.body.appendChild(particle);
+                setTimeout(() => particle.remove(), 1200);
+            }
+        }
+
+        function openDeleteModal(channelId, channelName) {
+            document.getElementById("delete-channel-id").value = channelId;
+            document.getElementById("delete-channel-name").value = channelName;
+            document.getElementById("delete-channel-reason").value = "";
+            document.getElementById("modal-delete-request").style.display = "flex";
+        }
+
+        function closeDeleteModal() { document.getElementById("modal-delete-request").style.display = "none"; }
+        function openLogsModal() { document.getElementById("modal-logs-view").style.display = "flex"; }
+        function closeLogsModal() { document.getElementById("modal-logs-view").style.display = "none"; }
+
+        function sendDeleteRequestToTelegram() {
+    const chId = document.getElementById("delete-channel-id").value;
+    const chName = document.getElementById("delete-channel-name").value;
+    const reason = document.getElementById("delete-channel-reason").value.trim();
+
+    if(!reason) {
+        showToast("Por favor ingresa una razón válida", "error");
+        return;
+    }
+
+    let targetChannel = INITIAL_CHANNELS_DATASET.find(c => c.id === parseInt(chId));
+    if (!targetChannel) {
+        targetChannel = INITIAL_CHANNELS_DATASET.find(c => c.id == chId);
+    }
+
+    const chUser = targetChannel ? targetChannel.user : "@Desconocido";
+    const usernameText = (state.user && state.user.username) ? state.user.username : "@Usuario";
+    const userIdText = (state.user && state.user.idTelegram) ? state.user.idTelegram : "No Detectado";
+
+    // 1. Construimos el mensaje predefinido
+    const messagePayload = `🚨 SOLICITUD DE BAJA DE CANAL 🚨\n\n• Canal ID: ${chId}\n• Nombre Canal: ${chName}\n• Usuario Canal: ${chUser}\n\n• Solicitante: ${usernameText}\n• ID Telegram Solicitante: ${userIdText}\n• Motivo: ${reason}`;
+    
+    // 2. Codificamos el mensaje para URL
+    const textEncoded = encodeURIComponent(messagePayload);
+    
+    // =========================================================================
+    // ⚠️ REVISIÓN CRÍTICA AQUÍ: 
+    // Cambia "TuAliasDeTelegram" por tu @usuario real de Telegram (SIN el @)
+    // Ejemplo si eres @SoporteApp: const TU_USUARIO_O_BOT = "SoporteApp";
+    // =========================================================================
+    const TU_USUARIO_O_BOT = "Airdayz"; 
+
+    // Usamos el protocolo interno nativo 'tg://' que la app de Telegram entiende directamente
+    const telegramUrl = `tg://resolve?domain=${TU_USUARIO_O_BOT}&text=${textEncoded}`;
+
+    // 3. Forzamos la apertura directa usando el sistema de enlaces de la WebApp
+    if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.openTelegramLink) {
+        window.Telegram.WebApp.openTelegramLink(`https://t.me/${TU_USUARIO_O_BOT}?text=${textEncoded}`);
+    } else {
+        // Si falla el método nativo, el protocolo 'tg://' obligará a Telegram a reaccionar
+        window.location.href = telegramUrl;
+    }
+    
+    closeDeleteModal();
+    showToast("Abriendo soporte privado...", "success");
+}
+       // CONTROLAR APERTURA Y CIERRE DEL MODAL CON DISPLAY FLEX
+function toggleBenefitsSection() {
+    const panel = document.getElementById("hidden-benefits-box");
+    if (!panel) return;
+    
+    if (panel.style.display === "flex") {
+        panel.style.display = "none";
+    } else {
+        panel.style.display = "flex";
+        
+        const title = document.getElementById("benefits-box-title");
+        const form = document.getElementById("premium-order-form");
+        
+        if (state.user.isVipMember) {
+            title.innerText = "Tus Beneficios VIP Activos:";
+            form.style.display = "none";
+        } else {
+            title.innerText = "Beneficios de la Suscripción VIP:";
+            form.style.display = "block";
+        }
+    }
+}
+
+// PROCESAR PEDIDO: CARGANDO -> CONFETI -> TELEGRAM
+function sendOrderToTelegram() {
+    const method = document.getElementById("pay-method").value;
+    const btn = document.getElementById("btn-submit-order");
+    const btnText = document.getElementById("btn-text-content");
+    
+    if(!btn || !btnText) return;
+
+    // 1. EXTRAER DATOS DEL USUARIO Y DE SUS CANALES ASOCIADOS
+    const userId = state.user.idTelegram || "No Detectado";
+    const username = state.user.username || "@Sin_Alias";
+    
+    // Buscamos si el usuario posee algún canal registrado en el dataset
+    const myChannel = INITIAL_CHANNELS_DATASET.find(c => c.telegramUserId === state.user.idTelegram);
+    const channelId = myChannel ? myChannel.id : "Ninguno Registrado";
+    const channelUser = myChannel ? myChannel.user : "@Sin_Asignar";
+
+    // 2. ACTIVAR EL ESTADO DE CARGA EN EL BOTÓN
+    btn.disabled = true;
+    btnText.innerHTML = `<span class="loading-spinner"></span> Procesando Pedido...`;
+
+    // 3. RETARDO CONTROLADO PARA EL EFECTO VISUAL (1.5 Segundos)
+    setTimeout(() => {
+        
+        // Ejecutar explosión de confeti original de tu app
+        if (typeof triggerConfettiExplosion === "function") {
+            triggerConfettiExplosion();
+        }
+
+        // Construcción del mensaje predefinido con los datos limpios extraídos
+        const msg = `🛒 NUEVO PEDIDO VIP 🛒\n\n• Usuario: ${username}\n• ID Telegram: ${userId}\n• Canal ID Ref: ${channelId}\n• Alias Canal: ${channelUser}\n• Método Elegido: ${method}\n• Estado: Esperando Pago`;
+        const textEncoded = encodeURIComponent(msg);
+        
+        // CONFIGURACIÓN DE DESTINO: Modifica con tu alias real de soporte
+        const SOPORTE_USER = "TuUsuarioO_Bot"; 
+        const telegramUrl = `https://t.me/${SOPORTE_USER}?text=${textEncoded}`;
+
+        // Abrir chat privado de forma nativa en Telegram
+        if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.openTelegramLink) {
+            window.Telegram.WebApp.openTelegramLink(telegramUrl);
+        } else {
+            window.open(telegramUrl, "_blank");
+        }
+
+        // Restaurar estado del botón y cerrar la ventana flotante
+        btn.disabled = false;
+        btnText.innerHTML = `Hacer Pedido 🛒`;
+        toggleBenefitsSection();
+        
+        showToast("Pedido enviado a soporte privado", "success");
+    }, 1500);
+} 
+        // ====================================================================
+// MÓDULO DE COMPARTICIÓN GLOBAL DE CANALES
+// ====================================================================
+
+// OBJETO DE ALMACENAMIENTO TEMPORAL
+let activeShareData = { id: null, name: "", user: "" };
+
+/**
+ * Abre el modal flotante y asigna los datos del canal seleccionado
+ */
+function openShareModal(id, name, user) {
+    console.log("-> Enrutando openShareModal para el ID:", id);
+    
+    // Guardamos los datos de forma segura en el estado temporal
+    activeShareData.id = id;
+    activeShareData.name = name || "Canal Recomendado";
+    activeShareData.user = user || "@Telegram";
+    
+    // Localizamos los elementos estructurales en el documento
+    const overlay = document.getElementById("share-modal-overlay");
+    const subtitle = document.getElementById("share-modal-subtitle");
+    
+    // Alerta de prevención por si el HTML se desubica
+    if (!overlay) {
+        console.error("❌ ERROR CRÍTICO: No se encontró el elemento con ID 'share-modal-overlay' en tu HTML.");
+        alert("Error: El contenedor del diseño de compartir no está colocado en el HTML.");
+        return;
+    }
+
+    // Inyectamos de forma dinámica el nombre y alias en la cabecera del modal
+    if (subtitle) {
+        subtitle.innerText = `${activeShareData.name} (${activeShareData.user})`;
+    }
+    
+    // Forzamos la apertura en modo Flex para centrar la tarjeta flotante
+    overlay.style.setProperty("display", "flex", "important");
+    console.log("-> ¡Modal abierto con éxito!");
+}
+
+/**
+ * Cierra la ventana flotante de compartición
+ */
+function closeShareModal() {
+    const overlay = document.getElementById("share-modal-overlay");
+    if (overlay) {
+        overlay.style.setProperty("display", "none", "important");
+    }
+}
+
+/**
+ * Ejecuta la API de redirección o copia en base a la red social elegida
+ */
+function executeShareAction(network) {
+    // Detectamos la URL exacta en la que corre la aplicación actual
+    const webAppUrl = window.location.origin + window.location.pathname;
+    
+    // Plantilla de mensaje predefinido con saltos de línea limpios
+    const messageText = `¡Mira este canal de Telegram en el Directorio! 🚀\n\n• Canal: ${activeShareData.name}\n• Alias: ${activeShareData.user}\n\nEncuentra más canales recomendados aquí 👇`;
+    
+    // Codificación segura para URLs
+    const textEncoded = encodeURIComponent(messageText);
+    const urlEncoded = encodeURIComponent(webAppUrl);
+
+    switch (network) {
+        case 'telegram':
+            window.open(`https://t.me/share/url?url=${urlEncoded}&text=${textEncoded}`, '_blank');
+            break;
+        case 'whatsapp':
+            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(messageText + "\n" + webAppUrl)}`, '_blank');
+            break;
+        case 'x':
+            window.open(`https://twitter.com/intent/tweet?text=${textEncoded}&url=${urlEncoded}`, '_blank');
+            break;
+        case 'facebook':
+            window.open(`https://www.facebook.com/sharer/sharer.php?u=${urlEncoded}`, '_blank');
+            break;
+        case 'reddit':
+            window.open(`https://www.reddit.com/submit?url=${urlEncoded}&title=${encodeURIComponent("Canal Recomendado: " + activeShareData.name)}`, '_blank');
+            break;
+        case 'email':
+            window.open(`mailto:?subject=${encodeURIComponent("Recomendación de Canal: " + activeShareData.name)}&body=${encodeURIComponent(messageText + "\n\n" + webAppUrl)}`, '_self');
+            break;
+        case 'copy':
+            // Método Primario: API Portapapeles asíncrona moderna
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(webAppUrl).then(() => {
+                    showToast("¡Enlace copiado al portapapeles!", "success");
+                }).catch(() => {
+                    showToast("Error al copiar el enlace", "error");
+                });
+            } else {
+                // Método Secundario (Fallback): Creación de Textarea fantasma para entornos Webview
+                const textArea = document.createElement("textarea");
+                textArea.value = webAppUrl;
+                textArea.style.position = 'fixed'; // Evita scroll abrupto en la pantalla
+                textArea.style.opacity = '0';
+                document.body.appendChild(textArea);
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                    showToast("¡Enlace copiado al portapapeles!", "success");
+                } catch (err) {
+                    showToast("No se pudo copiar el enlace", "error");
+                }
+                document.body.removeChild(textArea);
+            }
+            break;
+    }
+
+    // Cerramos el panel automáticamente en todas las redes para agilizar el flujo,
+    // excepto en "copiar enlace", manteniendo el modal abierto para que luzca el Toast de éxito.
+    if (network !== 'copy') {
+        closeShareModal();
+    }
+}
+    </script>
+    
+<div id="share-modal-overlay" class="share-overlay" style="display: none !important; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(10, 15, 26, 0.85); backdrop-filter: blur(6px); align-items: center; justify-content: center; z-index: 10000; padding: 16px;" onclick="closeShareModal()">
+    
+    <div class="share-modal-card" style="background: #182232 !important; border: 1px solid #2d3748 !important; border-radius: 20px !important; width: 100% !important; max-width: 320px !important; padding: 24px !important; position: relative !important; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6) !important; display: block !important;" onclick="event.stopPropagation();">
+        
+        <button class="share-close-btn" style="position: absolute; top: 12px; right: 16px; background: none; border: none; color: #718096; font-size: 1.6rem; cursor: pointer; line-height: 1;" onclick="closeShareModal()">&times;</button>
+        
+        <div class="share-modal-header" style="margin-bottom: 16px;">
+            <h3 id="share-modal-title" style="margin: 0 !important; color: #ffffff !important; font-size: 1.2rem !important; font-weight: bold !important;">Compartir Canal</h3>
+            <p id="share-modal-subtitle" style="font-size: 0.75rem !important; color: #a0aec0 !important; margin-top: 4px !important; margin-bottom: 0 !important; font-weight: normal !important;"></p>
+        </div>
+
+        <div class="share-grid-networks" style="display: grid !important; grid-template-columns: repeat(2, 1fr) !important; gap: 10px !important; margin: 16px 0 !important;">
+            <button class="share-net-btn telegram" style="background: #24a1de; color: white; border: none; padding: 10px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;" onclick="executeShareAction('telegram')">✈️ Telegram</button>
+            <button class="share-net-btn whatsapp" style="background: #22c55e; color: white; border: none; padding: 10px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;" onclick="executeShareAction('whatsapp')">💬 WhatsApp</button>
+            <button class="share-net-btn x-twitter" style="background: #0f1419; color: white; border: 1px solid #2d3748; padding: 10px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;" onclick="executeShareAction('x')">🐦 X / Twitter</button>
+            <button class="share-net-btn facebook" style="background: #1877f2; color: white; border: none; padding: 10px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;" onclick="executeShareAction('facebook')">📘 Facebook</button>
+            <button class="share-net-btn reddit" style="background: #ff4500; color: white; border: none; padding: 10px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;" onclick="executeShareAction('reddit')">🧡 Reddit</button>
+            <button class="share-net-btn email" style="background: #4a5568; color: white; border: none; padding: 10px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;" onclick="executeShareAction('email')">✉️ Correo</button>
+        </div>
+
+        <div class="share-modal-footer" style="margin-top: 14px; border-top: 1px solid #2d3748; padding-top: 14px;">
+            <button class="share-copy-link-btn" style="width: 100%; background: #2d3748; border: 1px solid #4a5568; color: #edf2f7; padding: 10px; font-size: 0.8rem; font-weight: bold; border-radius: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;" onclick="executeShareAction('copy')">
+                📋 Copiar Enlace de la App
+            </button>
+        </div>
+    </div>
+</div>
+</body>
+</html>
