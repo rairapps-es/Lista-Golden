@@ -3077,6 +3077,9 @@ function toggleBenefitsSection() {
             form.style.display = "block";
         }
     }
+
+    // 🔥 AÑADE ESTA LÍNEA AQUÍ: Hace que el anuncio GPlus se entere del cambio de estado al instante
+    if (typeof renderDynamicGPlusBanner === "function") renderDynamicGPlusBanner();
 }
 
 // PROCESAR PEDIDO: CARGANDO -> CONFETI -> TELEGRAM
@@ -3530,6 +3533,50 @@ document.addEventListener("DOMContentLoaded", () => {
     // Al arrancar la WebApp por primera vez, escanea si el usuario tiene derecho a la celebración
     checkFirstSessionFeaturedCeleb();
 });
+
+        // =========================================================================
+// NUEVA FUNCIÓN DINÁMICA PARA EL ANUNCIO GPLUS (Pégala aquí al final)
+// =========================================================================
+function renderDynamicGPlusBanner() {
+    const container = document.getElementById("gplus-dynamic-banner-container");
+    if (!container) return;
+
+    // Validamos exactamente igual que en tu función toggleBenefitsSection
+    const isVip = state.user && (state.user.isVipMember === true || state.user.isVipMember === "true");
+
+    if (isVip) {
+        // DISEÑO A: El usuario YA es VIP (Estética Premium de agradecimiento)
+        container.innerHTML = `
+            <div class="gplus-banner" style="position:relative; z-index: 1; border-color: #10b981; background: linear-gradient(135deg, #064e3b 0%, #111827 100%);">
+                <div style="position:relative; z-index:2;">
+                    <span style="background:#10b981; color:#fff; font-size:0.65rem; font-weight:900; padding:3px 8px; border-radius:20px; text-transform:uppercase; letter-spacing:1px;">Suscripción Activa ✔</span>
+                    <h3 style="font-size:1.3rem; font-weight:800; margin: 8px 0 4px 0; color:#fff;">⚡ Gracias por ser miembro GPlus</h3>
+                    <p style="font-size:0.8rem; color:#a7f3d0; margin-bottom:14px;">Tienes todos los privilegios desbloqueados: Multi-categorías, multi-listas y visibilidad máxima garantizada.</p>
+                    <button disabled style="background:#374151; color:#9ca3af; font-weight:800; border:none; padding:10px 16px; border-radius:8px; font-size:0.8rem; cursor:not-allowed; display:flex; align-items:center; gap:6px;">
+                        <i data-lucide="check-circle" style="width:14px; height:14px;"></i> Ya estás Suscrito (GPlus Activo)
+                    </button>
+                </div>
+            </div>
+        `;
+    } else {
+        // DISEÑO B: El usuario NO es VIP (Muestra el botón para contratar)
+        container.innerHTML = `
+            <div class="gplus-banner" style="position:relative; z-index: 1;">
+                <div style="position:relative; z-index:2;">
+                    <span style="background:#a855f7; color:#fff; font-size:0.65rem; font-weight:900; padding:3px 8px; border-radius:20px; text-transform:uppercase; letter-spacing:1px;">Suscripción GPlus</span>
+                    <h3 style="font-size:1.3rem; font-weight:800; margin: 8px 0 4px 0; color:#fff;">⚡ El Plan Todo en Uno para Propietarios</h3>
+                    <p style="font-size:0.8rem; color:#cbd5e1; margin-bottom:14px;">Multiplica por x10 el alcance de tus canales, sin límites y con privilegios exclusivos de la Golden List.</p>
+                    <button onclick="openGPlusPanel()" style="background:#fff; color:#000; font-weight:800; border:none; padding:10px 16px; border-radius:8px; font-size:0.8rem; cursor:pointer; display:flex; align-items:center; gap:6px;">
+                        <i data-lucide="sparkles" style="width:14px; height:14px;"></i> Ver Beneficios GPlus
+                    </button>
+                </div>
+            </div>
+        `;
+    }
+
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+}
+        
         </script>
 <div id="share-modal-overlay" class="share-overlay" style="display: none !important; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(10, 15, 26, 0.85); backdrop-filter: blur(6px); align-items: center; justify-content: center; z-index: 10000; padding: 16px;" onclick="closeShareModal()">
     
