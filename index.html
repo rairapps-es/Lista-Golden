@@ -1018,9 +1018,21 @@
             cursor: not-allowed !important;
         }
 
-        #vip-slider .channel-card {
-    min-width: 280px; /* Evita que las tarjetas se aplasten en el carrusel horizontal */
-    flex-shrink: 0;
+        #vip-slider {
+    display: flex;
+    gap: 12px;                  /* Espacio uniforme entre tarjetas */
+    overflow-x: auto;           /* Permite el scroll horizontal */
+    scroll-snap-type: x mandatory; /* 🔥 CLAVE: Activa el magnetismo horizontal */
+    scroll-behavior: smooth;    /* Desplazamiento suave al pulsar */
+    padding: 10px 4px;          /* Evita que las sombras se corten arriba y abajo */
+    
+    /* Ocultar la barra de scroll en Chrome, Safari y Opera */
+    &::-webkit-scrollbar {
+        display: none;
+    }
+    /* Ocultar la barra de scroll en Firefox y Edge */
+    -ms-overflow-style: none;  
+    scrollbar-width: none;  
 }
 
     </style>
