@@ -1876,21 +1876,35 @@ function checkVipInternalRegistration() {
 }
 
         function initTelegramContext() {
-            if (window.Telegram && window.Telegram.WebApp) {
-                const webApp = window.Telegram.WebApp;
-                webApp.ready();
-                webApp.expand();
-                if(webApp.colorScheme === 'light') document.documentElement.setAttribute('data-theme', 'light');
-                if (webApp.initDataUnsafe?.user) {
-                    const tgUser = webApp.initDataUnsafe.user;
-                    state.user.username = tgUser.username ? `@${tgUser.username}` : `${tgUser.first_name}`;
-                    state.user.idTelegram = tgUser.id;
-                    state.user.seed = tgUser.username || "player";
-                }
-            }
-            updateAvatarRenderers();
-            saveToLocalStorage();
+    if (window.Telegram && window.Telegram.WebApp) {
+        const webApp = window.Telegram.WebApp;
+        webApp.ready();
+        webApp.expand();
+        if(webApp.colorScheme === 'light') document.documentElement.setAttribute('data-theme', 'light');
+        if (webApp.initDataUnsafe?.user) {
+            const tgUser = webApp.initDataUnsafe.user;
+            state.user.username = tgUser.username ? `@${tgUser.username}` : `${tgUser.first_name}`;
+            state.user.idTelegram = tgUser.id;
+            state.user.seed = tgUser.username || "player";
         }
+    }
+    updateAvatarRenderers();
+    saveToLocalStorage();
+
+    // =========================================================================
+    // INYECTORES ASÍNCRONOS: Se disparan cuando ya tenemos el ID de Telegram
+    // =========================================================================
+    
+    // 1. Dibuja el banner bloqueado (verde) o desbloqueado (morado) según tu ID
+    if (typeof renderDynamicGPlusBanner === "function") {
+        renderDynamicGPlusBanner();
+    }
+
+    // 2. Comprueba si eres dueño de un canal VIP activo para lanzar el confeti por primera vez
+    if (typeof checkFirstSessionFeaturedCeleb === "function") {
+        checkFirstSessionFeaturedCeleb();
+    }
+}
 
         function updateAvatarRenderers() {
             let queryParams = `?seed=${state.user.seed}&radius=50&backgroundColor=1e293b`;
@@ -3099,7 +3113,7 @@ function sendOrderToTelegram() {
         const textEncoded = encodeURIComponent(msg);
         
         // CONFIGURACIÓN DE DESTINO: Modifica con tu alias real de soporte
-        const SOPORTE_USER = "TuUsuarioO_Bot"; 
+        const SOPORTE_USER = "Airdayz"; 
         const telegramUrl = `https://t.me/${SOPORTE_USER}?text=${textEncoded}`;
 
         // Abrir chat privado de forma nativa en Telegram
