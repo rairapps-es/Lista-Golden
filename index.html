@@ -615,6 +615,408 @@
     transition: background 0.2s;
 }
 .share-copy-link-btn:hover { background: #3a4a63; color: #fff; } 
+    
+    /* ==========================================================================
+           CARRUSEL ROTADOR DE DESTACADOS & TOP 3
+           ========================================================================== */
+        .featured-carousel-container {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .featured-track {
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            padding: 4px 4px 12px 4px;
+            scrollbar-width: none; /* Ocultar scroll en Firefox */
+        }
+
+        .featured-track::-webkit-scrollbar {
+            display: none; /* Ocultar scroll en Chrome/Safari */
+        }
+
+        .featured-slide {
+            flex: 0 0 85%;
+            scroll-snap-align: start;
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.95));
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 16px;
+            padding: 14px;
+            position: relative;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .featured-badge-tag {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255, 215, 0, 0.15);
+            color: var(--vip-gold);
+            padding: 3px 8px;
+            border-radius: 20px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+        }
+
+        /* Contenedor del Podio Top 3 */
+        .top3-podium-container {
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 14px;
+            margin-bottom: 20px;
+        }
+
+        .top3-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+        }
+
+        .top3-row:last-child {
+            border-bottom: none;
+        }
+
+        .top3-position {
+            font-size: 1.2rem;
+            font-weight: 800;
+            width: 24px;
+            text-align: center;
+        }
+        .pos-1 { color: var(--vip-gold); text-shadow: 0 0 8px rgba(255,215,0,0.4); }
+        .pos-2 { color: #cbd5e1; }
+        .pos-3 { color: #b45309; }
+
+        /* ==========================================================================
+           SELECTOR PREMIUM DE TEMAS VIP (TARJETAS ELEGANTES)
+           ========================================================================== */
+        .vip-theme-selector-container {
+            background: rgba(24, 34, 50, 0.4);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 215, 0, 0.15);
+            border-radius: 16px;
+            padding: 16px;
+            margin: 15px 0;
+        }
+
+        .vip-selector-title {
+            color: #ffd700;
+            font-size: 0.85rem;
+            font-weight: bold;
+            margin-bottom: 12px;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .vip-theme-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+
+        .theme-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            transition: transform 0.2s ease, filter 0.2s ease;
+        }
+
+        .theme-card span {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            margin-top: 6px;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        .theme-preview {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            transition: all 0.2s ease;
+        }
+
+        .style-default { background: linear-gradient(135deg, #182232, #0f172a); }
+        .style-matrix { background: linear-gradient(135deg, #001a00, #000a00); border-color: #00ff0033; }
+        .style-amethyst { background: linear-gradient(135deg, #160226, #0b0014); border-color: #a78bfa33; }
+        .style-sunset { background: linear-gradient(135deg, #2c0000, #150000); border-color: #ff450033; }
+
+        .theme-card.active .theme-preview {
+            border-color: #ffd700 !important;
+            transform: scale(1.08);
+            box-shadow: 0 0 12px rgba(255, 215, 0, 0.4);
+        }
+
+        .theme-card.active span {
+            color: #ffd700;
+            font-weight: bold;
+        }
+
+        /* Aura de Brillo VIP para el Avatar */
+        .vip-aura-active {
+            position: relative;
+            border: 2px solid #ffd700 !important;
+            background: linear-gradient(135deg, #2a2200 0%, #1c273a 100%) !important;
+            animation: vipGlowPulse 2.5s infinite alternate !important;
+        }
+
+        @keyframes vipGlowPulse {
+            0% { box-shadow: 0 0 6px rgba(255, 215, 0, 0.3); }
+            100% { box-shadow: 0 0 16px #ff8c00, inset 0 0 8px #ffd700 !important; }
+        }
+
+        /* ==========================================================================
+           DISEÑO DE LA TIENDA DE AVATARES RPG
+           ========================================================================== */
+        .shop-filter-bar {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+            scrollbar-width: none;
+        }
+
+        .btn-filter-shop {
+            background: var(--bg-tarjeta);
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            padding: 8px 14px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .btn-filter-shop.active {
+            background: var(--telegram-blue);
+            color: #fff;
+            border-color: var(--telegram-blue);
+        }
+
+        .rpg-shop-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .shop-item-card {
+            background: var(--bg-tarjeta);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            text-align: center;
+        }
+
+        .shop-item-icon {
+            font-size: 2.2rem;
+            margin-bottom: 8px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .shop-item-name {
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+            min-height: 34px;
+            display: flex;
+            align-items: center;
+        }
+
+        .shop-item-price {
+            font-size: 0.8rem;
+            font-weight: bold;
+            color: var(--vip-gold);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .btn-buy-item {
+            width: 100%;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 8px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-buy-item:hover:not(:disabled) {
+            background: var(--success-green);
+            color: #fff;
+        }
+
+        /* ==========================================================================
+           HISTORIAL DE COMPRAS Y ACCIONES / CÓMO GANAR PUNTOS
+           ========================================================================== */
+        .history-timeline {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .history-item {
+            background: var(--bg-tarjeta);
+            border-left: 3px solid var(--telegram-blue);
+            padding: 12px;
+            border-radius: 0 12px 12px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .history-info-left {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .history-title {
+            font-weight: 700;
+            font-size: 0.85rem;
+        }
+
+        .history-desc {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .history-date {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+        }
+
+        /* Guía para ganar puntos */
+        .earning-method-card {
+            background: var(--bg-tarjeta);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 14px;
+            margin-bottom: 10px;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+
+        .earning-icon-box {
+            background: rgba(36, 161, 222, 0.1);
+            color: var(--telegram-blue);
+            padding: 10px;
+            border-radius: 10px;
+        }
+
+        /* ==========================================================================
+           PANEL DE ADMINISTRADOR INTERNO
+           ========================================================================== */
+        .admin-dashboard-box {
+            background: linear-gradient(135deg, #1e1b4b, #0f172a);
+            border: 1px solid rgba(167, 139, 250, 0.3);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+
+        .admin-metric-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .admin-card-control {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 10px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* ==========================================================================
+           ELEMENTOS GENERALES INTERACTIVOS (ALERTAS TOAST & ENERGÍA)
+           ========================================================================== */
+        #toast-container {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10000;
+            width: 90%;
+            max-width: 380px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            pointer-events: none;
+        }
+
+        .toast {
+            background: #1e293b;
+            color: #fff;
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            border-left: 4px solid var(--telegram-blue);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: popIn 0.25s ease, fadeOut 0.25s ease 2.75s forwards;
+        }
+
+        .toast.success { border-left-color: var(--success-green); }
+        .toast.error { border-left-color: var(--danger-red); }
+        .toast.gold { border-left-color: var(--vip-gold); }
+
+        /* Ruleta interactiva */
+        #roulette-display {
+            width: 100%;
+            background: rgba(0,0,0,0.2);
+            border: 2px dashed var(--border-color);
+            border-radius: 16px;
+            min-height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 15px 0;
+            padding: 8px;
+        }
+
+        @keyframes pulseLoading {
+            0% { transform: scale(0.97); opacity: 0.8; }
+            100% { transform: scale(1.02); opacity: 1; color: var(--vip-gold); }
+        }
+
+        button:disabled {
+            opacity: 0.5 !important;
+            cursor: not-allowed !important;
+        }
     </style>
 </head>
 <body>
