@@ -1036,10 +1036,11 @@
 }
         
 #vip-slider .channel-card {
-    flex: 0 0 85%;             /* 🔥 CLAVE: Cada tarjeta ocupará exactamente el 85% del ancho de la pantalla */
-    max-width: 340px;          /* Límite de ancho para que no se vea gigante en tablets */
-    scroll-snap-align: start;  /* 🔥 CLAVE: Al deslizar, la tarjeta se imanta al inicio izquierdo */
-    box-shrink: 0;             /* Evita que el navegador aplaste la tarjeta */
+    flex: 0 0 100%;             /* 🔥 CLAVE: Cada tarjeta toma el 100% exacto del ancho disponible */
+    max-width: 100%;            /* Eliminamos el límite anterior para permitir el ancho completo */
+    scroll-snap-align: center;  /* ✨ CAMBIO: Al ocupar el 100%, es mejor centrar el imán para evitar descuadres en cualquier pantalla */
+    flex-shrink: 0;             /* Corrección de propiedad (es flex-shrink, no box-shrink) */
+    box-sizing: border-box;     /* Asegura que los paddings internos no estiren la tarjeta más del 100% */
 }
         
     </style>
