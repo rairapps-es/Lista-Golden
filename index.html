@@ -3057,7 +3057,7 @@ function executeShareAction(network) {
     // 1. Filtrar e Inyectar canales de Tecnología
     const techContainer = document.getElementById("tech-slider");
     if (techContainer && typeof INITIAL_CHANNELS_DATASET !== "undefined") {
-        const techChannels = INITIAL_CHANNELS_DATASET.filter(c => c.category === "Tecnología");
+        const techChannels = INITIAL_CHANNELS_DATASET.filter(c => c.category === "tecnologia");
         
         // Reutiliza tu función tal y como está hoy en tu código
         techContainer.innerHTML = techChannels.map(c => buildChannelCardHtml(c, 'tech-')).join('');
@@ -3066,7 +3066,7 @@ function executeShareAction(network) {
     // 2. Filtrar e Inyectar canales de Entretenimiento
     const funContainer = document.getElementById("fun-slider");
     if (funContainer && typeof INITIAL_CHANNELS_DATASET !== "undefined") {
-        const funChannels = INITIAL_CHANNELS_DATASET.filter(c => c.category === "Entretenimiento");
+        const funChannels = INITIAL_CHANNELS_DATASET.filter(c => c.category === "apuestas");
         
         // Reutiliza tu función tal y como está hoy en tu código
         funContainer.innerHTML = funChannels.map(c => buildChannelCardHtml(c, 'fun-')).join('');
