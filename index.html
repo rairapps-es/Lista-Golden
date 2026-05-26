@@ -2600,32 +2600,51 @@ function handleReSendChannel(id) {
         accordion.classList.add('open-accordion');
     }
 }
-        // BUSCA EN TU CÓDIGO la función que se ejecuta al pulsar la estrella. 
-// Debe ser muy parecida a esta. Asegúrate de agregar la línea que refresca la lista:
 function toggleFavoriteChannel(id, event) {
-    if (event) event.stopPropagation(); // Evita que se abra el acordeón
+    if (event) event.stopPropagation(); // 1. Evita que se abra el acordeón al pulsar la estrella
     
     const index = state.favorites.indexOf(id);
     if (index > -1) {
-        state.favorites.splice(index, 1); // Aquí lo elimina del array
+        state.favorites.splice(index, 1); // Elimina del array si ya existía
         showToast("Quitado de tus favoritos", "info");
     } else {
-        state.favorites.push(id);
+        state.favorites.push(id); // Añade al array si no existía
         showToast("¡Añadido a Favoritos!", "success");
     }
     
     // ========================================================
-    // LA SOLUCIÓN: Agrega estas líneas al final de esa función
+    // PERSISTENCIA Y ACTUALIZACIÓN DE ESTADO RPG
     // ========================================================
     if (typeof saveToLocalStorage === "function") saveToLocalStorage();
     if (typeof updateBalanceAndRpgUi === "function") updateBalanceAndRpgUi();
     
-    // Esto es lo que hace que la estrella desaparezca o la tarjeta se borre al instante:
-    renderFavoritesList(); 
+    // ========================================================
+    // RE-RENDERIZADO DE TODAS LAS VISTAS ACTIVAS (SINCRONIZACIÓN)
+    // ========================================================
     
-    // Si también muestras los canales en la pestaña Directorio, re-renderízalo por si acaso:
-    if (typeof renderDirectoryList === "function") renderDirectoryList();
-}
+    // 1. Actualiza tu pestaña/lista dedicada de Favoritos
+    if (typeof renderFavoritesList === "function") renderFavoritesList(); 
+    
+    // 2. Actualiza el Directorio general (apaga o enciende la estrella allí)
+    if (typeof renderDirectoryList === "function") {
+        renderDirectoryList();
+    } else if (typeof filterDirectory === "function") {
+        filterDirectory(); // Fallback por si tu función de render se llama filterDirectory
+    }
+    
+    // 3. Actualiza el carrusel/rotador VIP de la página principal
+    if (typeof renderVipSlider === "function") renderVipSlider();
+    
+    // 4. Parche manual para la Ruleta (Para que no pierda el canal que tocó en el giro)
+    const rouletteStar = document.querySelector(`#roulette-display .fav-star-icon`);
+    if (rouletteStar) {
+        if (state.favorites.includes(id)) {
+            rouletteStar.classList.add("is-fav");
+        } else {
+            rouletteStar.classList.remove("is-fav");
+        }
+    }
+}     
 
         function registerChannelAccess(id) {
     // Buscamos el canal correspondiente en tu dataset original
