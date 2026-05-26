@@ -1034,7 +1034,14 @@
     -ms-overflow-style: none;  
     scrollbar-width: none;  
 }
-
+        
+#vip-slider .channel-card {
+    flex: 0 0 85%;             /* 🔥 CLAVE: Cada tarjeta ocupará exactamente el 85% del ancho de la pantalla */
+    max-width: 340px;          /* Límite de ancho para que no se vea gigante en tablets */
+    scroll-snap-align: start;  /* 🔥 CLAVE: Al deslizar, la tarjeta se imanta al inicio izquierdo */
+    box-shrink: 0;             /* Evita que el navegador aplaste la tarjeta */
+}
+        
     </style>
 </head>
 <body>
