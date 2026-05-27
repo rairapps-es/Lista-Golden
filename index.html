@@ -1914,6 +1914,11 @@ function checkVipInternalRegistration() {
     if (typeof checkFirstSessionFeaturedCeleb === "function") {
         checkFirstSessionFeaturedCeleb();
     }
+
+    // 🔥 3. SISTEMA DE NOTIFICACIONES: Revisa si hay mensajes nuevos para el usuario
+    if (typeof actualizarContadorCampanita === "function") {
+        actualizarContadorCampanita();
+    }
 }
 
         function updateAvatarRenderers() {
@@ -3631,5 +3636,164 @@ function renderDynamicGPlusBanner() {
         <button style="width: 100%; background: linear-gradient(90deg, #3b82f6, #2563eb); border: none; color: #fff; padding: 10px; border-radius: 8px; font-weight: 800; font-size: 0.8rem; cursor: pointer;">✍ Enviar Mensaje al Administrador</button>
     </div>
 </div>
+    <script>
+// ==========================================================================
+// SISTEMA DE NOTIFICACIONES COMPACTO (CERO RIESGOS)
+// ==========================================================================
+let proxyFilter = 'TODOS'; 
+
+// Función segura para revisar que el estado global exista
+function asegurarNotifState() {
+    if (!window.state) window.state = {};
+    if (!window.state.user) window.state.user = { idTelegram: null };
+    if (!window.state.notifications) window.state.notifications = [];
+}
+
+// Renderiza los mensajes en el buzón según el filtro
+function actualizarBuzonVisual() {
+    asegurarNotifState();
+    const streamBox = document.getElementById("notifications-stream-box");
+    if (!streamBox) return;
+
+    const miIdTelegram = window.state.user.idTelegram ? String(window.state.user.idTelegram) : null;
+
+    if (!miIdTelegram) {
+        streamBox.innerHTML = `<p style="font-size:0.75rem; color:#9ca3af; text-align:center; padding:15px; margin:0;">Inicia sesión desde Telegram para ver tus mensajes.</p>`;
+        return;
+    }
+
+    // Filtramos los mensajes que pertenecen solo a ESTE usuario
+    let listado = window.state.notifications.filter(n => String(n.targetUserId) === miIdTelegram);
+
+    // Aplicamos filtros de las pestañas
+    if (proxyFilter === 'NO_LEIDOS') listado = listado.filter(n => !n.isRead);
+    if (proxyFilter === 'IMPORTANTE') listado = listado.filter(n => n.isImportant);
+
+    // Los importantes van arriba siempre
+    listado.sort((a, b) => (b.isImportant ? 1 : 0) - (a.isImportant ? 1 : 0));
+
+    if (listado.length === 0) {
+        streamBox.innerHTML = `<p style="font-size:0.75rem; color:#9ca3af; text-align:center; padding:20px; margin:0;">No hay mensajes en esta categoría.</p>`;
+        return;
+    }
+
+    streamBox.innerHTML = listado.map(n => `
+        <div style="background: #1f2937; border: 1px solid ${!n.isRead ? '#3b82f6' : '#374151'}; border-left: ${n.isImportant ? '4px solid #fbbf24' : ''}; border-radius: 10px; padding: 10px; margin-bottom: 8px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                <div style="display: flex; align-items: center; gap: 4px;">
+                    ${!n.isRead ? `<span style="background:#3b82f6; color:#fff; font-size:0.55rem; padding:1px 4px; border-radius:3px; font-weight:bold;">NO LEÍDO</span>` : ''}
+                    <span style="font-size:0.6rem; color:#9ca3af;">📁 Recibido</span>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    <button onclick="marcarImportanteNotif(${n.id})" style="background:transparent; border:none; color:${n.isImportant ? '#fbbf24' : '#4b5563'}; cursor:pointer; font-size:0.8rem;">★</button>
+                    <button onclick="eliminarNotifIndividual(${n.id})" style="background:transparent; border:none; color:#ef4444; cursor:pointer; font-size:0.75rem;">✕</button>
+                </div>
+            </div>
+            <h4 style="font-size:0.8rem; font-weight:bold; color:#fff; margin:2px 0;">${n.title}</h4>
+            
+            <div id="cuerpo-cerrado-${n.id}">
+                <button onclick="leerMensajeNotif(${n.id})" style="background:transparent; border:none; color:#3b82f6; font-size:0.7rem; font-weight:bold; cursor:pointer; padding:2px 0;">Leer más ▼</button>
+            </div>
+            <p id="cuerpo-abierto-${n.id}" style="display:none; font-size:0.75rem; color:#cbd5e1; margin:4px 0 0 0; line-height:1.3; border-top:1px dashed #374151; padding-top:4px;">
+                ${n.body}
+            </p>
+        </div>
+    `).join('');
+
+    actualizarContadorCampanita();
+}
+
+// Cambia el estado a leído al expandir
+function leerMensajeNotif(id) {
+    document.getElementById(`cuerpo-cerrado-${id}`).style.display = "none";
+    document.getElementById(`cuerpo-abierto-${id}`).style.display = "block";
+    
+    const item = window.state.notifications.find(n => n.id === id);
+    if (item && !item.isRead) {
+        item.isRead = true;
+        if (typeof saveToLocalStorage === "function") saveToLocalStorage();
+        actualizarContadorCampanita();
+    }
+}
+
+// Marca o desmarca favoritos
+function marcarImportanteNotif(id) {
+    const item = window.state.notifications.find(n => n.id === id);
+    if (item) {
+        item.isImportant = !item.isImportant;
+        if (typeof saveToLocalStorage === "function") saveToLocalStorage();
+        actualizarBuzonVisual();
+    }
+}
+
+// Elimina una notificación
+function eliminarNotifIndividual(id) {
+    window.state.notifications = window.state.notifications.filter(n => n.id !== id);
+    if (typeof saveToLocalStorage === "function") saveToLocalStorage();
+    actualizarBuzonVisual();
+}
+
+// Actualiza el círculo rojo de la campanita superior
+function actualizarContadorCampanita() {
+    asegurarNotifState();
+    const miIdTelegram = window.state.user.idTelegram ? String(window.state.user.idTelegram) : null;
+    const badge = document.getElementById("notification-badge-count");
+    
+    if (!badge || !miIdTelegram) return;
+
+    const sinLeer = window.state.notifications.filter(n => String(n.targetUserId) === miIdTelegram && !n.isRead).length;
+
+    if (sinLeer > 0) {
+        badge.innerText = sinLeer;
+        badge.style.display = "block";
+    } else {
+        badge.style.display = "none";
+    }
+}
+
+// Cambiar filtros visuales (Píldoras)
+function cambiarFiltroBuzon(tipo, filtroElemento) {
+    proxyFilter = tipo;
+    document.querySelectorAll('#notifications-filter-bar span').forEach(el => {
+        el.style.background = '#1f2937';
+        el.style.color = '#9ca3af';
+        el.style.borderColor = '#374151';
+    });
+    filtroElemento.style.background = 'rgba(59, 130, 246, 0.15)';
+    filtroElemento.style.color = '#3b82f6';
+    filtroElemento.style.borderColor = '#3b82f6';
+    actualizarBuzonVisual();
+}
+
+// Conectar de manera segura la apertura con el renderizador
+document.addEventListener("click", function(e){
+    const panel = document.getElementById("notifications-sliding-panel");
+    if(panel && panel.style.display === "flex") {
+        // Redirigir los clics de los filtros a nuestra función compacta
+        const filtros = document.querySelectorAll('#notifications-filter-bar span');
+        if(filtros.length >= 3) {
+            filtros[0].setAttribute("onclick", "cambiarFiltroBuzon('TODOS', this)");
+            filtros[1].setAttribute("onclick", "cambiarFiltroBuzon('NO_LEIDOS', this)");
+            filtros[2].setAttribute("onclick", "cambiarFiltroBuzon('IMPORTANTE', this)");
+        }
+    }
+});
+
+// FUNCIÓN DE PRUEBA: Pon esto en tu consola para enviarte un mensaje simulado
+function crearMensajePrueba(titulo, texto) {
+    asegurarNotifState();
+    window.state.notifications.unshift({
+        id: Date.now(),
+        targetUserId: String(window.state.user.idTelegram || "12345"), // Usa tu id o un fallback
+        title: titulo || "Notificación de Prueba 🚀",
+        body: texto || "¡Felicidades! Tu cuenta de GPlus ha verificado las credenciales correctamente.",
+        isRead: false,
+        isImportant: false
+    });
+    if (typeof saveToLocalStorage === "function") saveToLocalStorage();
+    actualizarContadorCampanita();
+    if(document.getElementById("notifications-sliding-panel").style.display === "flex") actualizarBuzonVisual();
+}
+</script>
 </body>
 </html>
