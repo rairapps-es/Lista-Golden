@@ -1151,7 +1151,21 @@
     </style>
 </head>
 <body>
+<div id="loading-screen-overlay" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #0b0f19; z-index: 9999999; display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: sans-serif; transition: opacity 0.5s ease, visibility 0.5s ease;">
+    
+    <div class="loading-spinner-circle" style="width: 50px; height: 50px; border: 4px solid rgba(168, 85, 247, 0.1); border-top: 4px solid #a855f7; border-radius: 50%; animation: spin-loading 1s linear infinite; margin-bottom: 20px;"></div>
+    
+    <h3 style="color: #fff; font-size: 1.1rem; font-weight: 800; margin: 0 0 8px 0; letter-spacing: 0.5px;">Cargando Lista Golden App...</h3>
+    
+    <p id="loading-random-phrase" style="color: #9ca3af; font-size: 0.8rem; text-align: center; max-width: 80%; line-height: 1.4; font-style: italic; margin: 0; min-height: 2.8rem; font-weight: 500;"></p>
+</div>
 
+<style>
+@keyframes spin-loading {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+</style>
     <div id="toast-container"></div>
 
     <div id="premium-congrats-modal" class="floating-congrats-modal">
@@ -1920,14 +1934,14 @@ function checkVipInternalRegistration() {
         asegurarNotifState(); // Ejecuta la lista interna de mensajes
     }
     if (typeof actualizarBuzonVisual === "function") {
-        actualizarBuzonVisual(); // 🌟 Renderiza los mensajes dentro del contenedor y enciende la campanita
+        actualizarBuzonVisual(); // Renderiza los mensajes dentro del contenedor y enciende la campanita
     }
 
     // ❄ 4. PANTALLA DE CARGA: Apaga el telón oscuro suavemente ahora que todo está pintado
     if (typeof ocultarPantallaCargaApp === "function") {
         ocultarPantallaCargaApp();
     }
-}
+} // Llave de cierre de tu función initTelegramContext
         
         function updateAvatarRenderers() {
             let queryParams = `?seed=${state.user.seed}&radius=50&backgroundColor=1e293b`;
@@ -3787,12 +3801,20 @@ function marcarImportanteNotif(id) {
     const item = window.state.notifications.find(n => n.id === id);
     if (item) {
         item.isImportant = !item.isImportant;
+        
+        // 💾 GUARDA EN EL TELÉFONO: Guarda el cambio de estrella
+        localStorage.setItem("gplus_backup_notifs", JSON.stringify(window.state.notifications));
+        
         actualizarBuzonVisual();
     }
 }
 
 function eliminarNotifIndividual(id) {
     window.state.notifications = window.state.notifications.filter(n => n.id !== id);
+    
+    // 💾 GUARDA EN EL TELÉFONO: Registra que el mensaje fue eliminado
+    localStorage.setItem("gplus_backup_notifs", JSON.stringify(window.state.notifications));
+    
     actualizarBuzonVisual();
 }
 
@@ -3837,7 +3859,9 @@ document.addEventListener("click", function(e){
     }
 });
 
-// PANTALLA DE CARGA ASÍNCRONA
+// ==========================================================================
+// PANTALLA DE CARGA ASÍNCRONA (INTEGRADA)
+// ==========================================================================
 (function inicializarPantallaCarga() {
     const frasesExploradores = [
         "🔍 Buscando las joyas ocultas de Telegram para ti...",
