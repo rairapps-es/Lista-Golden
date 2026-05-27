@@ -1148,6 +1148,89 @@
     padding: 4px; border-radius: 16px; margin: 16px 0;
 }
 @keyframes gradientBorder { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+
+        /* Configuración base de los contenedores de los Sliders */
+.slider-wrapper {
+    width: 100%;
+    overflow: hidden;
+    padding: 5px 0 15px 0;
+}
+
+/* El truco del Scroll-Snap para deslizamiento táctil ultra-fluido */
+.custom-snap-slider {
+    display: flex;
+    gap: 15px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    padding: 0 20px;
+    scrollbar-width: none; /* Oculta scroll en Firefox */
+}
+.custom-snap-slider::-webkit-scrollbar {
+    display: none; /* Oculta scroll en Chrome/Safari */
+}
+
+/* Tarjeta Base del Slider 1 (Grandes y Envolventes) */
+.slider-card {
+    flex: 0 0 82%;
+    height: 180px;
+    border-radius: 16px;
+    position: relative;
+    overflow: hidden;
+    scroll-snap-align: center;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    background-size: cover;
+    background-position: center;
+    font-family: sans-serif;
+}
+
+/* Tarjeta Base del Slider 2 (Panorámicas y Estilizadas) */
+.custom-snap-slider.panoramic .slider-card {
+    flex: 0 0 88%;
+    height: 120px;
+}
+
+/* Capa oscura superpuesta para que se lea perfectamente el texto blanco */
+.slider-card-overlay {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: linear-gradient(to top, rgba(11, 15, 25, 0.95) 30%, rgba(11, 15, 25, 0.3) 100%);
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    box-sizing: border-box;
+}
+
+/* Badge o Etiqueta de tipo de contenido */
+.slider-badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    color: #fff;
+    font-size: 0.65rem;
+    font-weight: 900;
+    padding: 4px 10px;
+    border-radius: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Contador de vistas con simulación en vivo */
+.slider-views-counter {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: #9ca3af;
+    font-size: 0.65rem;
+    padding: 4px 8px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
     </style>
 </head>
 <body>
@@ -1311,7 +1394,47 @@
                 <div class="stat-info"><h4>49</h4><p>Usuarios Online</p></div>
             </div>
         </div>
+<!-- ========================================================================= -->
+<!-- BLOQUE DE SLIDERS Y ANUNCIO PREMIUM (LISTA GOLDEN) -->
+<!-- ========================================================================= -->
 
+<!-- CONTENEDOR SLIDER 1: PROMOCIONES Y EVENTOS (Tarjetas Envolventes Grandes) -->
+<div class="slider-section-title" style="color: #fff; font-size: 1.1rem; font-weight: 800; padding: 15px 20px 5px 20px; font-family: sans-serif;">⭐ Destacados Lista Golden</div>
+<div class="slider-wrapper">
+    <div id="slider-destacados-container" class="custom-snap-slider">
+        <!-- Se rellena dinámicamente -->
+    </div>
+</div>
+
+<!-- CONTENEDOR SLIDER 2: COMUNIDAD Y ACTUALIZACIONES (Formato Banner Panorámico) -->
+<div class="slider-section-title" style="color: #fff; font-size: 1.1rem; font-weight: 800; padding: 15px 20px 5px 20px; font-family: sans-serif;">📢 Novedades y Comunidad</div>
+<div class="slider-wrapper">
+    <div id="slider-comunidad-container" class="custom-snap-slider panoramic">
+        <!-- Se rellena dinámicamente -->
+    </div>
+</div>
+
+<!-- ESPACIO DE ANUNCIO PREMIUM CON TOOLTIP -->
+<div class="premium-ad-container" style="margin: 20px; position: relative; background: #0f172a; border: 1px solid rgba(168, 85, 247, 0.4); border-radius: 16px; padding: 20px; box-shadow: 0 0 15px rgba(168, 85, 247, 0.1); font-family: sans-serif; overflow: visible;">
+    <!-- Botón de interrogación flotante -->
+    <button onclick="toggleAdTooltip(event)" style="position: absolute; top: 12px; right: 12px; background: rgba(255,255,255,0.1); border: none; color: #a855f7; width: 24px; height: 24px; border-radius: 50%; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 10;">?</button>
+    
+    <!-- Tooltip Flotante oculto por defecto con desenfoque de fondo -->
+    <div id="premium-ad-tooltip" style="display: none; position: absolute; top: 45px; right: 12px; width: 260px; background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(8px); border: 1px solid #a855f7; border-radius: 12px; padding: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); z-index: 100;">
+        <h4 style="color: #fff; margin: 0 0 6px 0; font-size: 0.9rem; font-weight: bold;">Anuncios Lista Golden</h4>
+        <p style="color: #9ca3af; margin: 0 0 12px 0; font-size: 0.75rem; line-height: 1.4;">Llega a miles de usuarios activos en Telegram diariamente. Tu canal se posicionará en las secciones más vistas aumentando tus miembros orgánicos de forma inmediata.</p>
+        <button onclick="openGPlusPanel()" style="background: linear-gradient(135deg, #a855f7, #7c3aed); color: #fff; border: none; padding: 8px 12px; font-size: 0.75rem; font-weight: bold; border-radius: 6px; width: 100%; cursor: pointer;">ANUNCIARME AQUÍ</button>
+    </div>
+
+    <!-- Contenido del Anuncio publicitario -->
+    <div style="display: flex; align-items: center; gap: 15px;">
+        <div style="background: linear-gradient(135deg, #a855f7, #6366f1); width: 45px; height: 45px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; box-shadow: 0 0 10px rgba(168,85,247,0.4);">🚀</div>
+        <div style="flex: 1;">
+            <h4 style="color: #fff; margin: 0 0 4px 0; font-size: 1.05rem; font-weight: 800;">¿Quieres ver tu canal aquí?</h4>
+            <p style="color: #9ca3af; margin: 0; font-size: 0.8rem; line-height: 1.4;">Impulsa tu comunidad con campañas integradas dentro de nuestra WebApp.</p>
+        </div>
+    </div>
+</div>
         <section class="top-podium-section">
             <h3 style="font-size:1.1rem; font-weight:800; margin-bottom:14px; display:flex; align-items:center; gap:8px;">🔥 Canales del Top 3 Histórico</h3>
             <div id="top-podium-container" class="podium-grid"></div>
@@ -1770,6 +1893,7 @@
             renderShopCarrousels();
             updateAdminToggleUI();
             renderCategorySliders();
+            initDynamicSliders();
             lucide.createIcons();
             addLog("Ecosistema unificado bajo ID único de Telegram.");
         });
@@ -3603,7 +3727,183 @@ function renderDynamicGPlusBanner() {
         if (typeof lucide !== 'undefined') lucide.createIcons();
     }
 }
+        // =========================================================================
+// DATASET CONFIGURABLE DE LOS DOS SLIDERS
+// =========================================================================
+const SLIDER_DESTACADOS_DATA = [
+    {
+        id: "promo-gplus-mayo", // IMPORTANTE: Cambia este ID si sustituyes la oferta para resetear su contador a 5-10 vistas
+        type: "Promoción",
+        title: "Suscripción GPlus x10",
+        desc: "Hazte visible ante miles de usuarios hoy mismo.",
+        bg: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=600",
+        link: "openGPlusPanel"
+    },
+    {
+        id: "evento-comunidad-cripto",
+        type: "Eventos",
+        title: "Gran Torneo de Canales",
+        desc: "Participa con tu comunidad y gana el cofre dorado.",
+        bg: "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?q=80&w=600",
+        link: "openGPlusPanel"
+    }
+];
+
+const SLIDER_COMUNIDAD_DATA = [
+    {
+        id: "anuncio-lista-golden-v2",
+        type: "Anuncio",
+        title: "Lanzamiento Versión 2.0",
+        desc: "Explora la nueva interfaz completamente gamificada.",
+        bg: "https://images.unsplash.com/photo-1614064641938-3bbee52942c7?q=80&w=600",
+        link: "openGPlusPanel"
+    },
+    {
+        id: "update-rangos-leyenda",
+        type: "Actualización",
+        title: "Nuevos Rangos de Usuario",
+        desc: "Gana puntos interactuando y sube hasta el nivel Leyenda.",
+        bg: "https://images.unsplash.com/photo-1579546929518-9e396f3cc809?q=80&w=600",
+        link: "openGPlusPanel"
+    }
+];
+
+// Configuración de Colores según la etiqueta (Badge)
+const BADGE_COLORS = {
+    "Promoción": "#ef4444",      // Rojo
+    "Eventos": "#a855f7",        // Morado
+    "Comunidad": "#3b82f6",      // Azul
+    "Anuncio": "#f97316",        // Naranja
+    "Actualización": "#22c55e"   // Verde
+};
+
+// =========================================================================
+// INICIALIZADOR Y MOTOR DE CONTADORES SIMULADOS
+// =========================================================================
+function initDynamicSliders() {
+    renderSliderElements("slider-destacados-container", SLIDER_DESTACADOS_DATA);
+    renderSliderElements("slider-comunidad-container", SLIDER_COMUNIDAD_DATA);
+
+    // Activamos la automatización de movimiento (Loop Elegante)
+    startAutoScroll("slider-destacados-container");
+    startAutoScroll("slider-comunidad-container");
+
+    // Lanzamos el motor del reloj de visitas simuladas (Revisa e incrementa cada 10 min)
+    setInterval(updateSliderViewsEngine, 10 * 60 * 1000); 
+}
+
+function renderSliderElements(containerId, dataset) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    container.innerHTML = dataset.map(item => {
+        // Gestión Inteligente del Contador de Vistas en LocalStorage
+        const storageKey = `slider_views_id_${item.id}`;
+        let currentViews = localStorage.getItem(storageKey);
+
+        if (!currentViews) {
+            // DETECTOR DE RESET: Si el ID es totalmente nuevo, arranca bajo de 5 a 10 vistas
+            // Si es un ID antiguo que ya habías borrado o creado de cero, le asigna su valor inicial orgánico.
+            const isBrandNew = !localStorage.getItem(`tracked_before_${item.id}`);
+            if (isBrandNew) {
+                currentViews = Math.floor(Math.random() * (10 - 5 + 1)) + 5; // Entre 5 y 10
+                localStorage.setItem(`tracked_before_${item.id}`, "true");
+            } else {
+                currentViews = Math.floor(Math.random() * (380 - 140 + 1)) + 140; // Inicial aleatorio estándar
+            }
+            localStorage.setItem(storageKey, currentViews);
+        }
+
+        const badgeColor = BADGE_COLORS[item.type] || "#a855f7";
+
+        return `
+            <div class="slider-card" style="background-image: url('${item.bg}');" onclick="${item.link}()">
+                <span class="slider-badge" style="background: ${badgeColor};">${item.type}</span>
+                <div class="slider-views-counter">👁️ <span id="view-text-${item.id}">${currentViews}</span></div>
+                <div class="slider-card-overlay">
+                    <h3 style="color: #fff; margin: 0 0 4px 0; font-size: 1.1rem; font-weight: 800;">${item.title}</h3>
+                    <p style="color: #cbd5e1; margin: 0; font-size: 0.75rem; line-height: 1.3; max-width: 90%;">${item.desc}</p>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+// Motor en segundo plano que suma de 1 a 10 vistas de forma realista cada 10 minutos
+function updateSliderViewsEngine() {
+    const todosLosObjetos = [...SLIDER_DESTACADOS_DATA, ...SLIDER_COMUNIDAD_DATA];
+    
+    todosLosObjetos.forEach(item => {
+        const storageKey = `slider_views_id_${item.id}`;
+        let views = parseInt(localStorage.getItem(storageKey)) || 10;
         
+        // Sumamos número aleatorio entre 1 y 10
+        const incremento = Math.floor(Math.random() * 10) + 1;
+        views += incremento;
+        
+        localStorage.setItem(storageKey, views);
+        
+        // Actualizamos en caliente la interfaz si el elemento está renderizado
+        const domElement = document.getElementById(`view-text-${item.id}`);
+        if (domElement) domElement.innerText = views;
+    });
+}
+
+// =========================================================================
+// SISTEMA DE DESPLAZAMIENTO AUTOMÁTICO (Elegante y Suave)
+// =========================================================================
+function startAutoScroll(containerId) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    let isUserInteracting = false;
+    
+    // Si el usuario toca el slider con el dedo, pausamos la automatización para no molestarle
+    container.addEventListener('touchstart', () => isUserInteracting = true, {passive: true});
+    container.addEventListener('touchend', () => {
+        // Al soltar el dedo, esperamos 6 segundos para reactivar el movimiento fluido
+        setTimeout(() => isUserInteracting = false, 6000);
+    }, {passive: true});
+
+    setInterval(() => {
+        if (isUserInteracting) return;
+        
+        const cardWidth = container.querySelector('.slider-card')?.offsetWidth || 300;
+        const maxScroll = container.scrollWidth - container.clientWidth;
+        
+        // Si llega al final del slider, resetea al principio suavemente
+        if (container.scrollLeft >= maxScroll - 5) {
+            container.scrollTo({ left: 0, behavior: 'smooth' });
+        } else {
+            container.scrollBy({ left: cardWidth + 15, behavior: 'smooth' });
+        }
+    }, 4500); // Se mueve automáticamente cada 4.5 segundos
+}
+
+// =========================================================================
+// CONTROLADOR INTERACTIVO DEL TOOLTIP DE ANUNCIOS
+// =========================================================================
+function toggleAdTooltip(event) {
+    event.stopPropagation(); // Evita que se disparen clics fantasmas
+    const tooltip = document.getElementById("premium-ad-tooltip");
+    if (!tooltip) return;
+    
+    if (tooltip.style.display === "none") {
+        tooltip.style.display = "block";
+        // Auto-cierre si el usuario hace clic en cualquier otro lado de la WebApp
+        document.addEventListener('click', closeTooltipOutside);
+    } else {
+        tooltip.style.display = "none";
+    }
+}
+
+function closeTooltipOutside(e) {
+    const tooltip = document.getElementById("premium-ad-tooltip");
+    if (tooltip && !tooltip.contains(e.target)) {
+        tooltip.style.display = "none";
+        document.removeEventListener('click', closeTooltipOutside);
+    }
+}
         </script>
 <div id="share-modal-overlay" class="share-overlay" style="display: none !important; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(10, 15, 26, 0.85); backdrop-filter: blur(6px); align-items: center; justify-content: center; z-index: 10000; padding: 16px;" onclick="closeShareModal()">
     
