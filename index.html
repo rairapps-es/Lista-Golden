@@ -1168,6 +1168,16 @@
         <div class="header-center-icon" onclick="switchView('shop')">
             <i data-lucide="shopping-bag"></i>
         </div>
+        <!-- ICONO CAMPANITA EN EL MENÚ SUPERIOR -->
+<div style="position: relative; cursor: pointer; display: inline-block; margin-right: 12px;" onclick="document.getElementById('notifications-sliding-panel').style.display = 'flex'">
+    <!-- Icono SVG de una campanita elegante -->
+    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#e5e7eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"></path>
+        <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"></path>
+    </svg>
+    <!-- Círculo rojo de avisos (oculto por ahora) -->
+    <span id="notification-badge-count" style="display: none; position: absolute; top: -6px; right: -6px; background: #ef4444; color: #fff; font-size: 0.65rem; font-weight: 900; padding: 2px 6px; border-radius: 50%; min-width: 16px; text-align: center;">0</span>
+</div>
         <div class="avatar-container" onclick="toggleProfileDrawer()">
             <img src="" id="header-avatar" class="avatar-img" alt="Avatar">
         </div>
@@ -3593,6 +3603,32 @@ function renderDynamicGPlusBanner() {
                 📋 Copiar Enlace de la App
             </button>
         </div>
+    </div>
+</div>
+    <div id="notifications-sliding-panel" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.7); z-index: 999999; align-items: center; justify-content: center; backdrop-filter: blur(4px);">
+    <div style="background: #111827; border: 1px solid #3b82f6; width: 90%; max-width: 480px; border-radius: 16px; padding: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); font-family: sans-serif;">
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid #374151; padding-bottom: 8px;">
+            <h3 style="font-size: 1.1rem; font-weight: 800; color: #fff; margin: 0; display: flex; align-items: center; gap: 6px;">📥 Centro de Mensajes</h3>
+            <button onclick="document.getElementById('notifications-sliding-panel').style.display = 'none'" style="background: transparent; border: none; color: #9ca3af; cursor: pointer; font-size: 1.2rem; font-weight: bold;">✕</button>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px;">
+            <button id="tab-btn-received" class="select-pill" style="font-weight: 700; font-size: 0.75rem; padding: 8px; border-radius: 6px; cursor: pointer; background: #3b82f6; color: white; border: none;">Recibidos</button>
+            <button id="tab-btn-sent" class="select-pill" style="font-weight: 700; font-size: 0.75rem; padding: 8px; border-radius: 6px; cursor: pointer; background: #1f2937; color: #9ca3af; border: 1px solid #374151;">Mis Mensajes</button>
+        </div>
+
+        <div id="notifications-filter-bar" style="display: flex; gap: 6px; overflow-x: auto; margin-bottom: 12px; padding-bottom: 4px;">
+            <span style="background: rgba(59, 130, 246, 0.15); color: #3b82f6; border: 1px solid #3b82f6; padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: bold; cursor: pointer;">Todos</span>
+            <span style="background: #1f2937; color: #9ca3af; border: 1px solid #374151; padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: bold; cursor: pointer;">No Leídos</span>
+            <span style="background: #1f2937; color: #9ca3af; border: 1px solid #374151; padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: bold; cursor: pointer;">⭐ Importantes</span>
+        </div>
+
+        <div id="notifications-stream-box" style="max-height: 40vh; overflow-y: auto; margin-bottom: 12px; min-height: 60px;">
+            <p style="font-size:0.75rem; color:#9ca3af; text-align:center; padding:20px; margin:0;">No tienes mensajes en este momento.</p>
+        </div>
+
+        <button style="width: 100%; background: linear-gradient(90deg, #3b82f6, #2563eb); border: none; color: #fff; padding: 10px; border-radius: 8px; font-weight: 800; font-size: 0.8rem; cursor: pointer;">✍ Enviar Mensaje al Administrador</button>
     </div>
 </div>
 </body>
