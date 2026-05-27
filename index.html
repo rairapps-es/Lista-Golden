@@ -1915,12 +1915,20 @@ function checkVipInternalRegistration() {
         checkFirstSessionFeaturedCeleb();
     }
 
-    // 🔥 3. SISTEMA DE NOTIFICACIONES: Revisa si hay mensajes nuevos para el usuario
-    if (typeof actualizarContadorCampanita === "function") {
-        actualizarContadorCampanita();
+    // 🔥 3. SISTEMA DE NOTIFICACIONES: Procesa los datos de tu ID e inyecta el render visual
+    if (typeof asegurarNotifState === "function") {
+        asegurarNotifState(); // Ejecuta la lista interna de mensajes
+    }
+    if (typeof actualizarBuzonVisual === "function") {
+        actualizarBuzonVisual(); // 🌟 Renderiza los mensajes dentro del contenedor y enciende la campanita
+    }
+
+    // ❄ 4. PANTALLA DE CARGA: Apaga el telón oscuro suavemente ahora que todo está pintado
+    if (typeof ocultarPantallaCargaApp === "function") {
+        ocultarPantallaCargaApp();
     }
 }
-
+        
         function updateAvatarRenderers() {
             let queryParams = `?seed=${state.user.seed}&radius=50&backgroundColor=1e293b`;
             
