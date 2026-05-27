@@ -3643,10 +3643,61 @@ function renderDynamicGPlusBanner() {
 let proxyFilter = 'TODOS'; 
 
 // Función segura para revisar que el estado global exista
+// Función que inyecta tus mensajes predefinidos vinculados por ID de Telegram
 function asegurarNotifState() {
     if (!window.state) window.state = {};
     if (!window.state.user) window.state.user = { idTelegram: null };
     if (!window.state.notifications) window.state.notifications = [];
+
+    // OBTENEMOS TU ID DE TELEGRAM ACTUAL
+    const miIdTelegram = window.state.user.idTelegram ? String(window.state.user.idTelegram) : null;
+    
+    if (!miIdTelegram) return; // Si aún no hay ID, no hacemos nada
+
+    // 📥 CONFIGURACIÓN: Lista de mensajes que tú defines manualmente en el código
+    const MENSAJES_PREDEFINIDOS = [
+        {
+            id: 101, // ID único para este mensaje
+            targetUserId: "1320417199", // 👈 REEMPLAZA CON TU ID REAL (ej: "671239845")
+            category: "Soporte",
+            title: "🛠️ Tu solicitud de soporte técnico",
+            body: "Hola. Hemos revisado la incidencia con la sincronización de tu base de datos y ya ha quedado resuelta. Si vuelves a tener problemas, escríbenos directamente.",
+            date: "27/5/2026",
+            isRead: false,
+            isImportant: false
+        },
+        {
+            id: 102,
+            targetUserId: "1320417199", // 👈 REEMPLAZA CON TU ID REAL
+            category: "GPlus",
+            title: "⚡ ¡Bienvenido al Club GPlus Premium!",
+            body: "Gracias por activar tu suscripción GPlus. Ya tienes habilitadas todas las ventajas: visibilidad por x10 en la Golden List, multi-categorías y soporte prioritario.",
+            date: "27/5/2026",
+            isRead: false,
+            isImportant: true // Muestra este mensaje resaltado con la barra dorada al principio
+        },
+        {
+            id: 103,
+            targetUserId: "1320417199", // ID simulado de otro usuario (este NO lo verás tú)
+            category: "Publicidad",
+            title: "📊 Campaña publicitaria pausada",
+            body: "Este mensaje pertenece a otra persona, así que no debería aparecer en tu campanita.",
+            date: "26/5/2026",
+            isRead: false,
+            isImportant: false
+        }
+    ];
+
+    // INYECTOR INTELIGENTE: Mete el mensaje al buzón solo si te pertenece y no lo habías recibido ya
+    MENSAJES_PREDEFINIDOS.forEach(msgPredefinido => {
+        if (String(msgPredefinido.targetUserId) === miIdTelegram) {
+            // Verificamos si este mensaje exacto ya existe en tu localStorage para no duplicarlo
+            const yaExiste = window.state.notifications.some(n => n.id === msgPredefinido.id);
+            if (!yaExiste) {
+                window.state.notifications.unshift(msgPredefinido);
+            }
+        }
+    });
 }
 
 // Renderiza los mensajes en el buzón según el filtro
