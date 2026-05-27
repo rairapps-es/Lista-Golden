@@ -1169,7 +1169,7 @@
             <i data-lucide="shopping-bag"></i>
         </div>
         <!-- ICONO CAMPANITA EN EL MENÚ SUPERIOR -->
-<div style="position: relative; cursor: pointer; display: inline-block; margin-right: 12px;" onclick="document.getElementById('notifications-sliding-panel').style.display = 'flex'">
+<div style="position: relative; cursor: pointer; display: inline-block; margin-right: 12px;" onclick="document.getElementById('notifications-sliding-panel').style.display = 'flex'; if(typeof actualizarBuzonVisual === 'function') actualizarBuzonVisual();">
     <!-- Icono SVG de una campanita elegante -->
     <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#e5e7eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"></path>
@@ -3702,10 +3702,11 @@ function asegurarNotifState() {
 
 // Renderiza los mensajes en el buzón según el filtro
 function actualizarBuzonVisual() {
-    asegurarNotifState();
+    asegurarNotifState(); // 👈 ESTA LÍNEA ES CLAVE: Carga tus mensajes configurados antes de pintar nada
     const streamBox = document.getElementById("notifications-stream-box");
     if (!streamBox) return;
-
+    
+    // ... el resto de la función se queda exactamente igual ...
     const miIdTelegram = window.state.user.idTelegram ? String(window.state.user.idTelegram) : null;
 
     if (!miIdTelegram) {
