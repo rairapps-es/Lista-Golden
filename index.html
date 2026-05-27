@@ -3643,22 +3643,19 @@ function renderDynamicGPlusBanner() {
 let proxyFilter = 'TODOS'; 
 
 // Función segura para revisar que el estado global exista
-// Función que inyecta tus mensajes predefinidos vinculados por ID de Telegram
 function asegurarNotifState() {
     if (!window.state) window.state = {};
     if (!window.state.user) window.state.user = { idTelegram: null };
     if (!window.state.notifications) window.state.notifications = [];
 
-    // OBTENEMOS TU ID DE TELEGRAM ACTUAL
-    const miIdTelegram = window.state.user.idTelegram ? String(window.state.user.idTelegram) : null;
-    
-    if (!miIdTelegram) return; // Si aún no hay ID, no hacemos nada
+    // OBTENEMOS TU ID DE TELEGRAM ACTUAL (Quitamos el return; de aquí para que no bloquee)
+    const miIdTelegram = window.state.user.idTelegram ? String(window.state.user.idTelegram).trim() : null;
 
-    // 📥 CONFIGURACIÓN: Lista de mensajes que tú defines manualmente en el código
+    // 📥 CONFIGURACIÓN: Lista de mensajes predefinidos
     const MENSAJES_PREDEFINIDOS = [
         {
-            id: 101, // ID único para este mensaje
-            targetUserId: "1320417199", // 👈 REEMPLAZA CON TU ID REAL (ej: "671239845")
+            id: 101,
+            targetUserId: "1320417199", 
             category: "Soporte",
             title: "🛠️ Tu solicitud de soporte técnico",
             body: "Hola. Hemos revisado la incidencia con la sincronización de tu base de datos y ya ha quedado resuelta. Si vuelves a tener problemas, escríbenos directamente.",
@@ -3668,30 +3665,33 @@ function asegurarNotifState() {
         },
         {
             id: 102,
-            targetUserId: "1320417199", // 👈 REEMPLAZA CON TU ID REAL
+            targetUserId: "1320417199", 
             category: "GPlus",
             title: "⚡ ¡Bienvenido al Club GPlus Premium!",
             body: "Gracias por activar tu suscripción GPlus. Ya tienes habilitadas todas las ventajas: visibilidad por x10 en la Golden List, multi-categorías y soporte prioritario.",
             date: "27/5/2026",
             isRead: false,
-            isImportant: true // Muestra este mensaje resaltado con la barra dorada al principio
+            isImportant: true 
         },
         {
             id: 103,
-            targetUserId: "1320417199", // ID simulado de otro usuario (este NO lo verás tú)
+            targetUserId: "1320417199", 
             category: "Publicidad",
             title: "📊 Campaña publicitaria pausada",
-            body: "Este mensaje pertenece a otra persona, así que no debería aparecer en tu campanita.",
+            body: "¡Solucionado! Ahora este mensaje también coincide con tu ID y aparecerá.",
             date: "26/5/2026",
             isRead: false,
             isImportant: false
         }
     ];
 
-    // INYECTOR INTELIGENTE: Mete el mensaje al buzón solo si te pertenece y no lo habías recibido ya
+    // 🔥 INYECTOR CORREGIDO: Si miIdTelegram es null (estás en PC), usamos tu ID real por defecto para testear
+    const idParaComparar = miIdTelegram || "1320417199";
+
     MENSAJES_PREDEFINIDOS.forEach(msgPredefinido => {
-        if (String(msgPredefinido.targetUserId) === miIdTelegram) {
-            // Verificamos si este mensaje exacto ya existe en tu localStorage para no duplicarlo
+        const targetIdLimpio = String(msgPredefinido.targetUserId).trim();
+        
+        if (targetIdLimpio === idParaComparar) {
             const yaExiste = window.state.notifications.some(n => n.id === msgPredefinido.id);
             if (!yaExiste) {
                 window.state.notifications.unshift(msgPredefinido);
