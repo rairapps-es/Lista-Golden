@@ -3653,15 +3653,25 @@ let proxyFilter = 'TODOS';
 function asegurarNotifState() {
     if (!window.state) window.state = {};
     if (!window.state.user) window.state.user = { idTelegram: null };
-    if (!window.state.notifications) window.state.notifications = [];
-
-    // Capturamos el ID dinámico
-    const miIdTelegram = window.state.user.idTelegram ? String(window.state.user.idTelegram).trim() : null;
     
-    // PLAN DE EMERGENCIA: Si no hay ID (testeo en PC), usamos tu ID real por defecto
+    // 1. INTENTO DE CARGA: Si el usuario ya tiene mensajes guardados en su teléfono, los usamos
+    if (!window.state.notifications) {
+        const guardadoLocal = localStorage.getItem("gplus_backup_notifs");
+        if (guardadoLocal) {
+            try {
+                window.state.notifications = JSON.parse(guardadoLocal);
+            } catch(e) {
+                window.state.notifications = [];
+            }
+        } else {
+            window.state.notifications = [];
+        }
+    }
+
+    const miIdTelegram = window.state.user.idTelegram ? String(window.state.user.idTelegram).trim() : null;
     const idParaFiltrar = miIdTelegram || "1320417199";
 
-    // Tu lista manual de mensajes predefinidos
+    // Tu lista manual de mensajes predefinidos de origen
     const MENSAJES_PREDEFINIDOS = [
         {
             id: 101,
@@ -3695,14 +3705,19 @@ function asegurarNotifState() {
         }
     ];
 
-    // Inyectamos los mensajes que coincidan
+    // 2. INYECTOR INTELIGENTE CON MEMORIA:
     MENSAJES_PREDEFINIDOS.forEach(msgPredefinido => {
         const targetIdLimpio = String(msgPredefinido.targetUserId).trim();
+        
         if (targetIdLimpio === idParaFiltrar) {
-            const yaExiste = window.state.notifications.some(n => n.id === msgPredefinido.id);
-            if (!yaExiste) {
+            // Buscamos si este mensaje exacto ya existía en la memoria del teléfono
+            const mensajeExistente = window.state.notifications.find(n => n.id === msgPredefinido.id);
+            
+            if (!mensajeExistente) {
+                // Si nunca antes se había guardado, lo metemos como nuevo
                 window.state.notifications.unshift(msgPredefinido);
             }
+            // Si ya existía, NO HACEMOS NADA. Respetamos si el usuario ya lo leyó, lo borró o lo marcó favorito.
         }
     });
 }
@@ -3756,9 +3771,14 @@ function actualizarBuzonVisual() {
 function leerMensajeNotif(id) {
     document.getElementById(`cuerpo-cerrado-${id}`).style.display = "none";
     document.getElementById(`cuerpo-abierto-${id}`).style.display = "block";
+    
     const item = window.state.notifications.find(n => n.id === id);
     if (item && !item.isRead) {
-        item.isRead = true;
+        item.isRead = true; // Cambia a leído
+        
+        // 💾 NUEVO: Guarda la lista actualizada físicamente en el teléfono
+        localStorage.setItem("gplus_backup_notifs", JSON.stringify(window.state.notifications));
+        
         actualizarContadorCampanita();
     }
 }
