@@ -4197,61 +4197,34 @@ window.manejarClicTarjeta = function(urlDestino, tituloTarjeta) {
 };
 
         // 🚀 AQUÍ PEGAS EL NUEVO MOTOR DEL TOP 10
-
-// =========================================================================
-
-function renderTopPodium() {
-
+// Cambia la primera línea para que quede así:
+function renderTopPodium(canales) {
     const container = document.getElementById('top-podium-container');
-
     if (!container) return;
 
-
-
-    // (Aquí va todo el código de la función renderTopPodium que te pasé antes)
-
-    const listaCanales = typeof datasetCanales !== 'undefined' ? datasetCanales : [];
-
-    if (listaCanales.length === 0) {
-
+    // Si le pasamos los canales por el render DOM, los usa directamente
+    const listaCanales = canales || (typeof INITIAL_CHANNELS_DATASET !== 'undefined' ? INITIAL_CHANNELS_DATASET : []);
+    
+    if (!listaCanales || listaCanales.length === 0) {
         container.innerHTML = `<p style="color:#64748b; text-align:center; font-size:0.8rem; padding:20px;">Cargando posiciones del ranking...</p>`;
-
         return;
-
     }
-
-
-
+    // ... (El resto del código con el .sort y el .map se queda exactamente igual) ...
     const top10 = listaCanales.slice(0, 10);
-
     container.innerHTML = top10.map((canal, index) => {
-
         const posicion = index + 1;
-
         let rankClass = "";
-
+        
         if (posicion === 1) rankClass = "rank-1";
-
         else if (posicion === 2) rankClass = "rank-2";
-
         else if (posicion === 3) rankClass = "rank-3";
-
         const crecimientoSimulado = `+${(12.4 - (index * 0.9)).toFixed(1)}%`;
-
-
-
         return `
-
             <div class="top10-row ${rankClass}" onclick="window.manejarClicTarjeta('${canal.url}', '${canal.title}')">
-
                 <div class="top10-badge">${posicion}</div>
-
                 <div class="top10-avatar" style="background-image: url('${canal.bg || canal.logo}');"></div>
-
                 <div class="top10-meta">
-
                     <h4 class="top10-title">${canal.title}</h4>
-
                     <p class="top10-user">${canal.user || '@ListaGolden'}</p>
 
                 </div>
@@ -4265,63 +4238,19 @@ function renderTopPodium() {
     }).join('');
 
 }
-// =========================================================================
-// 🏁 EL ORQUESTRADOR UNIFICADO DE ARRANQUE (Sin duplicaciones)
-// =========================================================================
-// =========================================================================
-// 🚀 MOTOR DEL RANKING TOP 10 (Se coloca libre en el archivo)
-// =========================================================================
-function renderTopPodium() {
-    const container = document.getElementById('top-podium-container');
-    if (!container) return;
-
-    // Aquí usamos tus canales reales. Si tu variable global del directorio
-    // se llama diferente (ej: canalesData), cambia este nombre:
-    const listaCanales = typeof datasetCanales !== 'undefined' ? datasetCanales : [];
-    
-    if (listaCanales.length === 0) {
-        container.innerHTML = `<p style="color:#64748b; text-align:center; font-size:0.8rem; padding:20px;">Cargando posiciones del ranking...</p>`;
-        return;
-    }
-
-    const top10 = listaCanales.slice(0, 10);
-
-    container.innerHTML = top10.map((canal, index) => {
-        const posicion = index + 1;
-        let rankClass = "";
-        if (posicion === 1) rankClass = "rank-1";
-        else if (posicion === 2) rankClass = "rank-2";
-        else if (posicion === 3) rankClass = "rank-3";
-
-        const crecimientoSimulado = `+${(12.4 - (index * 0.9)).toFixed(1)}%`;
-
-        return `
-            <div class="top10-row ${rankClass}" onclick="window.manejarClicTarjeta('${canal.url}', '${canal.title}')">
-                <div class="top10-badge">${posicion}</div>
-                <div class="top10-avatar" style="background-image: url('${canal.bg || canal.logo}');"></div>
-                <div class="top10-meta">
-                    <h4 class="top10-title">${canal.title}</h4>
-                    <p class="top10-user">${canal.user || '@ListaGolden'}</p>
-                </div>
-                <div class="top10-stats">
-                    ${crecimientoSimulado}
-                </div>
-            </div>
-        `;
-    }).join('');
-}
+    // ... (El resto de tu código con el .sort y el .map se queda exactamente igual) ...
 
 // =========================================================================
-// 🏁 EL ORQUESTRADOR UNIFICADO DE ARRANQUE (Tu bloque actual)
+// 🏁 EL ORQUESTRADOR UNIFICADO DE ARRANQUE (Limpiado y Sincronizado)
 // =========================================================================
 document.addEventListener("DOMContentLoaded", () => {
     loadFromLocalStorage();
     initTelegramContext();
     checkVipInternalRegistration();
     executeDailyCheckIn();
-    renderAppUiComponents();
     
-    renderTopPodium(); // 👈 Al arrancar, buscará la función que pusimos arriba
+    // 🏛️ Esta función ahora arrastrará el Top 10 asegurando que los datos existan
+    renderAppUiComponents(); 
     
     renderShopCarrousels();
     updateAdminToggleUI();
