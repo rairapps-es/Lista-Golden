@@ -3439,16 +3439,22 @@ function executeShareAction(network) {
             break;
     }
 
-    // 🔥 EL NUEVO MOTOR DE DESVÍO INTELIGENTE:
-    // Si se generó una URL (es decir, no es la acción de copiar) ejecutamos la apertura segura
+    // 🔥 EL NUEVO MOTOR DE DESVÍO INTELIGENTE (PARCHE DE CORREO ABSOLUTO):
     if (finalUrl !== "") {
-        if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.openLink) {
-            // Telegram maneja de forma nativa páginas web externas Y el protocolo mailto:
-            window.Telegram.WebApp.openLink(finalUrl);
+        if (network === 'email') {
+            // TRUCO MAESTRO: Si es correo, creamos un enlace invisible en el HTML
+            // y lo clicamos mediante código. Esto engaña al Webview de Telegram
+            // y le obliga a abrir la app de correo del móvil sin pasar por openLink.
+            const correoLink = document.createElement('a');
+            correoLink.href = finalUrl;
+            correoLink.style.display = 'none';
+            document.body.appendChild(correoLink);
+            correoLink.click(); // 👈 Clic fantasma instantáneo
+            document.body.removeChild(correoLink);
         } else {
-            // Respaldo para navegadores comunes de PC
-            if (network === 'email') {
-                window.location.href = finalUrl;
+            // Para las demás redes (WhatsApp, X, FB...) seguimos usando el openLink nativo que te funciona perfecto
+            if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.openLink) {
+                window.Telegram.WebApp.openLink(finalUrl);
             } else {
                 window.open(finalUrl, '_blank');
             }
