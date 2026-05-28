@@ -3918,7 +3918,7 @@ function initOnlineUsersSimulator(elementId) {
     const domElement = document.getElementById(elementId);
     if (!domElement) return;
 
-    const MIN_USERS = 142;
+    const MIN_USERS = 42;
     const MAX_USERS = 378;
 
     let currentOnline = parseInt(localStorage.getItem('simulated_online_users'));
@@ -3937,14 +3937,14 @@ function initOnlineUsersSimulator(elementId) {
         // 60% de las veces (del 1 al 6) el número NO CAMBIA. Simula estabilidad.
         if (probabilidad <= 6) return; 
 
-        // 40% restante: calculamos una fluctuación muy suave (-1, 0, o +1)
-        const cambio = Math.floor(Math.random() * 3) - 1; 
+        // 40% restante: calculamos una fluctuación muy suave (-7, 0, o +7)
+        const cambio = Math.floor(Math.random() * 3) - 7; 
         
         currentOnline += cambio;
 
         // Topes de seguridad
-        if (currentOnline < MIN_USERS) currentOnline = MIN_USERS + 2;
-        if (currentOnline > MAX_USERS) currentOnline = MAX_USERS - 2;
+        if (currentOnline < MIN_USERS) currentOnline = MIN_USERS + 5;
+        if (currentOnline > MAX_USERS) currentOnline = MAX_USERS - 9;
 
         localStorage.setItem('simulated_online_users', currentOnline);
         domElement.innerText = currentOnline;
