@@ -1429,6 +1429,11 @@
                 <div class="stat-icon" style="color:var(--success-green); background:rgba(46,204,113,0.1);"><i data-lucide="users"></i></div>
                 <div class="stat-info"><h4>49</h4><p>Usuarios Online</p></div>
             </div>
+<div class="online-badge" style="background: rgba(34, 197, 94, 0.15); color: #22c55e; padding: 4px 8px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; display: inline-flex; align-items: center; gap: 5px;">
+    <span style="width: 8px; height: 8px; background: #22c55e; border-radius: 50%; display: inline-block; animate: pulse 2s infinite;"></span>
+    🟢 Online: <span id="cont-usuarios-online">...</span>
+</div>
+            
         </div>
 <!-- ========================================================================= -->
 <!-- BLOQUE DE SLIDERS Y ANUNCIO PREMIUM (LISTA GOLDEN) -->
@@ -3909,6 +3914,46 @@ function updateSliderViewsEngine() {
     });
 }
 
+        // =========================================================================
+// MOTOR SIMULADOR DE USUARIOS ONLINE (Efecto Vivo y Realista)
+// =========================================================================
+function initOnlineUsersSimulator(elementId) {
+    const domElement = document.getElementById(elementId);
+    if (!domElement) return;
+
+    // 1. Establecemos rango base orgánico
+    const MIN_USERS = 142;
+    const MAX_USERS = 378;
+
+    // 2. Intentamos recuperar el último conteo para que no reinicie al recargar la app
+    let currentOnline = parseInt(localStorage.getItem('simulated_online_users'));
+    
+    if (!currentOnline || currentOnline < MIN_USERS || currentOnline > MAX_USERS) {
+        // Valor inicial aleatorio si es la primera vez que entra
+        currentOnline = Math.floor(Math.random() * (MAX_USERS - MIN_USERS + 1)) + MIN_USERS;
+    }
+
+    // Pintamos el valor inicial en la interfaz de inmediato
+    domElement.innerText = currentOnline;
+
+    // 3. Reloj en bucle que actualiza el conteo cada 2 segundos (2000 ms)
+    setInterval(() => {
+        // Generamos un factor de cambio aleatorio (-2, -1, 0, 1, 2)
+        const cambio = Math.floor(Math.random() * 5) - 2; 
+        
+        currentOnline += cambio;
+
+        // Topes de seguridad para que nunca se descontrole fuera del rango
+        if (currentOnline < MIN_USERS) currentOnline = MIN_USERS + Math.floor(Math.random() * 5);
+        if (currentOnline > MAX_USERS) currentOnline = MAX_USERS - Math.floor(Math.random() * 5);
+
+        // Guardamos en LocalStorage para mantener consistencia entre secciones
+        localStorage.setItem('simulated_online_users', currentOnline);
+
+        // Actualizamos el número en pantalla con una animación sutil si lo deseas
+        domElement.innerText = currentOnline;
+    }, 2000); 
+}
 // =========================================================================
 // SISTEMA DE DESPLAZAMIENTO AUTOMÁTICO (Elegante y Suave)
 // =========================================================================
@@ -4009,11 +4054,14 @@ document.addEventListener("DOMContentLoaded", () => {
     renderShopCarrousels();
     updateAdminToggleUI();
     renderCategorySliders();
+    
+    // 🔥 EL MOTOR SIMULADOR: Inyecta vida al contador en cuanto abre la WebApp
+    initOnlineUsersSimulator('cont-usuarios-online'); 
+    
     initDynamicSliders(); // 👈 Llama a tus sliders originales
     lucide.createIcons();
-    addLog("Ecosistema unificado bajo ID único de Telegram.");
+    addLog("Ecosistema unificado bajo ID único de Telegram y tráfico simulado activo.");
 });
-
  // 🏁 AQUÍ TERMINA TU ARCHIVO JAVASCRIPT O EL BLOQUE DE TU SCRIPT
         </script>
 <div id="share-modal-overlay" class="share-overlay" style="display: none !important; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(10, 15, 26, 0.85); backdrop-filter: blur(6px); align-items: center; justify-content: center; z-index: 10000; padding: 16px;" onclick="closeShareModal()">
