@@ -4220,11 +4220,11 @@ function renderTopPodium(canales) {
         else if (posicion === 3) rankClass = "rank-3";
         const crecimientoSimulado = `+${(12.4 - (index * 0.9)).toFixed(1)}%`;
         return `
-            <div class="top10-row ${rankClass}" onclick="window.manejarClicTarjeta('${canal.url}', '${canal.title}')">
+            <div class="top10-row ${rankClass}" onclick="window.manejarClicTarjeta('${canal.url}', '${canal.name}')">
                 <div class="top10-badge">${posicion}</div>
                 <div class="top10-avatar" style="background-image: url('${canal.bg || canal.logo}');"></div>
                 <div class="top10-meta">
-                    <h4 class="top10-title">${canal.title}</h4>
+                    <h4 class="top10-title">${canal.name}</h4>
                     <p class="top10-user">${canal.user || '@ListaGolden'}</p>
 
                 </div>
