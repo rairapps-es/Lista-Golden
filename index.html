@@ -3772,7 +3772,7 @@ const SLIDER_DESTACADOS_DATA = [
         title: "Suscripción GPlus x10",
         desc: "Hazte visible ante miles de usuarios hoy mismo.",
         bg: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=600",
-        link: "openGPlusPanel"
+        url: "https://t.me/ListaGolden" // 👈 Pon aquí el enlace para esta tarjeta
     },
     {
         id: "evento-comunidad-cripto",
@@ -3780,7 +3780,7 @@ const SLIDER_DESTACADOS_DATA = [
         title: "Gran Torneo de Canales",
         desc: "Participa con tu comunidad y gana el cofre dorado.",
         bg: "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?q=80&w=600",
-        link: "openGPlusPanel"
+        url: "https://t.me/ListaGolden" // 👈 Pon aquí el enlace para esta tarjeta
     }
 ];
 
@@ -3791,7 +3791,7 @@ const SLIDER_COMUNIDAD_DATA = [
         title: "Lanzamiento Versión 2.0",
         desc: "Explora la nueva interfaz completamente gamificada.",
         bg: "https://images.unsplash.com/photo-1614064641938-3bbee52942c7?q=80&w=600",
-        link: "openGPlusPanel"
+        url: "https://t.me/ListaGolden" // 👈 Pon aquí el enlace para esta tarjeta
     },
     {
         id: "update-rangos-leyenda",
@@ -3799,10 +3799,9 @@ const SLIDER_COMUNIDAD_DATA = [
         title: "Nuevos Rangos de Usuario",
         desc: "Gana puntos interactuando y sube hasta el nivel Leyenda.",
         bg: "https://images.unsplash.com/photo-1579546929518-9e396f3cc809?q=80&w=600",
-        link: "openGPlusPanel"
+        url: "https://t.me/ListaGolden" // 👈 Pon aquí el enlace para esta tarjeta
     }
 ];
-
 // Configuración de Colores según la etiqueta (Badge)
 const BADGE_COLORS = {
     "Promoción": "#ef4444",      // Rojo
@@ -3848,8 +3847,12 @@ function renderSliderElements(containerId, dataset) {
 
         const badgeColor = BADGE_COLORS[item.type] || "#a855f7";
 
+        // Mensaje de confirmación limpio
+        const mensajeConfirmacion = `Al pulsar se abrirá el sitio externo para "${item.title}". ¿Deseas continuar?`;
+
+        // Modificado: Si confirma, abre la URL correspondiente en una pestaña nueva
         return `
-            <div class="slider-card" style="background-image: url('${item.bg}');" onclick="${item.link}()">
+            <div class="slider-card" style="background-image: url('${item.bg}'); cursor: pointer;" onclick="if(confirm('${mensajeConfirmacion}')) { window.open('${item.url}', '_blank'); }">
                 <span class="slider-badge" style="background: ${badgeColor};">${item.type}</span>
                 <div class="slider-views-counter">👁️ <span id="view-text-${item.id}">${currentViews}</span></div>
                 <div class="slider-card-overlay">
