@@ -3902,10 +3902,11 @@ function startAutoScroll(containerId) {
         const cardWidth = container.querySelector('.slider-card')?.offsetWidth || 300;
         const maxScroll = container.scrollWidth - container.clientWidth;
         
-        if (container.scrollLeft >= maxScroll - 5) {
+        // 🔥 SOLUCIÓN: Subimos la tolerancia a un margen de seguridad más amplio (cardWidth / 2)
+        // Si el slider ya ha avanzado casi todo el recorrido, lo mandamos al principio sin rebotes.
+        if (container.scrollLeft >= maxScroll - (cardWidth / 2)) {
             container.scrollTo({ left: 0, behavior: 'smooth' });
         } else {
-            // Ajustado a cardWidth puro para adaptarse al formato 100% de ancho de pantalla
             container.scrollBy({ left: cardWidth, behavior: 'smooth' });
         }
     }, 4500);
