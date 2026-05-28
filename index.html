@@ -1434,24 +1434,20 @@
 <!-- BLOQUE DE SLIDERS Y ANUNCIO PREMIUM (LISTA GOLDEN) -->
 <!-- ========================================================================= -->
 
-<!-- CONTENEDOR SLIDER 1: PROMOCIONES Y EVENTOS (Tarjetas Envolventes Grandes) -->
-<div class="slider-section-title" style="color: #fff; font-size: 1.1rem; font-weight: 800; padding: 15px 20px 5px 20px; font-family: sans-serif;">⭐ Destacados Lista Golden</div>
+<div class="slider-section-title" style="color: #fff; font-size: 1.1rem; font-weight: 800; padding: 15px 0px 5px 0px; font-family: sans-serif;">⭐ Destacados Lista Golden</div>
 <div class="slider-wrapper">
     <div id="slider-destacados-container" class="custom-snap-slider">
-        <!-- Se rellena dinámicamente -->
-    </div>
+        </div>
 </div>
 
-<!-- CONTENEDOR SLIDER 2: COMUNIDAD Y ACTUALIZACIONES (Formato Banner Panorámico) -->
-<div class="slider-section-title" style="color: #fff; font-size: 1.1rem; font-weight: 800; padding: 15px 20px 5px 20px; font-family: sans-serif;">📢 Novedades y Comunidad</div>
+<div class="slider-section-title" style="color: #fff; font-size: 1.1rem; font-weight: 800; padding: 15px 0px 5px 0px; font-family: sans-serif;">📢 Novedades y Comunidad</div>
 <div class="slider-wrapper">
     <div id="slider-comunidad-container" class="custom-snap-slider panoramic">
-        <!-- Se rellena dinámicamente -->
-    </div>
+        </div>
 </div>
 
 <!-- ESPACIO DE ANUNCIO PREMIUM CON TOOLTIP -->
-<div class="premium-ad-container" style="margin: 20px; position: relative; background: #0f172a; border: 1px solid rgba(168, 85, 247, 0.4); border-radius: 16px; padding: 20px; box-shadow: 0 0 15px rgba(168, 85, 247, 0.1); font-family: sans-serif; overflow: visible;">
+<div class="premium-ad-container" style="margin: 10px; position: relative; background: #0f172a; border: 1px solid rgba(168, 85, 247, 0.4); border-radius: 16px; padding: 20px; box-shadow: 0 0 15px rgba(168, 85, 247, 0.1); font-family: sans-serif; overflow: visible;">
     <!-- Botón de interrogación flotante -->
     <button onclick="toggleAdTooltip(event)" style="position: absolute; top: 12px; right: 12px; background: rgba(255,255,255,0.1); border: none; color: #a855f7; width: 24px; height: 24px; border-radius: 50%; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 10;">?</button>
     
@@ -3805,6 +3801,9 @@ const SLIDER_COMUNIDAD_DATA = [
 ];
 
 // Configuración de Colores según la etiqueta (Badge)
+// =========================================================================
+// VARIABLES GLOBALES Y DATASETS DEL SLIDER (Asegúrate de que estén aquí)
+// =========================================================================
 const BADGE_COLORS = {
     "Promoción": "#ef4444",      // Rojo
     "Eventos": "#a855f7",        // Morado
@@ -3813,18 +3812,64 @@ const BADGE_COLORS = {
     "Actualización": "#22c55e"   // Verde
 };
 
+const SLIDER_DESTACADOS_DATA = [
+    {
+        id: "promo-gplus-mayo",
+        type: "Promoción",
+        title: "Suscripción GPlus x10",
+        desc: "Hazte visible ante miles de usuarios hoy mismo.",
+        bg: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=600",
+        date: "28/05/2026",
+        fullText: "¡Ha llegado el momento de liderar el mercado! Con el plan premium <b>GPlus</b> dejarás de rascar visitas de forma manual. <br><br>💎 <b>Beneficios exclusivos activos:</b><br>• Visibilidad incrementada un 1000% (x10) en el core de la app.<br>• Posibilidad de listarte en múltiples categorías a la vez.<br>• Soporte técnico premium prioritario.<br><br>Únete a los propietarios que ya están multiplicando su comunidad a diario.",
+        btnText: "CONTRATAR GPLUS PREMIUM ⚡",
+        targetUrl: "https://t.me/TuBotSoporteO_Enlace" 
+    },
+    {
+        id: "evento-comunidad-cripto",
+        type: "Eventos",
+        title: "Gran Torneo de Canales",
+        desc: "Participa con tu comunidad y gana el cofre dorado.",
+        bg: "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?q=80&w=600",
+        date: "26/05/2026",
+        fullText: "🔥 ¡Atención creadores de contenido! Arranca el mayor evento inter-comunidades de la <b>Lista Golden</b>.<br><br>Sube puestos en el ranking general interactuando y haciendo que tus seguidores voten por tu espacio. Los 3 canales ganadores se repartirán un cofre de recompensas.",
+        btnText: "INSCRIBIR MI CANAL AL TORNEO 🏆",
+        targetUrl: "https://t.me/TuCanalComunidad"
+    }
+];
+
+const SLIDER_COMUNIDAD_DATA = [
+    {
+        id: "anuncio-lista-golden-v2",
+        type: "Anuncio",
+        title: "Lanzamiento Versión 2.0",
+        desc: "Explora la nueva interfaz completamente gamificada.",
+        bg: "https://images.unsplash.com/photo-1614064641938-3bbee52942c7?q=80&w=600",
+        date: "25/05/2026",
+        fullText: "Hemos reescrito todo el código base de la aplicación desde cero para ofrecerte una velocidad de carga instantánea.<br><br>🛠️ <b>Novedades de esta compilación:</b><br>• Sistema de guardado persistente local.<br>• Nuevo centro de notificaciones local por ID.",
+        btnText: "VER NOTAS DE ACTUALIZACIÓN 📋",
+        targetUrl: "https://t.me/TuCanalAnuncios"
+    },
+    {
+        id: "update-rangos-leyenda",
+        type: "Actualización",
+        title: "Nuevos Rangos de Usuario",
+        desc: "Gana puntos interactuando y sube hasta el nivel Leyenda.",
+        bg: "https://images.unsplash.com/photo-1579546929518-9e396f3cc809?q=80&w=600",
+        date: "24/05/2026",
+        fullText: "¡La economía interna de la WebApp ya está en marcha! A partir de hoy, cada acción que realices acumula puntos de experiencia en tu perfil.",
+        btnText: "IR A LA TIENDA DE AVATARES 🛍️",
+        targetUrl: "https://t.me/TuEnlaceInterno"
+    }
+];
+
 // =========================================================================
-// INICIALIZADOR Y MOTOR DE CONTADORES SIMULADOS
+// MOTOR DE INICIALIZACIÓN Y RENDER
 // =========================================================================
 function initDynamicSliders() {
     renderSliderElements("slider-destacados-container", SLIDER_DESTACADOS_DATA);
     renderSliderElements("slider-comunidad-container", SLIDER_COMUNIDAD_DATA);
-
-    // Activamos la automatización de movimiento (Loop Elegante)
     startAutoScroll("slider-destacados-container");
     startAutoScroll("slider-comunidad-container");
-
-    // Lanzamos el motor del reloj de visitas simuladas (Revisa e incrementa cada 10 min)
     setInterval(updateSliderViewsEngine, 10 * 60 * 1000); 
 }
 
@@ -3833,27 +3878,25 @@ function renderSliderElements(containerId, dataset) {
     if (!container) return;
 
     container.innerHTML = dataset.map(item => {
-        // Gestión Inteligente del Contador de Vistas en LocalStorage
         const storageKey = `slider_views_id_${item.id}`;
         let currentViews = localStorage.getItem(storageKey);
 
         if (!currentViews) {
-            // DETECTOR DE RESET: Si el ID es totalmente nuevo, arranca bajo de 5 a 10 vistas
-            // Si es un ID antiguo que ya habías borrado o creado de cero, le asigna su valor inicial orgánico.
             const isBrandNew = !localStorage.getItem(`tracked_before_${item.id}`);
             if (isBrandNew) {
-                currentViews = Math.floor(Math.random() * (10 - 5 + 1)) + 5; // Entre 5 y 10
+                currentViews = Math.floor(Math.random() * (10 - 5 + 1)) + 5;
                 localStorage.setItem(`tracked_before_${item.id}`, "true");
             } else {
-                currentViews = Math.floor(Math.random() * (380 - 140 + 1)) + 140; // Inicial aleatorio estándar
+                currentViews = Math.floor(Math.random() * (380 - 140 + 1)) + 140;
             }
             localStorage.setItem(storageKey, currentViews);
         }
 
         const badgeColor = BADGE_COLORS[item.type] || "#a855f7";
 
+        // Forzamos la llamada explícita a window.abrirPostExt para asegurar compatibilidad en Telegram
         return `
-            <div class="slider-card" style="background-image: url('${item.bg}');" onclick="${item.link}()">
+            <div class="slider-card" style="background-image: url('${item.bg}'); cursor:pointer;" onclick="window.abrirPostExt('${item.id}')">
                 <span class="slider-badge" style="background: ${badgeColor};">${item.type}</span>
                 <div class="slider-views-counter">👁️ <span id="view-text-${item.id}">${currentViews}</span></div>
                 <div class="slider-card-overlay">
@@ -3865,80 +3908,91 @@ function renderSliderElements(containerId, dataset) {
     }).join('');
 }
 
-// Motor en segundo plano que suma de 1 a 10 vistas de forma realista cada 10 minutos
 function updateSliderViewsEngine() {
     const todosLosObjetos = [...SLIDER_DESTACADOS_DATA, ...SLIDER_COMUNIDAD_DATA];
-    
     todosLosObjetos.forEach(item => {
         const storageKey = `slider_views_id_${item.id}`;
         let views = parseInt(localStorage.getItem(storageKey)) || 10;
-        
-        // Sumamos número aleatorio entre 1 y 10
-        const incremento = Math.floor(Math.random() * 10) + 1;
-        views += incremento;
-        
+        views += Math.floor(Math.random() * 10) + 1;
         localStorage.setItem(storageKey, views);
-        
-        // Actualizamos en caliente la interfaz si el elemento está renderizado
         const domElement = document.getElementById(`view-text-${item.id}`);
         if (domElement) domElement.innerText = views;
     });
 }
 
-// =========================================================================
-// SISTEMA DE DESPLAZAMIENTO AUTOMÁTICO (Elegante y Suave)
-// =========================================================================
 function startAutoScroll(containerId) {
     const container = document.getElementById(containerId);
     if (!container) return;
-
     let isUserInteracting = false;
-    
-    // Si el usuario toca el slider con el dedo, pausamos la automatización para no molestarle
     container.addEventListener('touchstart', () => isUserInteracting = true, {passive: true});
-    container.addEventListener('touchend', () => {
-        // Al soltar el dedo, esperamos 6 segundos para reactivar el movimiento fluido
-        setTimeout(() => isUserInteracting = false, 6000);
-    }, {passive: true});
+    container.addEventListener('touchend', () => setTimeout(() => isUserInteracting = false, 6000), {passive: true});
 
     setInterval(() => {
         if (isUserInteracting) return;
-        
         const cardWidth = container.querySelector('.slider-card')?.offsetWidth || 300;
         const maxScroll = container.scrollWidth - container.clientWidth;
-        
-        // Si llega al final del slider, resetea al principio suavemente
         if (container.scrollLeft >= maxScroll - 5) {
             container.scrollTo({ left: 0, behavior: 'smooth' });
         } else {
-            container.scrollBy({ left: cardWidth + 15, behavior: 'smooth' });
+            container.scrollBy({ left: cardWidth, behavior: 'smooth' });
         }
-    }, 4500); // Se mueve automáticamente cada 4.5 segundos
+    }, 4500);
 }
 
 // =========================================================================
-// CONTROLADOR INTERACTIVO DEL TOOLTIP DE ANUNCIOS
+// INYECTORES DE EVENTOS GLOBALES DE APERTURA (EN WINDOW)
 // =========================================================================
+window.abrirPostExt = function(idObjeto) {
+    const listaCompleta = [...SLIDER_DESTACADOS_DATA, ...SLIDER_COMUNIDAD_DATA];
+    const post = listaCompleta.find(item => item.id === idObjeto);
+    
+    if (!post) return;
+
+    const modal = document.getElementById("slider-detail-modal");
+    const caja = document.getElementById("slider-detail-box");
+    
+    if (!modal || !caja) return;
+
+    const vistasActuales = localStorage.getItem(`slider_views_id_${post.id}`) || "5";
+
+    document.getElementById("modal-ext-bg").style.backgroundImage = `url('${post.bg}')`;
+    document.getElementById("modal-ext-badge").innerText = post.type;
+    document.getElementById("modal-ext-badge").style.background = BADGE_COLORS[post.type] || "#a855f7";
+    document.getElementById("modal-ext-views").innerText = `👁️ ${vistasActuales}`;
+    document.getElementById("modal-ext-date").innerText = `📅 ${post.date}`;
+    document.getElementById("modal-ext-title").innerText = post.title;
+    document.getElementById("modal-ext-body").innerHTML = post.fullText;
+    
+    const botonTexto = document.querySelector(".glow-pulse-button");
+    if (botonTexto) botonTexto.innerText = post.btnText || "SABER MÁS 🚀";
+    document.getElementById("modal-ext-btn-link").href = post.targetUrl;
+
+    modal.style.display = "flex";
+    setTimeout(() => {
+        modal.style.opacity = "1";
+        caja.style.transform = "translateY(0)";
+    }, 50);
+};
+
+window.cerrarPostExt = function() {
+    const modal = document.getElementById("slider-detail-modal");
+    const caja = document.getElementById("slider-detail-box");
+    
+    if (!modal || !caja) return;
+
+    modal.style.opacity = "0";
+    caja.style.transform = "translateY(40px)";
+    
+    setTimeout(() => {
+        modal.style.display = "none";
+    }, 300);
+};
+
 function toggleAdTooltip(event) {
-    event.stopPropagation(); // Evita que se disparen clics fantasmas
+    event.stopPropagation();
     const tooltip = document.getElementById("premium-ad-tooltip");
     if (!tooltip) return;
-    
-    if (tooltip.style.display === "none") {
-        tooltip.style.display = "block";
-        // Auto-cierre si el usuario hace clic en cualquier otro lado de la WebApp
-        document.addEventListener('click', closeTooltipOutside);
-    } else {
-        tooltip.style.display = "none";
-    }
-}
-
-function closeTooltipOutside(e) {
-    const tooltip = document.getElementById("premium-ad-tooltip");
-    if (tooltip && !tooltip.contains(e.target)) {
-        tooltip.style.display = "none";
-        document.removeEventListener('click', closeTooltipOutside);
-    }
+    tooltip.style.display = tooltip.style.display === "none" ? "block" : "none";
 }
 
         document.addEventListener("DOMContentLoaded", () => {
