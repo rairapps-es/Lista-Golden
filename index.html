@@ -3917,42 +3917,42 @@ function updateSliderViewsEngine() {
         // =========================================================================
 // MOTOR SIMULADOR DE USUARIOS ONLINE (Efecto Vivo y Realista)
 // =========================================================================
+
 function initOnlineUsersSimulator(elementId) {
     const domElement = document.getElementById(elementId);
     if (!domElement) return;
 
-    // 1. Establecemos rango base orgánico
     const MIN_USERS = 142;
     const MAX_USERS = 378;
 
-    // 2. Intentamos recuperar el último conteo para que no reinicie al recargar la app
     let currentOnline = parseInt(localStorage.getItem('simulated_online_users'));
-    
     if (!currentOnline || currentOnline < MIN_USERS || currentOnline > MAX_USERS) {
-        // Valor inicial aleatorio si es la primera vez que entra
         currentOnline = Math.floor(Math.random() * (MAX_USERS - MIN_USERS + 1)) + MIN_USERS;
     }
 
-    // Pintamos el valor inicial en la interfaz de inmediato
     domElement.innerText = currentOnline;
 
-    // 3. Reloj en bucle que actualiza el conteo cada 2 segundos (2000 ms)
+    // ⏱️ RELAJAMOS EL TIEMPO: Cambios cada 7 segundos (7000ms) en vez de 2
     setInterval(() => {
-        // Generamos un factor de cambio aleatorio (-2, -1, 0, 1, 2)
-        const cambio = Math.floor(Math.random() * 5) - 2; 
+        // 🎲 FILTRO DE PROBABILIDAD (El secreto del realismo)
+        // Generamos un número del 1 al 10.
+        const probabilidad = Math.floor(Math.random() * 10) + 1;
+        
+        // 60% de las veces (del 1 al 6) el número NO CAMBIA. Simula estabilidad.
+        if (probabilidad <= 6) return; 
+
+        // 40% restante: calculamos una fluctuación muy suave (-1, 0, o +1)
+        const cambio = Math.floor(Math.random() * 3) - 1; 
         
         currentOnline += cambio;
 
-        // Topes de seguridad para que nunca se descontrole fuera del rango
-        if (currentOnline < MIN_USERS) currentOnline = MIN_USERS + Math.floor(Math.random() * 5);
-        if (currentOnline > MAX_USERS) currentOnline = MAX_USERS - Math.floor(Math.random() * 5);
+        // Topes de seguridad
+        if (currentOnline < MIN_USERS) currentOnline = MIN_USERS + 2;
+        if (currentOnline > MAX_USERS) currentOnline = MAX_USERS - 2;
 
-        // Guardamos en LocalStorage para mantener consistencia entre secciones
         localStorage.setItem('simulated_online_users', currentOnline);
-
-        // Actualizamos el número en pantalla con una animación sutil si lo deseas
         domElement.innerText = currentOnline;
-    }, 2000); 
+    }, 7000); 
 }
 // =========================================================================
 // SISTEMA DE DESPLAZAMIENTO AUTOMÁTICO (Elegante y Suave)
