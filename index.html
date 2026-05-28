@@ -3762,9 +3762,12 @@ function renderDynamicGPlusBanner() {
         // =========================================================================
 // DATASET CONFIGURABLE DE LOS DOS SLIDERS
 // =========================================================================
+// =========================================================================
+// DATASET CONFIGURABLE DE LOS DOS SLIDERS (Tu código original)
+// =========================================================================
 const SLIDER_DESTACADOS_DATA = [
     {
-        id: "promo-gplus-mayo", // IMPORTANTE: Cambia este ID si sustituyes la oferta para resetear su contador a 5-10 vistas
+        id: "promo-gplus-mayo", 
         type: "Promoción",
         title: "Suscripción GPlus x10",
         desc: "Hazte visible ante miles de usuarios hoy mismo.",
@@ -3801,60 +3804,153 @@ const SLIDER_COMUNIDAD_DATA = [
 ];
 
 // Configuración de Colores según la etiqueta (Badge)
-// =========================================================================
-// VARIABLES GLOBALES Y DATASETS DEL SLIDER (Asegúrate de que estén aquí)
-// =========================================================================
-
- 🔥 NUEVOS SLIDERS DE BORDE A BORDE
-    if (typeof initDynamicSliders === "function") {
-        initDynamicSliders();
-    }
-    
-    // 4. Inicialización de iconos y logs
-    if (window.lucide && typeof lucide.createIcons === "function") {
-        lucide.createIcons();
-    }
-    
-    if (typeof addLog === "function") {
-        addLog("Ecosistema unificado bajo ID único de Telegram.");
-    }
-});
-        // ... (Aquí termina el código de la función updateSliderViewsEngine o startAutoScroll) ...
+const BADGE_COLORS = {
+    "Promoción": "#ef4444",      // Rojo
+    "Eventos": "#a855f7",        // Morado
+    "Comunidad": "#3b82f6",      // Azul
+    "Anuncio": "#f97316",        // Naranja
+    "Actualización": "#22c55e"   // Verde
+};
 
 // =========================================================================
-// 🔥 EL ÚNICO Y VERDADERO BLOQUE DE ARRANQUE (Sin duplicados)
+// INICIALIZADOR Y MOTOR DE CONTADORES SIMULADOS
+// =========================================================================
+function initDynamicSliders() {
+    renderSliderElements("slider-destacados-container", SLIDER_DESTACADOS_DATA);
+    renderSliderElements("slider-comunidad-container", SLIDER_COMUNIDAD_DATA);
+
+    // Activamos la automatización de movimiento (Loop Elegante)
+    startAutoScroll("slider-destacados-container");
+    startAutoScroll("slider-comunidad-container");
+
+    // Lanzamos el motor del reloj de visitas simuladas (Revisa e incrementa cada 10 min)
+    setInterval(updateSliderViewsEngine, 10 * 60 * 1000); 
+}
+
+function renderSliderElements(containerId, dataset) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    container.innerHTML = dataset.map(item => {
+        const storageKey = `slider_views_id_${item.id}`;
+        let currentViews = localStorage.getItem(storageKey);
+
+        if (!currentViews) {
+            const isBrandNew = !localStorage.getItem(`tracked_before_${item.id}`);
+            if (isBrandNew) {
+                currentViews = Math.floor(Math.random() * (10 - 5 + 1)) + 5; 
+                localStorage.setItem(`tracked_before_${item.id}`, "true");
+            } else {
+                currentViews = Math.floor(Math.random() * (380 - 140 + 1)) + 140; 
+            }
+            localStorage.setItem(storageKey, currentViews);
+        }
+
+        const badgeColor = BADGE_COLORS[item.type] || "#a855f7";
+
+        return `
+            <div class="slider-card" style="background-image: url('${item.bg}');" onclick="${item.link}()">
+                <span class="slider-badge" style="background: ${badgeColor};">${item.type}</span>
+                <div class="slider-views-counter">👁️ <span id="view-text-${item.id}">${currentViews}</span></div>
+                <div class="slider-card-overlay">
+                    <h3 style="color: #fff; margin: 0 0 4px 0; font-size: 1.1rem; font-weight: 800;">${item.title}</h3>
+                    <p style="color: #cbd5e1; margin: 0; font-size: 0.75rem; line-height: 1.3; max-width: 90%;">${item.desc}</p>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+// Motor en segundo plano que suma de 1 a 10 visitas
+function updateSliderViewsEngine() {
+    const todosLosObjetos = [...SLIDER_DESTACADOS_DATA, ...SLIDER_COMUNIDAD_DATA];
+    
+    todosLosObjetos.forEach(item => {
+        const storageKey = `slider_views_id_${item.id}`;
+        let views = parseInt(localStorage.getItem(storageKey)) || 10;
+        
+        const incremento = Math.floor(Math.random() * 10) + 1;
+        views += incremento;
+        
+        localStorage.setItem(storageKey, views);
+        
+        const domElement = document.getElementById(`view-text-${item.id}`);
+        if (domElement) domElement.innerText = views;
+    });
+}
+
+// =========================================================================
+// SISTEMA DE DESPLAZAMIENTO AUTOMÁTICO (Elegante y Suave)
+// =========================================================================
+function startAutoScroll(containerId) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    let isUserInteracting = false;
+    
+    container.addEventListener('touchstart', () => isUserInteracting = true, {passive: true});
+    container.addEventListener('touchend', () => {
+        setTimeout(() => isUserInteracting = false, 6000);
+    }, {passive: true});
+
+    setInterval(() => {
+        if (isUserInteracting) return;
+        
+        const cardWidth = container.querySelector('.slider-card')?.offsetWidth || 300;
+        const maxScroll = container.scrollWidth - container.clientWidth;
+        
+        if (container.scrollLeft >= maxScroll - 5) {
+            container.scrollTo({ left: 0, behavior: 'smooth' });
+        } else {
+            // Ajustado a cardWidth puro para adaptarse al formato 100% de ancho de pantalla
+            container.scrollBy({ left: cardWidth, behavior: 'smooth' });
+        }
+    }, 4500);
+}
+
+// =========================================================================
+// CONTROLADOR INTERACTIVO DEL TOOLTIP DE ANUNCIOS
+// =========================================================================
+function toggleAdTooltip(event) {
+    event.stopPropagation(); 
+    const tooltip = document.getElementById("premium-ad-tooltip");
+    if (!tooltip) return;
+    
+    if (tooltip.style.display === "none" || tooltip.style.display === "") {
+        tooltip.style.display = "block";
+        document.addEventListener('click', closeTooltipOutside);
+    } else {
+        tooltip.style.display = "none";
+    }
+}
+
+function closeTooltipOutside(e) {
+    const tooltip = document.getElementById("premium-ad-tooltip");
+    if (tooltip && !tooltip.contains(e.target)) {
+        tooltip.style.display = "none";
+        document.removeEventListener('click', closeTooltipOutside);
+    }
+}
+
+// =========================================================================
+// 🏁 EL ORQUESTRADOR UNIFICADO DE ARRANQUE (Sin duplicaciones)
 // =========================================================================
 document.addEventListener("DOMContentLoaded", () => {
-    // 1. Carga de datos y contexto base
-    if (typeof loadFromLocalStorage === "function") loadFromLocalStorage();
-    if (typeof initTelegramContext === "function") initTelegramContext();
-    
-    // 2. Verificaciones y lógica de negocio
-    if (typeof checkVipInternalRegistration === "function") checkVipInternalRegistration();
-    if (typeof executeDailyCheckIn === "function") executeDailyCheckIn();
-    
-    // 3. Renderizado de componentes visuales de la interfaz
-    if (typeof renderAppUiComponents === "function") renderAppUiComponents();
-    if (typeof renderTopPodium === "function") renderTopPodium();
-    if (typeof renderShopCarrousels === "function") renderShopCarrousels();
-    if (typeof updateAdminToggleUI === "function") updateAdminToggleUI();
-    if (typeof renderCategorySliders === "function") renderCategorySliders();
-    
-    // Inicializa los sliders sencillos de borde a borde (sin post flotante)
-    if (typeof initDynamicSliders === "function") {
-        initDynamicSliders();
-    }
-    
-    // 4. Inicialización de iconos y logs
-    if (window.lucide && typeof lucide.createIcons === "function") {
-        lucide.createIcons();
-    }
-    
-    if (typeof addLog === "function") {
-        addLog("Ecosistema unificado bajo ID único de Telegram.");
-    }
+    loadFromLocalStorage();
+    initTelegramContext();
+    checkVipInternalRegistration();
+    executeDailyCheckIn();
+    renderAppUiComponents();
+    renderTopPodium();
+    renderShopCarrousels();
+    updateAdminToggleUI();
+    renderCategorySliders();
+    initDynamicSliders(); // 👈 Llama a tus sliders originales
+    lucide.createIcons();
+    addLog("Ecosistema unificado bajo ID único de Telegram.");
 });
-// 🏁 AQUÍ TERMINA TU ARCHIVO JAVASCRIPT O EL BLOQUE DE TU SCRIPT
+
+ // 🏁 AQUÍ TERMINA TU ARCHIVO JAVASCRIPT O EL BLOQUE DE TU SCRIPT
         </script>
 <div id="share-modal-overlay" class="share-overlay" style="display: none !important; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(10, 15, 26, 0.85); backdrop-filter: blur(6px); align-items: center; justify-content: center; z-index: 10000; padding: 16px;" onclick="closeShareModal()">
     
