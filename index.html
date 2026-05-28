@@ -1267,6 +1267,127 @@
 .slider-views-counter { position: absolute; top: 12px; right: 12px; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(4px); border: 1px solid rgba(255,255,255,0.1); color: #9ca3af; font-size: 0.65rem; padding: 4px 8px; border-radius: 6px; display: flex; align-items: center; gap: 4px; }
 .glow-pulse-button:hover { transform: scale(1.02); filter: brightness(1.1); }
 .glow-pulse-button:active { transform: scale(0.98); }
+
+        /* Contenedor Principal del Top 10 */
+.top10-ranking-container {
+    background: linear-gradient(135deg, rgba(30, 41, 59, 0.7), rgba(15, 23, 42, 0.8));
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    padding: 6px;
+    margin: 15px 0;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+/* Filas del Ranking Interactivas */
+.top10-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 16px;
+    margin: 6px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.03);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+}
+
+/* Efecto Hover/Touch al pulsar la tarjeta */
+.top10-row:hover, .top10-row:active {
+    background: rgba(255, 255, 255, 0.07);
+    border-color: rgba(255, 255, 255, 0.15);
+    transform: translateY(-2px);
+}
+
+/* Diseño de la Medalla / Posición */
+.top10-badge {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    font-weight: 900;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.05);
+    color: #94a3b8;
+    flex-shrink: 0;
+    box-shadow: inset 0 2px 4px rgba(255,255,255,0.05);
+}
+
+/* Estilos VIP para el Podio de Honor (Top 3) */
+.top10-row.rank-1 {
+    background: linear-gradient(90deg, rgba(250, 204, 21, 0.12), rgba(250, 204, 21, 0.02));
+    border-color: rgba(250, 204, 21, 0.3);
+}
+.top10-row.rank-1 .top10-badge {
+    background: linear-gradient(135deg, #facc15, #eab308);
+    color: #0f172a;
+    box-shadow: 0 0 15px rgba(234, 179, 8, 0.4);
+}
+
+.top10-row.rank-2 {
+    background: linear-gradient(90deg, rgba(226, 232, 240, 0.08), rgba(226, 232, 240, 0.01));
+    border-color: rgba(226, 232, 240, 0.2);
+}
+.top10-row.rank-2 .top10-badge {
+    background: linear-gradient(135deg, #e2e8f0, #94a3b8);
+    color: #0f172a;
+    box-shadow: 0 0 12px rgba(148, 163, 184, 0.3);
+}
+
+.top10-row.rank-3 {
+    background: linear-gradient(90deg, rgba(249, 115, 22, 0.08), rgba(249, 115, 22, 0.01));
+    border-color: rgba(249, 115, 22, 0.25);
+}
+.top10-row.rank-3 .top10-badge {
+    background: linear-gradient(135deg, #f97316, #c2410c);
+    color: #fff;
+    box-shadow: 0 0 12px rgba(249, 115, 22, 0.3);
+}
+
+/* Avatar del Canal */
+.top10-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background-size: cover;
+    background-position: center;
+    border: 1px solid rgba(255,255,255,0.1);
+    flex-shrink: 0;
+}
+
+/* Textos informativos */
+.top10-meta {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+.top10-title {
+    color: #ffffff;
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin: 0;
+}
+.top10-user {
+    color: #64748b;
+    font-size: 0.75rem;
+    margin: 0;
+}
+
+/* Badge de crecimiento / Categoría */
+.top10-stats {
+    text-align: right;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #22c55e; /* Verde de crecimiento */
+    background: rgba(34, 197, 94, 0.1);
+    padding: 4px 8px;
+    border-radius: 8px;
+}
     </style>
 </head>
 <body>
@@ -1467,10 +1588,13 @@
         </div>
     </div>
 </div>
-        <section class="top-podium-section">
-            <h3 style="font-size:1.1rem; font-weight:800; margin-bottom:14px; display:flex; align-items:center; gap:8px;">🔥 Canales del Top 3 Histórico</h3>
-            <div id="top-podium-container" class="podium-grid"></div>
-        </section>
+        <section class="top-podium-section" style="margin: 0; padding: 0 10px;">
+    <h3 style="color: #fff; font-size: 1.1rem; font-weight: 800; font-family: sans-serif; margin: 18px 0px 6px 0px; display: flex; align-items: center; gap: 8px;">
+        🔥 Ranking Top 10 Global
+    </h3>
+    <div id="top-podium-container" class="top10-ranking-container">
+        </div>
+</section>
 
         <section class="slider-section">
             <div class="slider-header">
@@ -4036,8 +4160,124 @@ window.manejarClicTarjeta = function(urlDestino, tituloTarjeta) {
         }
     }
 };
+
+        // 🚀 AQUÍ PEGAS EL NUEVO MOTOR DEL TOP 10
+
+// =========================================================================
+
+function renderTopPodium() {
+
+    const container = document.getElementById('top-podium-container');
+
+    if (!container) return;
+
+
+
+    // (Aquí va todo el código de la función renderTopPodium que te pasé antes)
+
+    const listaCanales = typeof datasetCanales !== 'undefined' ? datasetCanales : [];
+
+    if (listaCanales.length === 0) {
+
+        container.innerHTML = `<p style="color:#64748b; text-align:center; font-size:0.8rem; padding:20px;">Cargando posiciones del ranking...</p>`;
+
+        return;
+
+    }
+
+
+
+    const top10 = listaCanales.slice(0, 10);
+
+    container.innerHTML = top10.map((canal, index) => {
+
+        const posicion = index + 1;
+
+        let rankClass = "";
+
+        if (posicion === 1) rankClass = "rank-1";
+
+        else if (posicion === 2) rankClass = "rank-2";
+
+        else if (posicion === 3) rankClass = "rank-3";
+
+        const crecimientoSimulado = `+${(12.4 - (index * 0.9)).toFixed(1)}%`;
+
+
+
+        return `
+
+            <div class="top10-row ${rankClass}" onclick="window.manejarClicTarjeta('${canal.url}', '${canal.title}')">
+
+                <div class="top10-badge">${posicion}</div>
+
+                <div class="top10-avatar" style="background-image: url('${canal.bg || canal.logo}');"></div>
+
+                <div class="top10-meta">
+
+                    <h4 class="top10-title">${canal.title}</h4>
+
+                    <p class="top10-user">${canal.user || '@ListaGolden'}</p>
+
+                </div>
+
+                <div class="top10-stats">${crecimientoSimulado}</div>
+
+            </div>
+
+        `;
+
+    }).join('');
+
+}
 // =========================================================================
 // 🏁 EL ORQUESTRADOR UNIFICADO DE ARRANQUE (Sin duplicaciones)
+// =========================================================================
+// =========================================================================
+// 🚀 MOTOR DEL RANKING TOP 10 (Se coloca libre en el archivo)
+// =========================================================================
+function renderTopPodium() {
+    const container = document.getElementById('top-podium-container');
+    if (!container) return;
+
+    // Aquí usamos tus canales reales. Si tu variable global del directorio
+    // se llama diferente (ej: canalesData), cambia este nombre:
+    const listaCanales = typeof datasetCanales !== 'undefined' ? datasetCanales : [];
+    
+    if (listaCanales.length === 0) {
+        container.innerHTML = `<p style="color:#64748b; text-align:center; font-size:0.8rem; padding:20px;">Cargando posiciones del ranking...</p>`;
+        return;
+    }
+
+    const top10 = listaCanales.slice(0, 10);
+
+    container.innerHTML = top10.map((canal, index) => {
+        const posicion = index + 1;
+        let rankClass = "";
+        if (posicion === 1) rankClass = "rank-1";
+        else if (posicion === 2) rankClass = "rank-2";
+        else if (posicion === 3) rankClass = "rank-3";
+
+        const crecimientoSimulado = `+${(12.4 - (index * 0.9)).toFixed(1)}%`;
+
+        return `
+            <div class="top10-row ${rankClass}" onclick="window.manejarClicTarjeta('${canal.url}', '${canal.title}')">
+                <div class="top10-badge">${posicion}</div>
+                <div class="top10-avatar" style="background-image: url('${canal.bg || canal.logo}');"></div>
+                <div class="top10-meta">
+                    <h4 class="top10-title">${canal.title}</h4>
+                    <p class="top10-user">${canal.user || '@ListaGolden'}</p>
+                </div>
+                <div class="top10-stats">
+                    ${crecimientoSimulado}
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+// =========================================================================
+// 🏁 EL ORQUESTRADOR UNIFICADO DE ARRANQUE (Tu bloque actual)
 // =========================================================================
 document.addEventListener("DOMContentLoaded", () => {
     loadFromLocalStorage();
@@ -4045,7 +4285,9 @@ document.addEventListener("DOMContentLoaded", () => {
     checkVipInternalRegistration();
     executeDailyCheckIn();
     renderAppUiComponents();
-    renderTopPodium();
+    
+    renderTopPodium(); // 👈 Al arrancar, buscará la función que pusimos arriba
+    
     renderShopCarrousels();
     updateAdminToggleUI();
     renderCategorySliders();
