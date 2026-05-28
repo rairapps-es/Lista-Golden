@@ -3377,7 +3377,7 @@ function closeShareModal() {
 }
 
 /**
- * Ejecuta la API de redirección o copia en base a la red social elegida
+ * Ejecuta la API de redirección o copia en base a la red social elegida (Edición Telegram WebApp)
  */
 function executeShareAction(network) {
     // Detectamos la URL exacta en la que corre la aplicación actual
@@ -3390,24 +3390,27 @@ function executeShareAction(network) {
     const textEncoded = encodeURIComponent(messageText);
     const urlEncoded = encodeURIComponent(webAppUrl);
 
+    // Variable para almacenar la URL final generada
+    let finalUrl = "";
+
     switch (network) {
         case 'telegram':
-            window.open(`https://t.me/share/url?url=${urlEncoded}&text=${textEncoded}`, '_blank');
+            finalUrl = `https://t.me/share/url?url=${urlEncoded}&text=${textEncoded}`;
             break;
         case 'whatsapp':
-            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(messageText + "\n" + webAppUrl)}`, '_blank');
+            finalUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(messageText + "\n" + webAppUrl)}`;
             break;
         case 'x':
-            window.open(`https://twitter.com/intent/tweet?text=${textEncoded}&url=${urlEncoded}`, '_blank');
+            finalUrl = `https://twitter.com/intent/tweet?text=${textEncoded}&url=${urlEncoded}`;
             break;
         case 'facebook':
-            window.open(`https://www.facebook.com/sharer/sharer.php?u=${urlEncoded}`, '_blank');
+            finalUrl = `https://www.facebook.com/sharer/sharer.php?u=${urlEncoded}`;
             break;
         case 'reddit':
-            window.open(`https://www.reddit.com/submit?url=${urlEncoded}&title=${encodeURIComponent("Canal Recomendado: " + activeShareData.name)}`, '_blank');
+            finalUrl = `https://www.reddit.com/submit?url=${urlEncoded}&title=${encodeURIComponent("Canal Recomendado: " + activeShareData.name)}`;
             break;
         case 'email':
-            window.open(`mailto:?subject=${encodeURIComponent("Recomendación de Canal: " + activeShareData.name)}&body=${encodeURIComponent(messageText + "\n\n" + webAppUrl)}`, '_self');
+            finalUrl = `mailto:?subject=${encodeURIComponent("Recomendación de Canal: " + activeShareData.name)}&body=${encodeURIComponent(messageText + "\n\n" + webAppUrl)}`;
             break;
         case 'copy':
             // Método Primario: API Portapapeles asíncrona moderna
@@ -3434,6 +3437,22 @@ function executeShareAction(network) {
                 document.body.removeChild(textArea);
             }
             break;
+    }
+
+    // 🔥 EL NUEVO MOTOR DE DESVÍO INTELIGENTE:
+    // Si se generó una URL (es decir, no es la acción de copiar) ejecutamos la apertura segura
+    if (finalUrl !== "") {
+        if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.openLink) {
+            // Telegram maneja de forma nativa páginas web externas Y el protocolo mailto:
+            window.Telegram.WebApp.openLink(finalUrl);
+        } else {
+            // Respaldo para navegadores comunes de PC
+            if (network === 'email') {
+                window.location.href = finalUrl;
+            } else {
+                window.open(finalUrl, '_blank');
+            }
+        }
     }
 
     // Cerramos el panel automáticamente en todas las redes para agilizar el flujo,
