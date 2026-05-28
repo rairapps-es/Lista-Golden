@@ -2597,27 +2597,62 @@ function checkVipInternalRegistration() {
             saveToLocalStorage();
         }
 
-        function renderTopPodium() {
-            const container = document.getElementById("top-podium-container");
-            if (!container) return;
-            const sortedTop = [...INITIAL_CHANNELS_DATASET].sort((a, b) => b.subs - a.subs).slice(0, 3);
-            
-            container.innerHTML = sortedTop.map((c, index) => `
-                <div class="podium-card rank-${index + 1}">
-                    <div class="podium-badge">#${index + 1}</div>
-                    <div style="display:flex; align-items:center; gap:12px;">
-                        <span style="font-size:1.8rem;">${c.logo}</span>
-                        <div>
-                            <h4 style="font-weight:800; font-size:1.05rem;">${c.name}</h4>
-                            <p style="font-size:0.75rem; color:var(--text-muted);">${c.user}</p>
-                        </div>
-                    </div>
-                    <p style="font-size:0.8rem; color:var(--text-muted); line-height:1.4;">${c.description}</p>
-                    <div style="font-size:0.75rem; font-weight:700;">👥 Suscriptores: <span style="color:var(--telegram-blue);">${c.subs.toLocaleString()}</span></div>
-                    <button class="btn-subscribe-trigger" style="padding:10px; font-size:0.8rem;" onclick="registerChannelAccess(${c.id})">Visitar Canal Top</button>
+        // =========================================================================
+// 🚀 MOTOR DEL RANKING TOP 10 (Adaptado a INITIAL_CHANNELS_DATASET)
+// =========================================================================
+function renderTopPodium() {
+    const container = document.getElementById('top-podium-container');
+    if (!container) return;
+
+    // 1. Apuntamos a tu variable real de canales
+    const listaCanales = typeof INITIAL_CHANNELS_DATASET !== 'undefined' ? INITIAL_CHANNELS_DATASET : [];
+    
+    if (listaCanales.length === 0) {
+        container.innerHTML = `<p style="color:#64748b; text-align:center; font-size:0.8rem; padding:20px;">Cargando posiciones del ranking...</p>`;
+        return;
+    }
+
+    // 2. SÚPER MEJORA: Ordenamos los canales por número de suscriptores (subs) de mayor a menor
+    const canalesOrdenados = [...listaCanales].sort((a, b) => b.subs - a.subs);
+
+    // 3. Tomamos los primeros 10 (en tu dataset hay 7, se adaptará dinámicamente)
+    const top10 = canalesOrdenados.slice(0, 10);
+
+    container.innerHTML = top10.map((canal, index) => {
+        const posicion = index + 1;
+        
+        // Estilos para el podio
+        let rankClass = "";
+        if (posicion === 1) rankClass = "rank-1";
+        else if (posicion === 2) rankClass = "rank-2";
+        else if (posicion === 3) rankClass = "rank-3";
+
+        // Formateamos los suscriptores para que luzcan pro (ej: 112,000 -> 112K)
+        const totalSubs = canal.subs >= 1000 ? (canal.subs / 1000).toFixed(0) + 'K' : canal.subs;
+
+        // Construimos una URL de búsqueda simulada o pasamos su alias directo para Telegram
+        const urlTelegram = `https://t.me/${canal.user.replace('@', '')}`;
+
+        return `
+            <div class="top10-row ${rankClass}" onclick="window.manejarClicTarjeta('${urlTelegram}', '${canal.name}')">
+                <div class="top10-badge">${posicion}</div>
+                
+                <div class="top10-avatar" style="display: flex; align-items: center; justify-content: center; font-size: 1.6rem; background: rgba(255,255,255,0.03);">
+                    ${canal.logo}
                 </div>
-            `).join('');
-        }
+                
+                <div class="top10-meta">
+                    <h4 class="top10-title">${canal.name}</h4>
+                    <p class="top10-user">${canal.user}</p>
+                </div>
+                
+                <div class="top10-stats" style="color: #38bdf8; background: rgba(56, 189, 248, 0.1);">
+                    👥 ${totalSubs}
+                </div>
+            </div>
+        `;
+    }).join('');
+}
 
         function renderAppUiComponents() {
             document.getElementById("drawer-username").innerText = state.user.username;
