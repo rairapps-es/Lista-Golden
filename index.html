@@ -3847,12 +3847,9 @@ function renderSliderElements(containerId, dataset) {
 
         const badgeColor = BADGE_COLORS[item.type] || "#a855f7";
 
-        // Mensaje de confirmación limpio
-        const mensajeConfirmacion = `Al pulsar se abrirá el sitio externo para "${item.title}". ¿Deseas continuar?`;
-
-        // Modificado: Si confirma, abre la URL correspondiente en una pestaña nueva
+        // Forzamos la llamada a una función segura global pasándole la URL y el Título
         return `
-            <div class="slider-card" style="background-image: url('${item.bg}'); cursor: pointer;" onclick="if(confirm('${mensajeConfirmacion}')) { window.open('${item.url}', '_blank'); }">
+            <div class="slider-card" style="background-image: url('${item.bg}'); cursor: pointer;" onclick="window.manejarClicTarjeta('${item.url}', '${item.title}')">
                 <span class="slider-badge" style="background: ${badgeColor};">${item.type}</span>
                 <div class="slider-views-counter">👁️ <span id="view-text-${item.id}">${currentViews}</span></div>
                 <div class="slider-card-overlay">
@@ -3863,7 +3860,6 @@ function renderSliderElements(containerId, dataset) {
         `;
     }).join('');
 }
-
 // Motor en segundo plano que suma de 1 a 10 visitas
 function updateSliderViewsEngine() {
     const todosLosObjetos = [...SLIDER_DESTACADOS_DATA, ...SLIDER_COMUNIDAD_DATA];
@@ -3936,6 +3932,39 @@ function closeTooltipOutside(e) {
     }
 }
 
+        // =========================================================================
+// INTERRUPTOR DE ALERTA NATIVA PARA TELEGRAM (Bypass de Seguridad)
+// =========================================================================
+window.manejarClicTarjeta = function(urlDestino, tituloTarjeta) {
+    // Comprobamos si estamos dentro de Telegram de verdad
+    if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.showPopup) {
+        
+        window.Telegram.WebApp.showPopup({
+            title: 'Enlace Externo 🚀',
+            message: `Al pulsar se abrirá el sitio oficial para "${tituloTarjeta}". ¿Deseas continuar fuera de la WebApp?`,
+            buttons: [
+                { id: 'continuar', type: 'default', text: 'SÍ, VISITAR' },
+                { id: 'cancelar', type: 'cancel', text: 'VOLVER' }
+            ]
+        }, function(buttonId) {
+            // Si el usuario presiona el botón de continuar
+            if (buttonId === 'continuar') {
+                if (window.Telegram.WebApp.openLink) {
+                    window.Telegram.WebApp.openLink(urlDestino); // Abre de forma segura en Telegram
+                } else {
+                    window.open(urlDestino, '_blank');
+                }
+            }
+        });
+
+    } else {
+        // Alerta de respaldo por si lo pruebas desde un navegador web común fuera de Telegram
+        const mensajeConfirmacion = `Al pulsar se abrirá el sitio externo para "${tituloTarjeta}". ¿Deseas continuar?`;
+        if (confirm(mensajeConfirmacion)) {
+            window.open(urlDestino, '_blank');
+        }
+    }
+};
 // =========================================================================
 // 🏁 EL ORQUESTRADOR UNIFICADO DE ARRANQUE (Sin duplicaciones)
 // =========================================================================
