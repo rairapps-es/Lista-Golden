@@ -3805,54 +3805,7 @@ const SLIDER_COMUNIDAD_DATA = [
 // VARIABLES GLOBALES Y DATASETS DEL SLIDER (Asegúrate de que estén aquí)
 // =========================================================================
 
-    botonTexto) botonTexto.innerText = post.btnText || "SABER MÁS 🚀";
-    document.getElementById("modal-ext-btn-link").href = post.targetUrl;
-
-    modal.style.display = "flex";
-    setTimeout(() => {
-        modal.style.opacity = "1";
-        caja.style.transform = "translateY(0)";
-    }, 50);
-};
-
-window.cerrarPostExt = function() {
-    const modal = document.getElementById("slider-detail-modal");
-    const caja = document.getElementById("slider-detail-box");
-    
-    if (!modal || !caja) return;
-
-    modal.style.opacity = "0";
-    caja.style.transform = "translateY(40px)";
-    
-    setTimeout(() => {
-        modal.style.display = "none";
-    }, 300);
-};
-
-function toggleAdTooltip(event) {
-    event.stopPropagation();
-    const tooltip = document.getElementById("premium-ad-tooltip");
-    if (!tooltip) return;
-    tooltip.style.display = tooltip.style.display === "none" ? "block" : "none";
-}
-
-        document.addEventListener("DOMContentLoaded", () => {
-    // 1. Carga de datos y contexto base
-    if (typeof loadFromLocalStorage === "function") loadFromLocalStorage();
-    if (typeof initTelegramContext === "function") initTelegramContext();
-    
-    // 2. Verificaciones y lógica de negocio
-    if (typeof checkVipInternalRegistration === "function") checkVipInternalRegistration();
-    if (typeof executeDailyCheckIn === "function") executeDailyCheckIn();
-    
-    // 3. Renderizado de componentes visuales de la interfaz
-    if (typeof renderAppUiComponents === "function") renderAppUiComponents();
-    if (typeof renderTopPodium === "function") renderTopPodium();
-    if (typeof renderShopCarrousels === "function") renderShopCarrousels();
-    if (typeof updateAdminToggleUI === "function") updateAdminToggleUI();
-    if (typeof renderCategorySliders === "function") renderCategorySliders();
-    
-    // 🔥 NUEVOS SLIDERS DE BORDE A BORDE
+ 🔥 NUEVOS SLIDERS DE BORDE A BORDE
     if (typeof initDynamicSliders === "function") {
         initDynamicSliders();
     }
