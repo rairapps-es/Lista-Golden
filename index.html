@@ -3866,13 +3866,28 @@ const SLIDER_COMUNIDAD_DATA = [
 // MOTOR DE INICIALIZACIÓN Y RENDER
 // =========================================================================
 function initDynamicSliders() {
-    renderSliderElements("slider-destacados-container", SLIDER_DESTACADOS_DATA);
-    renderSliderElements("slider-comunidad-container", SLIDER_COMUNIDAD_DATA);
-    startAutoScroll("slider-destacados-container");
-    startAutoScroll("slider-comunidad-container");
-    setInterval(updateSliderViewsEngine, 10 * 60 * 1000); 
-}
+    console.log("⚡ Buscando contenedores de sliders en el HTML...");
+    const container1 = document.getElementById("slider-destacados-container");
+    const container2 = document.getElementById("slider-comunidad-container");
 
+    if (!container1 || !container2) {
+        // Si sale esto en la consola, es que el JS se ejecuta antes de que el HTML termine de cargar
+        console.warn("⚠️ Los contenedores no estaban listos en el DOM. Reintentando en 100ms...");
+        setTimeout(initDynamicSliders, 100);
+        return;
+    }
+
+    try {
+        renderSliderElements("slider-destacados-container", SLIDER_DESTACADOS_DATA);
+        renderSliderElements("slider-comunidad-container", SLIDER_COMUNIDAD_DATA);
+        startAutoScroll("slider-destacados-container");
+        startAutoScroll("slider-comunidad-container");
+        console.log("✅ ¡Sliders cargados a la fuerza con éxito!");
+    } catch (e) {
+        console.error("❌ Error al renderizar sliders:", e);
+    }
+}
+        
 function renderSliderElements(containerId, dataset) {
     const container = document.getElementById(containerId);
     if (!container) return;
