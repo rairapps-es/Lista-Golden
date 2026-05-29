@@ -2385,16 +2385,37 @@ function checkVipInternalRegistration() {
         }
 
         function claimDailyGacha() {
-            const prize = Math.floor(Math.random() * (50 - 5 + 1)) + 5;
-            rewardPoints(prize, "Apertura de Cofre Diario");
-            registerActionToHistory("Cofre Sorpresa", `Abriste el cofre y reclamaste +${prize} puntos.`, "success");
-            showToast(`¡Ganaste +${prize} puntos de energía!`, "success");
-            
-            const btn = document.getElementById("gacha-trigger-btn");
-            btn.disabled = true;
-            btn.innerText = "Cofre Reclamado";
-            btn.style.opacity = "0.5";
-        }
+    // 💡 NUEVO: Guardamos la fecha de hoy antes de dar el premio
+    const hoy = new Date().toISOString().split('T')[0]; // Genera "AAAA-MM-DD"
+    localStorage.setItem('ultimo_reclamado_gacha', hoy);
+
+    const prize = Math.floor(Math.random() * (50 - 5 + 1)) + 5;
+    rewardPoints(prize, "Apertura de Cofre Diario");
+    registerActionToHistory("Cofre Sorpresa", `Abriste el cofre y reclamaste +${prize} puntos.`, "success");
+    showToast(`¡Ganaste +${prize} puntos de energía!`, "success");
+    
+    // Desactivamos el botón en caliente
+    desactivarBotonGacha();
+}
+        // Función para dejar el botón "Cofre Reclamado" bloqueado
+function desactivarBotonGacha() {
+    const btn = document.getElementById("gacha-trigger-btn");
+    if (!btn) return;
+    btn.disabled = true;
+    btn.innerText = "Cofre Reclamado";
+    btn.style.opacity = "0.5";
+}
+
+// Función que verifica el estado al entrar a la WebApp
+function checkDailyGachaStatus() {
+    const hoy = new Date().toISOString().split('T')[0];
+    const ultimoReclamo = localStorage.getItem('ultimo_reclamado_gacha');
+
+    // Si la fecha guardada es igual a la de hoy, bloqueamos el botón de inmediato
+    if (ultimoReclamo === hoy) {
+        desactivarBotonGacha();
+    }
+}
 
         function switchView(viewId) {
             state.adminFilterOnly = false; 
@@ -4255,6 +4276,7 @@ document.addEventListener("DOMContentLoaded", () => {
     renderShopCarrousels();
     updateAdminToggleUI();
     renderCategorySliders();
+    checkDailyGachaStatus();
     
     // 🔥 EL MOTOR SIMULADOR: Inyecta vida al contador en cuanto abre la WebApp
     initOnlineUsersSimulator('cont-usuarios-online'); 
