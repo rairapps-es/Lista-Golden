@@ -1624,8 +1624,12 @@
 
         <div id="creator-ad-banner" class="creator-banner admin-only">
             <h4 style="color:var(--vip-gold); font-size:0.95rem; font-weight:800; margin-bottom:4px;">📣 Panel Avanzado de Administrador</h4>
-            <p style="font-size:0.75rem; color:var(--text-muted); margin-bottom:12px;">Estás viendo este banner porque tu rol actual es ADMIN.</p>
-            <button class="btn-subscribe-trigger" style="background:var(--vip-gold); color:black; width:auto; margin:0 auto; padding:8px 16px;" onclick="showToast('Abriendo Consola Maestra...','gold')">Configurar Espacios VIP</button>
+            <p style="font-size:0.75rem; color:var(--text-muted); margin-bottom:12px;">Estás viendo este banner porque cambiaste al modo ADMIN.</p>
+            <button class="btn-subscribe-trigger" 
+            style="background:var(--vip-gold); color:black; width:auto; margin:0 auto; padding:8px 16px;" 
+            onclick="if(typeof switchView === 'function') { switchView('view-my-channels'); } else { showToast('Abriendo tus canales...', 'gold'); }">
+        Configurar Espacios
+    </button>
         </div>
     </main>
 
@@ -3341,8 +3345,11 @@ function toggleFavoriteChannel(id, event) {
             // Elegimos el canal definitivo de forma aleatoria
             const randomChannel = INITIAL_CHANNELS_DATASET[Math.floor(Math.random() * INITIAL_CHANNELS_DATASET.length)];
             
-            // 🔥 LA CLAVE: Inyectamos tu tarjeta mejorada pasándole el contexto 'roulette-'
+            // Inyectamos tu tarjeta mejorada pasándole el contexto 'roulette-'
             display.innerHTML = buildChannelCardHtml(randomChannel, 'roulette-');
+            
+            // 🔥 ¡BUM! LA LLUVIA DE CONFETI EN EL CLÍMAX EXACTO:
+            triggerConfetiParticlesExplosion(); 
             
             // Añadimos tu clase de animación de impacto (sacudida)
             display.classList.add("shake-anim");
