@@ -2711,30 +2711,56 @@ function renderTopPodium() {
         }
 
         function updateBalanceAndRpgUi() {
-            document.getElementById("profile-balance").innerText = state.user.balance;
-            document.getElementById("drawer-range").innerText = `[ Rango RPG Nivel ${state.user.range} ]`;
-            document.getElementById("cnt-favs").innerText = state.favorites.length;
-            document.getElementById("rpg-current-pts").innerText = state.user.pointsProgress;
-            
-            const percentage = Math.min(100, state.user.pointsProgress);
-            document.getElementById("rpg-bar-fill").style.width = `${percentage}%`;
-            
-            const badge = document.getElementById("rpg-status-badge");
-            const lockText = document.getElementById("drawer-locked-text");
-            const lockIcon = document.getElementById("drawer-locked-icon");
-            const drawerBtn = document.getElementById("epic-avatar-link");
+    // 1. Inyección de textos básicos
+    document.getElementById("profile-balance").innerText = state.user.balance;
+    document.getElementById("drawer-range").innerText = `[ Rango RPG Nivel ${state.user.range} ]`;
+    document.getElementById("cnt-favs").innerText = state.favorites.length;
+    document.getElementById("rpg-current-pts").innerText = state.user.pointsProgress;
+    
+    // 2. 🟢 NUEVA MATEMÁTICA: Cálculo dinámico de la barra de progreso
+    // Queremos saber cuántos puntos necesita el nivel actual para completarse.
+    // Si usas la Opción A (50 pts por nivel), el objetivo de puntos es: Rango * 50
+    const puntosPorNivel = 50; 
+    const puntosObjetivoSiguienteNivel = state.user.range * puntosPorNivel;
+    
+    // Calculamos el porcentaje real en base a la meta de ese nivel
+    const percentage = Math.min(100, Math.floor((state.user.pointsProgress / puntosObjetivoSiguienteNivel) * 100));
+    document.getElementById("rpg-bar-fill").style.width = `${percentage}%`;
+    
+    // 3. Captura de elementos del DOM de tu interfaz
+    const badge = document.getElementById("rpg-status-badge");
+    const lockText = document.getElementById("drawer-locked-text");
+    const lockIcon = document.getElementById("drawer-locked-icon");
+    const drawerBtn = document.getElementById("epic-avatar-link");
 
-            if (state.user.range >= 5) {
-                badge.innerText = "Nivel Máximo (Rango 5)";
-                badge.style.color = "var(--vip-gold)";
-                lockText.innerText = "✨ Taller de Avatar IA (Desbloqueado)";
-                drawerBtn.classList.remove("locked");
-                if(lockIcon) lockIcon.style.display = "none";
-            } else {
-                badge.innerText = `Rango ${state.user.range}`;
-                badge.style.color = "var(--telegram-blue)";
-            }
+    // 4. 🛑 NUEVA CONDICIÓN DE TOPE: Ahora el Olimpo es el Nivel 100
+    if (state.user.range >= 100) {
+        if (badge) {
+            badge.innerText = "Nivel Máximo (Rango 100) 👑";
+            badge.style.color = "var(--vip-gold)";
         }
+        if (lockText) lockText.innerText = "✨ Taller de Avatar IA (Desbloqueado)";
+        if (drawerBtn) drawerBtn.classList.remove("locked");
+        if (lockIcon) lockIcon.style.display = "none";
+        
+    } else {
+        // Mientras no sea nivel 100, muestra su rango dinámico normal
+        if (badge) {
+            badge.innerText = `Rango ${state.user.range} (Progreso: ${percentage}%)`;
+            badge.style.color = "var(--telegram-blue)";
+        }
+        
+        // Opcional: Si quieres que el Taller IA se desbloquee antes (ej: al nivel 10), cambia el 100 de abajo:
+        if (state.user.range >= 10) {
+            if (lockText) lockText.innerText = "✨ Taller de Avatar IA (Desbloqueado)";
+            if (drawerBtn) drawerBtn.classList.remove("locked");
+            if (lockIcon) lockIcon.style.display = "none";
+        } else {
+            // Si está por debajo del nivel de desbloqueo, se mantiene cerrado
+            if (lockText) lockText.innerText = `🔒 Bloqueado hasta Nivel 10`;
+        }
+    }
+}
 
         function renderVipSlider() {
     const container = document.getElementById("vip-slider");
