@@ -1561,13 +1561,7 @@
         </div>
 </div>
 
-<div class="slider-section-title" style="color: #111111; font-size: 1.1rem; font-weight: 800; margin: 0px; padding: 0px 0px 4px 10px; font-family: sans-serif;">📢 Novedades y Comunidad</div>
-<div class="slider-wrapper">
-    <div id="slider-comunidad-container" class="custom-snap-slider panoramic">
-        </div>
-</div>
-
-<!-- ESPACIO DE ANUNCIO PREMIUM CON TOOLTIP -->
+        <!-- ESPACIO DE ANUNCIO PREMIUM CON TOOLTIP -->
 <div class="premium-ad-container" style="margin: 10px; position: relative; background: #0f172a; border: 1px solid rgba(168, 85, 247, 0.4); border-radius: 16px; padding: 20px; box-shadow: 0 0 15px rgba(168, 85, 247, 0.1); font-family: sans-serif; overflow: visible;">
     <!-- Botón de interrogación flotante -->
     <button onclick="toggleAdTooltip(event)" style="position: absolute; top: 12px; right: 12px; background: rgba(255,255,255,0.1); border: none; color: #a855f7; width: 24px; height: 24px; border-radius: 50%; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 10;">?</button>
@@ -1588,6 +1582,13 @@
         <button onclick="openGPlusPanel()" style="background: linear-gradient(135deg, #a855f7, #7c3aed); color: #fff; border: none; padding: 8px 12px; font-size: 0.75rem; font-weight: bold; border-radius: 6px; width: 100%; cursor: pointer;">ANUNCIARME AQUÍ</button>
     </div>
 </div>
+        
+<div class="slider-section-title" style="color: #111111; font-size: 1.1rem; font-weight: 800; margin: 0px; padding: 0px 0px 4px 10px; font-family: sans-serif;">📢 Novedades y Comunidad</div>
+<div class="slider-wrapper">
+    <div id="slider-comunidad-container" class="custom-snap-slider panoramic">
+        </div>
+</div>
+
         <section class="top-podium-section" style="margin: 0; padding: 0 10px;">
     <h3 style="color: #fff; font-size: 1.1rem; font-weight: 800; font-family: sans-serif; margin: 18px 0px 6px 0px; display: flex; align-items: center; gap: 8px;">
         🔥 Ranking Top 10 Global
@@ -2362,22 +2363,29 @@ function checkVipInternalRegistration() {
         }
 
         function rewardPoints(amount, actionLabel) {
-            state.user.balance += amount;
-            state.user.pointsProgress += amount;
-            
-            const oldRange = state.user.range;
-            state.user.range = Math.min(5, Math.floor(state.user.pointsProgress / 20) + 1);
-            
-            if(state.user.range > oldRange) {
-                triggerConfettiExplosion();
-                showToast(`¡Felicidades! Has alcanzado el Rango ${state.user.range}.`, "gold");
-                registerActionToHistory("Evolución de Rango", `Alcanzaste el rango de usuario de nivel ${state.user.range}`, "gold");
-            }
-            
-            updateBalanceAndRpgUi();
-            renderShopCatalog();
-            saveToLocalStorage();
-        }
+    state.user.balance += amount;
+    state.user.pointsProgress += amount;
+    
+    const oldRange = state.user.range;
+    
+    // 🟢 MATEMÁTICA RPG: Curva exponencial balanceada hasta nivel 100
+    // Fórmula: Nivel = Multiplicador * RaízCuadrada(Puntos) + 1
+    // Con un multiplicador de 1.4, el nivel 100 se alcanza a los ~5,000 puntos acumulados.
+    let calculoNivel = Math.floor(1.4 * Math.sqrt(state.user.pointsProgress)) + 1;
+    
+    // Anclamos el tope en 100 de forma segura
+    state.user.range = Math.min(100, calculoNivel);
+    
+    if(state.user.range > oldRange) {
+        triggerConfettiExplosion();
+        showToast(`¡Felicidades! Has alcanzado el Rango ${state.user.range}.`, "gold");
+        registerActionToHistory("Evolución de Rango", `Alcanzaste el rango de usuario de nivel ${state.user.range}`, "gold");
+    }
+    
+    updateBalanceAndRpgUi();
+    renderShopCatalog();
+    saveToLocalStorage();
+}
 
         function executeDailyCheckIn() {
             const today = new Date().toDateString();
