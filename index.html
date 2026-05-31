@@ -1388,6 +1388,25 @@
     padding: 4px 8px;
     border-radius: 8px;
 }
+
+        /* Se aplica a elementos que SOLO los VIP deben ver */
+.only-vip {
+    display: none !important;
+}
+
+/* Se aplica a banners o publicidad que los VIP NO deben ver (y los normales sí) */
+.no-vip {
+    display: block;
+}
+
+/* 🌟 Clase mágica: Cuando el body tenga "user-is-vip", alteramos el comportamiento de golpe */
+body.user-is-vip .only-vip {
+    display: block !important;
+}
+
+body.user-is-vip .no-vip {
+    display: none !important;
+}
     </style>
 </head>
 <body>
@@ -1628,7 +1647,7 @@
             <p style="font-size:0.75rem; color:var(--text-muted); margin-bottom:12px;">Estás viendo este banner porque cambiaste al modo ADMIN.</p>
             <button class="btn-subscribe-trigger" 
             style="background:var(--vip-gold); color:black; width:auto; margin:0 auto; padding:8px 16px;" 
-            onclick="if(typeof switchView === 'function') { switchView('view-my-channels'); } else { showToast('Abriendo tus canales...', 'gold'); }">
+            onclick="if(typeof switchView === 'function') { switchView('my-channels'); } else { showToast('Abriendo tus canales...', 'gold'); }">
         Configurar Espacios
     </button>
         </div>
