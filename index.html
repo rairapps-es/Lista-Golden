@@ -2040,24 +2040,29 @@ body.user-is-vip .no-vip {
         const CAROUSEL_OWNERS_SEEDS = ["alex", "ruby", "sam", "eva", "boss"];
 
         let state = {
-            user: { 
-                username: "Invitado Anónimo", 
-                idTelegram: 12345678,
-                balance: 100, 
-                role: "user", 
-                range: 1,
-                pointsProgress: 25,
-                seed: "carlos",
-                isVipMember: false, 
-                equipped: { clothing: "", glasses: "" }
-            },
-            favorites: [], 
-            history: [], 
-            systemLogs: [],
-            purchasedItems: [],
-            adminFilterOnly: false
-        };
-
+    user: { 
+        username: "Invitado Anónimo", 
+        idTelegram: 12345678,
+        balance: parseInt(localStorage.getItem('golden_balance')) ?? 100, 
+        role: "user", 
+        range: parseInt(localStorage.getItem('golden_range')) || 1,
+        pointsProgress: parseInt(localStorage.getItem('golden_points')) || 25,
+        
+        // 💾 Persistencia de la Semilla base del Avatar
+        seed: localStorage.getItem('golden_avatar_seed') || "carlos",
+        isVipMember: localStorage.getItem('cripta_vip') === 'true', 
+        
+        // 💾 Persistencia de la ropa y gafas equipadas actualmente
+        equipped: JSON.parse(localStorage.getItem('golden_equipped')) || { clothing: "", glasses: "" }
+    },
+    favorites: JSON.parse(localStorage.getItem('golden_favs')) || [], 
+    history: [], 
+    systemLogs: [],
+    
+    // 💾 Lista de IDs de ítems que el usuario ya ha comprado (Ej: ["cloth_1", "glass_4"])
+    purchasedItems: JSON.parse(localStorage.getItem('golden_purchased')) || [],
+    adminFilterOnly: false
+};
         let showFullHistory = false;
 
         const CATEGORIES = [
