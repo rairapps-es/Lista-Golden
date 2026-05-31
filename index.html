@@ -2075,19 +2075,29 @@ body.user-is-vip .no-vip {
         let activeCategoryFilter = "all";
 
         document.addEventListener("DOMContentLoaded", () => {
-            loadFromLocalStorage();
-            initTelegramContext();
-            checkVipInternalRegistration();
-            executeDailyCheckIn();
-            renderAppUiComponents();
-            renderTopPodium();
-            renderShopCarrousels();
-            updateAdminToggleUI();
-            renderCategorySliders();
-            initDynamicSliders();
-            lucide.createIcons();
-            addLog("Ecosistema unificado bajo ID único de Telegram.");
-        });
+    // 1. Primero capturamos el contexto de Telegram (ID, nombre, etc.)
+    initTelegramContext();
+    
+    // 2. 🌟 AHORA SÍ: Cargamos del LocalStorage. 
+    // Como Telegram ya inicializó el usuario, esta función reescribirá la ropa/gafas encima sin que nadie las pise.
+    loadFromLocalStorage();
+    
+    // 3. Validaciones de estado internas
+    checkVipInternalRegistration();
+    executeDailyCheckIn();
+    
+    // 4. Renderizado completo de la interfaz (Ya con los datos finales blindados)
+    renderAppUiComponents();
+    renderTopPodium();
+    renderShopCarrousels();
+    updateAdminToggleUI();
+    renderCategorySliders();
+    initDynamicSliders();
+    
+    // 5. Iconos y Logs
+    lucide.createIcons();
+    addLog("Ecosistema unificado bajo ID único de Telegram.");
+});
 
         function saveToLocalStorage() {
             localStorage.setItem('canales_top_state_v3', JSON.stringify({
@@ -2100,20 +2110,39 @@ body.user-is-vip .no-vip {
         }
 
         function loadFromLocalStorage() {
-            const saved = localStorage.getItem('canales_top_state_v3');
-            if (saved) {
-                try {
-                    const parsed = JSON.parse(saved);
-                    state.user = parsed.user || state.user;
-                    state.favorites = parsed.favorites || state.favorites;
-                    state.history = parsed.history || state.history;
-                    state.systemLogs = parsed.systemLogs || state.systemLogs;
-                    state.purchasedItems = parsed.purchasedItems || state.purchasedItems;
-                } catch(e) {
-                    console.error("Error cargando localStorage", e);
-                }
+    const saved = localStorage.getItem('canales_top_state_v3');
+    if (saved) {
+        try {
+            const parsed = JSON.parse(saved);
+            
+            // 🌟 LA REPARACIÓN MAESTRA: Fusión inteligente
+            // En vez de pisar state.user completo, combinamos lo que ya creó Telegram
+            // con lo que el usuario tenía comprado/equipado en LocalStorage.
+            if (parsed.user) {
+                state.user = {
+                    ...state.user, // Mantiene IDTelegram, username actual, role, etc.
+                    balance: parsed.user.balance !== undefined ? parsed.user.balance : state.user.balance,
+                    range: parsed.user.range || state.user.range,
+                    pointsProgress: parsed.user.pointsProgress || state.user.pointsProgress,
+                    seed: parsed.user.seed || state.user.seed,
+                    isVipMember: parsed.user.isVipMember || state.user.isVipMember,
+                    // Protegemos el sub-objeto de ropa y gafas
+                    equipped: parsed.user.equipped || { clothing: "", glasses: "" }
+                };
             }
+            
+            // Recuperar el resto de colecciones globales con normalidad
+            state.favorites = parsed.favorites || state.favorites;
+            state.history = parsed.history || state.history;
+            state.systemLogs = parsed.systemLogs || state.systemLogs;
+            state.purchasedItems = parsed.purchasedItems || state.purchasedItems;
+            
+            console.log("💾 Estado fusionado con éxito en el arranque. Ropa actual:", state.user.equipped);
+        } catch(e) {
+            console.error("Error cargando localStorage", e);
         }
+    }
+}
 
         // SISTEMA AUTOMÁTICO DE VERIFICACIÓN PREMIUM REQUERIDO
 function checkVipInternalRegistration() {
@@ -2300,65 +2329,90 @@ function checkVipInternalRegistration() {
         }
 
         function renderEquippedChipsList() {
-            const container = document.getElementById("equipped-items-list");
-            if (!container) return;
-            container.innerHTML = "";
+    const container = document.getElementById("equipped-items-list");
+    if (!container) return;
+    container.innerHTML = "";
 
-            let hasAddons = false;
+    let hasAddons = false;
 
-            if (state.user.equipped.clothing) {
-                hasAddons = true;
-                const itemData = PREMIUM_SHOP_CATALOG.find(i => i.value === state.user.equipped.clothing);
-                container.innerHTML += `
-                    <div class="equipped-chip">
-                        <span>👕 ${itemData ? itemData.name : 'Ropa'}</span>
-                        <button class="btn-unequip" onclick="unequipItem('clothing')"><i data-lucide="x" style="width:12px; height:12px;"></i></button>
-                    </div>
-                `;
-            }
-            if (state.user.equipped.glasses) {
-                hasAddons = true;
-                const itemData = PREMIUM_SHOP_CATALOG.find(i => i.value === state.user.equipped.glasses);
-                container.innerHTML += `
-                    <div class="equipped-chip">
-                        <span>👓 ${itemData ? itemData.name : 'Gafas'}</span>
-                        <button class="btn-unequip" onclick="unequipItem('glasses')"><i data-lucide="x" style="width:12px; height:12px;"></i></button>
-                    </div>
-                `;
-            }
+    if (state.user.equipped.clothing) {
+        hasAddons = true;
+        const itemData = PREMIUM_SHOP_CATALOG.find(i => i.value === state.user.equipped.clothing);
+        container.innerHTML += `
+            <div class="equipped-chip">
+                <span>👕 ${itemData ? itemData.name : 'Ropa'}</span>
+                <button class="btn-unequip" onclick="unequipItem('clothing')">
+                    <i data-lucide="x" style="width:12px; height:12px;"></i>
+                </button>
+            </div>
+        `;
+    }
+    if (state.user.equipped.glasses) {
+        hasAddons = true;
+        const itemData = PREMIUM_SHOP_CATALOG.find(i => i.value === state.user.equipped.glasses);
+        container.innerHTML += `
+            <div class="equipped-chip">
+                <span>👓 ${itemData ? itemData.name : 'Gafas'}</span>
+                <button class="btn-unequip" onclick="unequipItem('glasses')">
+                    <i data-lucide="x" style="width:12px; height:12px;"></i>
+                </button>
+            </div>
+        `;
+    }
 
-            if(!hasAddons) {
-                container.innerHTML = `<span style="font-size:0.72rem; color:var(--text-muted);">Sin accesorios equipados</span>`;
-            }
-            lucide.createIcons();
-        }
+    if(!hasAddons) {
+        container.innerHTML = `<span style="font-size:0.72rem; color:var(--text-muted);">Sin accesorios equipados</span>`;
+    }
+    
+    // Verificación por si Lucide no ha cargado en ventanas rápidas
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+}
 
-        function unequipItem(type) {
-            state.user.equipped[type] = "";
-            showToast("Accesorio removido del avatar", "info");
-            updateAvatarRenderers();
-            renderShopCatalog();
-            saveToLocalStorage();
-        }
+function unequipItem(type) {
+    state.user.equipped[type] = "";
+    
+    if (typeof showToast === 'function') showToast("Accesorio removido del avatar", "info");
+    
+    // 🔄 REPARACIÓN AQUÍ: Volvemos a renderizar la lista de chips 
+    // para que el accesorio desaparezca de la pantalla inmediatamente.
+    renderEquippedChipsList(); 
+    
+    // Logs del sistema opcionales para trazar qué se quitó
+    if (typeof addLog === 'function') addLog(`Accesorio removido: ${type}`);
 
-        function addLog(msg) {
-            const timestamp = new Date().toLocaleTimeString();
-            state.systemLogs.unshift(`[${timestamp}] ${msg}`);
-            const container = document.getElementById("logs-terminal-box");
-            if (container) container.innerHTML = state.systemLogs.map(l => `<div class="log-line">${l}</div>`).join('');
-            saveToLocalStorage();
-        }
+    if (typeof updateAvatarRenderers === 'function') updateAvatarRenderers();
+    if (typeof renderShopCatalog === 'function') renderShopCatalog();
+    
+    saveToLocalStorage();
+}
 
-        function registerActionToHistory(title, detail, type = "info") {
-            const icons = { info: "info", success: "check-circle", gold: "star", error: "alert-triangle" };
-            const actionIcon = icons[type] || "activity";
-            const now = new Date();
-            const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            
-            state.history.unshift({ title, detail, time: timeString, icon: actionIcon, type });
-            document.getElementById("cnt-purchases").innerText = state.history.filter(h => h.type === 'gold').length;
-            saveToLocalStorage();
-        }
+function addLog(msg) {
+    const timestamp = new Date().toLocaleTimeString();
+    state.systemLogs.unshift(`[${timestamp}] ${msg}`);
+    
+    const container = document.getElementById("logs-terminal-box");
+    if (container) {
+        container.innerHTML = state.systemLogs.map(l => `<div class="log-line">${l}</div>`).join('');
+    }
+    saveToLocalStorage();
+}
+
+function registerActionToHistory(title, detail, type = "info") {
+    const icons = { info: "info", success: "check-circle", gold: "star", error: "alert-triangle" };
+    const actionIcon = icons[type] || "activity";
+    const now = new Date();
+    const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    
+    state.history.unshift({ title, detail, time: timeString, icon: actionIcon, type });
+    
+    // Protección por si el contador de compras no existe en la vista actual
+    const counterEl = document.getElementById("cnt-purchases");
+    if (counterEl) {
+        counterEl.innerText = state.history.filter(h => h.type === 'gold').length;
+    }
+    
+    saveToLocalStorage();
+}
 
         function showToast(text, type = "info") {
             const container = document.getElementById("toast-container");
