@@ -2099,14 +2099,29 @@ body.user-is-vip .no-vip {
 });
 
         function saveToLocalStorage() {
-            localStorage.setItem('canales_top_state_v3', JSON.stringify({
-                user: state.user,
-                favorites: state.favorites,
-                history: state.history,
-                systemLogs: state.systemLogs,
-                purchasedItems: state.purchasedItems
-            }));
-        }
+    try {
+        // 🛡️ Filtro de seguridad: Si el estado global no existe, no hacemos nada para no romper la app
+        if (typeof state === 'undefined') return;
+
+        const dataToSave = {
+            // Guardamos el usuario o un objeto vacío si no se ha cargado
+            user: state.user || {},
+            
+            // 🌟 PROTECCIÓN ABSOLUTA: Si es un array válido lo guarda, si no, fuerza un array vacío []
+            favorites: Array.isArray(state.favorites) ? state.favorites : [],
+            history: Array.isArray(state.history) ? state.history : [],
+            systemLogs: Array.isArray(state.systemLogs) ? state.systemLogs : [],
+            purchasedItems: Array.isArray(state.purchasedItems) ? state.purchasedItems : []
+        };
+
+        // Guardamos de forma limpia en el disco local
+        localStorage.setItem('canales_top_state_v3', JSON.stringify(dataToSave));
+        
+        console.log("📝 Disco actualizado con éxito. Favoritos en memoria guardados:", dataToSave.favorites.length);
+    } catch (error) {
+        console.error("🚨 Error crítico al escribir en el LocalStorage:", error);
+    }
+}
 
         function loadFromLocalStorage() {
     const saved = localStorage.getItem('canales_top_state_v3');
