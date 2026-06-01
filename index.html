@@ -2262,11 +2262,16 @@ function checkVipInternalRegistration() {
 }
 
         function initTelegramContext() {
+    // Aseguramos que el esqueleto base exista antes de inyectar datos de Telegram
+    if (typeof state === 'undefined') window.state = {};
+    if (!state.user) state.user = {};
+
     if (window.Telegram && window.Telegram.WebApp) {
         const webApp = window.Telegram.WebApp;
         webApp.ready();
         webApp.expand();
         if(webApp.colorScheme === 'light') document.documentElement.setAttribute('data-theme', 'light');
+        
         if (webApp.initDataUnsafe?.user) {
             const tgUser = webApp.initDataUnsafe.user;
             state.user.username = tgUser.username ? `@${tgUser.username}` : `${tgUser.first_name}`;
@@ -2274,8 +2279,13 @@ function checkVipInternalRegistration() {
             state.user.seed = tgUser.username || "player";
         }
     }
+
+    // 🌟 CORRECCIÓN CRÍTICA:
+    // Actualizamos los renders visuales del avatar del usuario actual
     updateAvatarRenderers();
-    saveToLocalStorage();
+    
+    // ❌ ELIMINADO: saveToLocalStorage(); 
+    // ¡NUNCA guardes en disco en el arranque antes de haber leído los datos viejos!
 
     // =========================================================================
     // INYECTORES ASÍNCRONOS: Se disparan cuando ya tenemos el ID de Telegram
@@ -2293,19 +2303,18 @@ function checkVipInternalRegistration() {
 
     // 🔥 3. SISTEMA DE NOTIFICACIONES: Procesa los datos de tu ID e inyecta el render visual
     if (typeof asegurarNotifState === "function") {
-        asegurarNotifState(); // Ejecuta la lista interna de mensajes
+        asegurarNotifState(); 
     }
     if (typeof actualizarBuzonVisual === "function") {
-        actualizarBuzonVisual(); // Renderiza los mensajes dentro del contenedor y enciende la campanita
+        actualizarBuzonVisual(); 
     }
 
     // ❄ 4. PANTALLA DE CARGA: Apaga el telón oscuro suavemente ahora que todo está pintado
     if (typeof ocultarPantallaCargaApp === "function") {
         ocultarPantallaCargaApp();
     }
-} // Llave de cierre de tu función initTelegramContext
-        
-        function updateAvatarRenderers() {
+}
+      function updateAvatarRenderers() {
             let queryParams = `?seed=${state.user.seed}&radius=50&backgroundColor=1e293b`;
             
             if (state.user.equipped.clothing) queryParams += `&clothing=${state.user.equipped.clothing}`;
