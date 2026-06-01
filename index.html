@@ -1425,7 +1425,7 @@
         <!-- ICONO CAMPANITA EN EL MENÚ SUPERIOR -->
 <div style="position: relative; cursor: pointer; display: inline-block; margin-right: 12px;" onclick="document.getElementById('notifications-sliding-panel').style.display = 'flex'; if(typeof actualizarBuzonVisual === 'function') actualizarBuzonVisual();">
     <!-- Icono SVG de una campanita elegante -->
-    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#e5e7eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"></path>
         <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"></path>
     </svg>
@@ -1494,7 +1494,7 @@
         </div>
 
         <div class="premium-balance-box">
-            <div class="balance-title">Saldo</div>
+            <div class="balance-title">Saldo Acumulado</div>
             <div class="balance-amount"><span id="profile-balance">0</span> <span style="color: var(--vip-gold)">✨ Pts</span></div>
         </div>
 
@@ -1784,7 +1784,7 @@
     <div class="ads-modal-content" style="max-width:440px; text-align:center; border-color:#fbbf24;">
         <span style="font-size:3rem; display:block; animation: shake-anim 0.5s infinite;">🎉</span>
         <h2 style="font-size:1.4rem; font-weight:900; color:#fbbf24; margin:10px 0 4px 0;">¡ENHORABUENA!</h2>
-        <p style="font-size:0.8rem; color:#cbd5e1; margin-bottom:16px;">Tu canal ha sido destacado Destacado correctamente.</p>
+        <p style="font-size:0.8rem; color:#cbd5e1; margin-bottom:16px;">Tu canal ha verificado el Destacado Activo correctamente.</p>
         
         <div id="congrats-card-target"></div>
 
@@ -1800,7 +1800,7 @@
     </main>
 
     <main id="view-shop" class="app-view">
-        <h2 class="view-title"><i data-lucide="shopping-bag" style="color:var(--mystic-purple)"></i> Forja tu Avatar</h2>
+        <h2 class="view-title"><i data-lucide="shopping-bag" style="color:var(--mystic-purple)"></i> Forja de Avatar RPG & Personalización</h2>
         <div class="shop-layout">
             
             <div class="avatar-canvas-area" id="canvas-area-wrapper">
@@ -1811,11 +1811,11 @@
                 <div class="equipped-badges-container" id="equipped-items-list"></div>
 
                 <div class="carousel-wrapper">
-                    <div class="carousel-title">🏃 Personajes Exploradores</div>
+                    <div class="carousel-title">🏃 Carrusel Personajes Exploradores</div>
                     <div class="carousel-track" id="track-explorers"></div>
                 </div>
                 <div class="carousel-wrapper">
-                    <div class="carousel-title">👑 Admin Owners</div>
+                    <div class="carousel-title">👑 Carrusel Admin Owners</div>
                     <div class="carousel-track" id="track-owners"></div>
                 </div>
             </div>
@@ -1856,10 +1856,11 @@
                 <tr><th>Acción del Usuario</th><th>Monto</th><th>Regla / Frecuencia</th></tr>
             </thead>
             <tbody>
-                <tr><td>Check-In Diario</td><td style="color:var(--success-green);">+15 Pts</td><td>Diario automático</td></tr>
+                <tr><td>Check-In por Sesión</td><td style="color:var(--success-green);">+15 Pts</td><td>Diario automático</td></tr>
                 <tr><td>Cofre Diario Sorpresa</td><td style="color:var(--success-green);">+5 a +50 Pts</td><td>Cada 24 horas</td></tr>
+                <tr><td>Añadir Canal a Favoritos</td><td style="color:var(--success-green);">+5 Pts</td><td>Por canal único</td></tr>
                 <tr><td>Visitar Canales del Directorio</td><td style="color:var(--success-green);">+2 Pts</td><td>Sin límite diario</td></tr>
-                <tr><td>Ruleta Aleatoria</td><td style="color:#e74c3c;">-5 Pts</td><td>Por intento</td></tr>
+                <tr><td>Ruleta Aleatoria Premium</td><td style="color:#e74c3c;">-5 Pts</td><td>Por intento</td></tr>
             </tbody>
         </table>
     </main>
@@ -1977,17 +1978,17 @@
         ];
 
         const PREMIUM_SHOP_CATALOG = [
-            const PREMIUM_SHOP_CATALOG = [
-    { id: "cloth_1", name: "Sudadera Hoodie", cost: 15, minRange: 1, value: "hoodie", type: "clothing", previewSeed: "b6e3f4" },
-    { id: "cloth_2", name: "Blazer & Camisa", cost: 25, minRange: 2, value: "blazerAndShirt", type: "clothing", previewSeed: "c0aede" },
-    { id: "cloth_3", name: "Camiseta Gráfica", cost: 35, minRange: 3, value: "graphicTee", type: "clothing", previewSeed: "ffdfbf" }, // 🌟 Corregido a 'graphicTee'
-    { id: "cloth_4", name: "Traje Ejecutivo V", cost: 45, minRange: 4, value: "shirtVNeck", type: "clothing", previewSeed: "d1fae5" },
-    
-    { id: "glass_1", name: "Gafas de Lectura", cost: 10, minRange: 1, value: "prescription01", type: "glasses", previewSeed: "fef08a" },
-    { id: "glass_2", name: "Gafas Redondas Hipster", cost: 20, minRange: 2, value: "round", type: "glasses", previewSeed: "fed7aa" },
-    { id: "glass_3", name: "Gafas Kurt Classic", cost: 30, minRange: 3, value: "kurt", type: "glasses", previewSeed: "fbcfe8" }, // 🌟 Corregido a 'kurt'
-    { id: "glass_4", name: "Gafas de Sol Premium", cost: 50, minRange: 4, value: "sunglasses", type: "glasses", previewSeed: "c7d2fe" }
-];
+            { id: "cloth_1", name: "Sudadera Hoodie", cost: 15, minRange: 1, value: "hoodie", type: "clothing", previewSeed: "b6e3f4" },
+            { id: "cloth_2", name: "Blazer & Camisa", cost: 25, minRange: 2, value: "blazerAndShirt", type: "clothing", previewSeed: "c0aede" },
+            { id: "cloth_3", name: "Camiseta Gráfica", cost: 35, minRange: 3, value: "graphicShirt", type: "clothing", previewSeed: "ffdfbf" },
+            { id: "cloth_4", name: "Traje Ejecutivo V", cost: 45, minRange: 4, value: "shirtVNeck", type: "clothing", previewSeed: "d1fae5" },
+            
+            { id: "glass_1", name: "Gafas de Lectura", cost: 10, minRange: 1, value: "prescription01", type: "glasses", previewSeed: "fef08a" },
+            { id: "glass_2", name: "Gafas Redondas Hipster", cost: 20, minRange: 2, value: "round", type: "glasses", previewSeed: "fed7aa" },
+            { id: "glass_3", name: "Gafas Wayfarer Classic", cost: 30, minRange: 3, value: "wayfarers", type: "glasses", previewSeed: "fbcfe8" },
+            { id: "glass_4", name: "Gafas de Sol Premium", cost: 50, minRange: 4, value: "sunglasses", type: "glasses", previewSeed: "c7d2fe" },
+
+            { 
                 id: "combo_epic_1", 
                 name: "Pack Hacker Cyberpunk", 
                 cost: 60, 
@@ -2234,83 +2235,38 @@ function checkVipInternalRegistration() {
 } // Llave de cierre de tu función initTelegramContext
         
         function updateAvatarRenderers() {
-    // 🛡️ Evitamos que la función muera si state.user tarda en cargar
-    if (!state || !state.user) return;
+            let queryParams = `?seed=${state.user.seed}&radius=50&backgroundColor=1e293b`;
+            
+            if (state.user.equipped.clothing) queryParams += `&clothing=${state.user.equipped.clothing}`;
+            if (state.user.equipped.glasses) queryParams += `&accessoriesProbability=100&accessories=${state.user.equipped.glasses}`;
 
-    // 1. Base de la query con la semilla elegida
-    let queryParams = `?seed=${state.user.seed}&radius=50&backgroundColor=1e293b`;
-    
-    // 🌟 CORRECCIÓN CRÍTICA DE PARÁMETROS PARA DICEBEAR 9.x:
-    // En la versión 9.x, la ropa se declara como 'outfit'.
-    if (state.user.equipped.clothing) {
-        queryParams += `&outfit=${state.user.equipped.clothing}`;
-    }
-    
-    // Las gafas se mantienen como 'accessories' pero sin requerir probabilities externas adicionales
-    if (state.user.equipped.glasses) {
-        queryParams += `&accessories=${state.user.equipped.glasses}`;
-    }
+            const finalUrl = `https://api.dicebear.com/9.x/avataaars/svg${queryParams}`;
+            
+            document.getElementById("header-avatar").src = finalUrl;
+            document.getElementById("shop-ia-avatar-preview").src = finalUrl;
+            document.getElementById("drawer-avatar-render").src = finalUrl;
+            
+            renderEquippedChipsList();
+        }
 
-    // 🌟 EL TRUCO MAESTRO PARA TELEGRAM: Cache Buster
-    // Añadimos un número único basado en la fecha y hora actual para obligar a Telegram a refrescar
-    const cacheBuster = new Date().getTime();
-    queryParams += `&cb=${cacheBuster}`;
+        function renderShopCarrousels() {
+            const trackExplorers = document.getElementById("track-explorers");
+            const trackOwners = document.getElementById("track-owners");
 
-    // Construimos la URL final inyectable (Mantenemos tu SVG de la 9.x)
-    const finalUrl = `https://api.dicebear.com/9.x/avataaars/svg${queryParams}`;
-    
-    console.log("🔗 URL Generada para el Avatar:", finalUrl); // Por si quieres auditarla en consola
+            trackExplorers.innerHTML = CAROUSEL_EXPLORERS_SEEDS.map(seed => `
+                <div class="carousel-item-avatar" onclick="selectCarouselSeed('${seed}')">
+                    <img src="https://api.dicebear.com/9.x/avataaars/svg?seed=${seed}&radius=50" style="width: 50px; height: 50px;" />
+                    <div style="font-size: 0.65rem; margin-top: 4px; color: var(--text-muted); font-weight:bold;">${seed}</div>
+                </div>
+            `).join('');
 
-    // 2. Inyectamos de forma segura comprobando que los IDs existan en tu HTML
-    const imgHeader = document.getElementById("header-avatar");
-    const imgPreview = document.getElementById("shop-ia-avatar-preview");
-    const imgDrawer = document.getElementById("drawer-avatar-render");
-
-    if (imgHeader) imgHeader.src = finalUrl;
-    if (imgPreview) imgPreview.src = finalUrl;
-    if (imgDrawer) imgDrawer.src = finalUrl;
-    
-    // Redibujamos las etiquetas de accesorios equipados
-    if (typeof renderEquippedChipsList === 'function') {
-        renderEquippedChipsList();
-    }
-}
-
-        function updateAvatarRenderers() {
-    if (!state || !state.user) return;
-
-    // Base limpia del avatar
-    let queryParams = `?seed=${state.user.seed}&radius=50&backgroundColor=1e293b`;
-    
-    // Ropa en 9.x -> outfit
-    if (state.user.equipped.clothing) {
-        queryParams += `&outfit=${state.user.equipped.clothing}`;
-    }
-    
-    // Gafas en 9.x -> accessories
-    if (state.user.equipped.glasses) {
-        queryParams += `&accessories=${state.user.equipped.glasses}`;
-    }
-
-    // Cache Buster vital para que Telegram fuerce el renderizado en móviles
-    const cacheBuster = new Date().getTime();
-    queryParams += `&cb=${cacheBuster}`;
-
-    // Generamos el enlace final con la versión 9.x
-    const finalUrl = `https://api.dicebear.com/9.x/avataaars/svg${queryParams}`;
-    
-    const imgHeader = document.getElementById("header-avatar");
-    const imgPreview = document.getElementById("shop-ia-avatar-preview");
-    const imgDrawer = document.getElementById("drawer-avatar-render");
-
-    if (imgHeader) imgHeader.src = finalUrl;
-    if (imgPreview) imgPreview.src = finalUrl;
-    if (imgDrawer) imgDrawer.src = finalUrl;
-    
-    if (typeof renderEquippedChipsList === 'function') {
-        renderEquippedChipsList();
-    }
-}
+            trackOwners.innerHTML = CAROUSEL_OWNERS_SEEDS.map(seed => `
+                <div class="carousel-item-avatar" onclick="selectCarouselSeed('${seed}')" style="border-color: var(--vip-gold);">
+                    <img src="https://api.dicebear.com/9.x/avataaars/svg?seed=${seed}&radius=50" style="width: 50px; height: 50px;" />
+                    <div style="font-size: 0.65rem; margin-top: 4px; color: var(--vip-gold); font-weight:bold;">${seed}</div>
+                </div>
+            `).join('');
+        }
 
         function selectCarouselSeed(seed) {
             state.user.seed = seed;
@@ -2320,61 +2276,38 @@ function checkVipInternalRegistration() {
         }
 
         function renderEquippedChipsList() {
-    const container = document.getElementById("equipped-items-list");
-    if (!container) return;
-    container.innerHTML = "";
+            const container = document.getElementById("equipped-items-list");
+            if (!container) return;
+            container.innerHTML = "";
 
-    let hasAddons = false;
+            let hasAddons = false;
 
-    // 👕 Procesamos la ropa de forma segura
-    if (state.user.equipped.clothing) {
-        hasAddons = true;
-        const itemData = PREMIUM_SHOP_CATALOG.find(i => i.value === state.user.equipped.clothing);
-        
-        // 🌟 CONTROL DE DAÑOS: Si itemData no existe, usamos un nombre por defecto en vez de romper la app
-        const nombreRopa = itemData ? itemData.name : `Ropa (${state.user.equipped.clothing})`;
-        
-        container.innerHTML += `
-            <div class="equipped-chip">
-                <span>👕 ${nombreRopa}</span>
-                <button class="btn-unequip" onclick="unequipItem('clothing')">
-                    <i data-lucide="x" style="width:12px; height:12px;"></i>
-                </button>
-            </div>
-        `;
-    }
+            if (state.user.equipped.clothing) {
+                hasAddons = true;
+                const itemData = PREMIUM_SHOP_CATALOG.find(i => i.value === state.user.equipped.clothing);
+                container.innerHTML += `
+                    <div class="equipped-chip">
+                        <span>👕 ${itemData ? itemData.name : 'Ropa'}</span>
+                        <button class="btn-unequip" onclick="unequipItem('clothing')"><i data-lucide="x" style="width:12px; height:12px;"></i></button>
+                    </div>
+                `;
+            }
+            if (state.user.equipped.glasses) {
+                hasAddons = true;
+                const itemData = PREMIUM_SHOP_CATALOG.find(i => i.value === state.user.equipped.glasses);
+                container.innerHTML += `
+                    <div class="equipped-chip">
+                        <span>👓 ${itemData ? itemData.name : 'Gafas'}</span>
+                        <button class="btn-unequip" onclick="unequipItem('glasses')"><i data-lucide="x" style="width:12px; height:12px;"></i></button>
+                    </div>
+                `;
+            }
 
-    // 👓 Procesamos las gafas de forma segura
-    if (state.user.equipped.glasses) {
-        hasAddons = true;
-        const itemData = PREMIUM_SHOP_CATALOG.find(i => i.value === state.user.equipped.glasses);
-        
-        // 🌟 CONTROL DE DAÑOS: Si el accesorio viejo ya no existe en el catálogo, no revienta
-        const nombreGafas = itemData ? itemData.name : `Gafas (${state.user.equipped.glasses})`;
-        
-        container.innerHTML += `
-            <div class="equipped-chip">
-                <span>👓 ${nombreGafas}</span>
-                <button class="btn-unequip" onclick="unequipItem('glasses')">
-                    <i data-lucide="x" style="width:12px; height:12px;"></i>
-                </button>
-            </div>
-        `;
-    }
-
-    if (!hasAddons) {
-        container.innerHTML = `<span style="font-size:0.72rem; color:var(--text-muted);">Sin accesorios equipados</span>`;
-    }
-
-    // Renderizado seguro de iconos de Lucide
-    if (typeof lucide !== 'undefined' && typeof lucide.createIcons === 'function') {
-        try {
+            if(!hasAddons) {
+                container.innerHTML = `<span style="font-size:0.72rem; color:var(--text-muted);">Sin accesorios equipados</span>`;
+            }
             lucide.createIcons();
-        } catch (e) {
-            console.warn("No se pudieron renderizar los iconos de las chips:", e);
         }
-    }
-}
 
         function unequipItem(type) {
             state.user.equipped[type] = "";
