@@ -1444,7 +1444,7 @@ body.user-is-vip .no-vip {
         <!-- ICONO CAMPANITA EN EL MENÚ SUPERIOR -->
 <div style="position: relative; cursor: pointer; display: inline-block; margin-right: 12px;" onclick="document.getElementById('notifications-sliding-panel').style.display = 'flex'; if(typeof actualizarBuzonVisual === 'function') actualizarBuzonVisual();">
     <!-- Icono SVG de una campanita elegante -->
-    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#e5e7eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"></path>
         <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"></path>
     </svg>
@@ -1531,7 +1531,10 @@ body.user-is-vip .no-vip {
                 <span id="cnt-favs">0</span>
                 <span>Favoritos ⭐</span>
             </div>
-            
+            <div class="counter-card" onclick="toggleProfileDrawer(); switchView('view-history')">
+    <span id="cnt-purchases">0</span>
+    <span>Historial 📜</span>
+</div>
         </div>
 
         <div class="admin-only" style="margin-bottom: 12px;">
@@ -1961,7 +1964,10 @@ body.user-is-vip .no-vip {
             </button>
         </div>
     </div>
+
 <button onclick="switchView('shop')">🛍️ Visitar Tienda</button>
+
+    <button onclick="switchView('history-list')">🛍️ Historial de compras</button>
 
 <button onclick="switchView('home')">🏠 Volver al Inicio</button>
 
@@ -2423,56 +2429,6 @@ function addLog(msg) {
     }
     saveToLocalStorage();
 }
-
-function registerActionToHistory(title, detail, type = "info") {
-    const icons = { info: "info", success: "check-circle", gold: "star", error: "alert-triangle" };
-    const actionIcon = icons[type] || "activity";
-    
-    const now = new Date();
-    const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    // Creamos también una fecha corta por si tu visor de historial la requiere
-    const dateString = now.toLocaleDateString([], { day: '2-digit', month: '2-digit' });
-
-    // 🌟 UNIFICACIÓN DE PROPIEDADES:
-    // Guardamos 'time', 'detail' y también 'date' y 'text' para que sea compatible 
-    // con todos los componentes y listados de la MiniApp.
-    state.history.unshift({ 
-        title: title, 
-        detail: detail, 
-        text: `${title}: ${detail}`, // Compatibilidad con lectores de texto plano
-        time: timeString, 
-        date: dateString,            // Compatibilidad con la versión de la Cripta
-        icon: actionIcon, 
-        type: type 
-    });
-    
-    // Protección por si el contador de compras no existe en la vista actual
-    const counterEl = document.getElementById("cnt-purchases");
-    if (counterEl) {
-        counterEl.innerText = state.history.filter(h => h.type === 'gold').length;
-    }
-    
-    // Forzamos el guardado en el LocalStorage
-    saveToLocalStorage();
-
-    // 🔄 RE-RENDER INMEDIATO: 
-    // Si tienes una función para pintar el historial en la interfaz, la ejecutamos aquí
-    if (typeof renderHistoryUI === 'function') {
-        renderHistoryUI();
-    }
-    
-    console.log("📝 Acción registrada en el historial unificado:", state.history[0]);
-}
-
-        function renderHistoryUI() {
-    // 🌟 CORRECCIÓN CLAVE: Cambiado de 'history-list-container' a 'history-list'
-    const container = document.getElementById("history-list");
-    if (!container) return; 
-
-    container.innerHTML = "";
-
-    // Decidimos si mostramos todo o recortamos (por si usas el botón de expandir)
-    const limiteHistorial = (typeof showFullHistory !== 'undefined' && showFullHistory) ? state.history : state.history.slice(0, 10);
 
     if (limiteHistorial.length === 0) {
         container.innerHTML = `
@@ -4521,38 +4477,44 @@ function renderTopPodium(canales) {
 // 🏁 EL ORQUESTRADOR UNIFICADO DE ARRANQUE (Limpiado y Sincronizado)
 // =========================================================================
 document.addEventListener("DOMContentLoaded", () => {
-    // 1. 🌟 PRIMERO: Capturamos las credenciales reales de Telegram (ID, username, etc.)
+    // 1. 🤖 CONTEXTO: Capturamos las credenciales reales de Telegram (ID, username, etc.)
+    // *Nota: Asegúrate de haberle quitado el saveToLocalStorage() interno que encontramos antes.
     initTelegramContext();
     
-    // 2. 🌟 SEGUNDO: Recuperamos el inventario, saldo e historial del LocalStorage.
-    // Como el esqueleto del usuario ya existe gracias a Telegram, esta función 
-    // fusiona los datos encima de forma segura.
+    // 2. 💾 ALMACENAMIENTO: Recuperamos el inventario, saldo real, historial y favoritos del LocalStorage.
+    // Esta función combina los datos encima del usuario de Telegram de forma segura.
     loadFromLocalStorage();
     
-    // 3. Verificaciones de estado e ingresos internos
+    // 3. ⚙️ VALIDACIONES: Verificaciones de estado, reseteos e ingresos internos periódicos
     checkVipInternalRegistration();
     executeDailyCheckIn();
+    checkDailyGachaStatus();
     
-    // 🏛️ Esta función ahora arrastrará el Top 10 asegurando que los datos existan
+    // 4. 🏛️ INTERFAZ GRÁFICA: Renderizado de componentes del ecosistema principal (Top 10 y listas)
     renderAppUiComponents(); 
-    
-    // 4. Renders de la tienda y sliders
     renderShopCarrousels();
     updateAdminToggleUI();
     renderCategorySliders();
-    checkDailyGachaStatus();
     
-    // 📝 AÑADIDO: Forzamos el renderizado de tu historial con su nombre correcto
-    if (typeof renderHistoryList === 'function') {
-        renderHistoryList();
+    // 🌟 CORRECCIÓN CRÍTICA DE NOMBRES: 
+    // Forzamos el renderizado de tu historial real y activamos los botones de su paginador
+    if (typeof renderHistoryUI === 'function') {
+        renderHistoryUI();
+    }
+    if (typeof renderHistoryPagination === 'function') {
+        renderHistoryPagination();
     }
     
-    // 🔥 EL MOTOR SIMULADOR: Inyecta vida al contador en cuanto abre la WebApp
-    initOnlineUsersSimulator('cont-usuarios-online'); 
+    // 5. 🚀 ANIMACIONES Y COMPONENTES DINÁMICOS
+    initOnlineUsersSimulator('cont-usuarios-online'); // Inyecta vida al contador online simulado
+    initDynamicSliders();                            // Llama a tus sliders de banners originales
     
-    initDynamicSliders(); // 👈 Llama a tus sliders originales
-    lucide.createIcons();
-    addLog("Ecosistema unificado bajo ID único de Telegram y tráfico simulado activo.");
+    // Transformamos las etiquetas data-lucide en iconos vectoriales SVG reales
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
+    
+    addLog("Ecosistema unificado bajo ID único de Telegram y tráfico reactivo listo.");
 });
         
  // 🏁 AQUÍ TERMINA TU ARCHIVO JAVASCRIPT O EL BLOQUE DE TU SCRIPT
