@@ -1388,25 +1388,6 @@
     padding: 4px 8px;
     border-radius: 8px;
 }
-
-        /* Se aplica a elementos que SOLO los VIP deben ver */
-.only-vip {
-    display: none !important;
-}
-
-/* Se aplica a banners o publicidad que los VIP NO deben ver (y los normales sí) */
-.no-vip {
-    display: block;
-}
-
-/* 🌟 Clase mágica: Cuando el body tenga "user-is-vip", alteramos el comportamiento de golpe */
-body.user-is-vip .only-vip {
-    display: block !important;
-}
-
-body.user-is-vip .no-vip {
-    display: none !important;
-}
     </style>
 </head>
 <body>
@@ -1444,7 +1425,7 @@ body.user-is-vip .no-vip {
         <!-- ICONO CAMPANITA EN EL MENÚ SUPERIOR -->
 <div style="position: relative; cursor: pointer; display: inline-block; margin-right: 12px;" onclick="document.getElementById('notifications-sliding-panel').style.display = 'flex'; if(typeof actualizarBuzonVisual === 'function') actualizarBuzonVisual();">
     <!-- Icono SVG de una campanita elegante -->
-    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#e5e7eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"></path>
         <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"></path>
     </svg>
@@ -1531,10 +1512,10 @@ body.user-is-vip .no-vip {
                 <span id="cnt-favs">0</span>
                 <span>Favoritos ⭐</span>
             </div>
-            <div class="counter-card" onclick="toggleProfileDrawer(); switchView('view-history')">
-    <span id="cnt-purchases">0</span>
-    <span>Historial 📜</span>
-</div>
+            <div class="counter-card" onclick="toggleProfileDrawer(); switchView('history')">
+                <span id="cnt-purchases">0</span>
+                <span>Mis Compras</span>
+            </div>
         </div>
 
         <div class="admin-only" style="margin-bottom: 12px;">
@@ -1647,7 +1628,7 @@ body.user-is-vip .no-vip {
             <p style="font-size:0.75rem; color:var(--text-muted); margin-bottom:12px;">Estás viendo este banner porque cambiaste al modo ADMIN.</p>
             <button class="btn-subscribe-trigger" 
             style="background:var(--vip-gold); color:black; width:auto; margin:0 auto; padding:8px 16px;" 
-            onclick="if(typeof switchView === 'function') { switchView('my-channels'); } else { showToast('Abriendo tus canales...', 'gold'); }">
+            onclick="if(typeof switchView === 'function') { switchView('view-my-channels'); } else { showToast('Abriendo tus canales...', 'gold'); }">
         Configurar Espacios
     </button>
         </div>
@@ -1813,15 +1794,10 @@ body.user-is-vip .no-vip {
     </main>
 
     <main id="view-history" class="app-view">
-    <h2 class="view-title">
-        <i data-lucide="history" style="color:var(--success-green)"></i> 
-        Historial de Compras y Accesos
-    </h2>
-    
-    <div id="history-list" class="directory-grid"></div>
-    
-    <div id="history-pagination-container"></div>
-</main>
+        <h2 class="view-title"><i data-lucide="history" style="color:var(--success-green)"></i> Historial de Compras y Accesos</h2>
+        <div id="history-list" class="directory-grid"></div>
+        <div id="history-pagination-container"></div>
+    </main>
 
     <main id="view-shop" class="app-view">
         <h2 class="view-title"><i data-lucide="shopping-bag" style="color:var(--mystic-purple)"></i> Forja de Avatar RPG & Personalización</h2>
@@ -1964,10 +1940,7 @@ body.user-is-vip .no-vip {
             </button>
         </div>
     </div>
-
 <button onclick="switchView('shop')">🛍️ Visitar Tienda</button>
-
-    <button onclick="switchView('history-list')">🛍️ Historial de compras</button>
 
 <button onclick="switchView('home')">🏠 Volver al Inicio</button>
 
@@ -1983,6 +1956,9 @@ body.user-is-vip .no-vip {
         </div>
         <div class="tab-item" id="tab-favorites" onclick="switchView('favorites')">
             <i data-lucide="star"></i><span>Favoritos</span>
+        </div>
+        <div class="tab-item" id="tab-history" onclick="switchView('history')">
+            <i data-lucide="history"></i><span>Historial</span>
         </div>
         <div class="tab-item" id="tab-energy" onclick="switchView('energy')">
             <i data-lucide="zap"></i><span>Puntos</span>
@@ -2045,29 +2021,24 @@ body.user-is-vip .no-vip {
         const CAROUSEL_OWNERS_SEEDS = ["alex", "ruby", "sam", "eva", "boss"];
 
         let state = {
-    user: { 
-        username: "Invitado Anónimo", 
-        idTelegram: 12345678,
-        balance: parseInt(localStorage.getItem('golden_balance')) ?? 100, 
-        role: "user", 
-        range: parseInt(localStorage.getItem('golden_range')) || 1,
-        pointsProgress: parseInt(localStorage.getItem('golden_points')) || 25,
-        
-        // 💾 Persistencia de la Semilla base del Avatar
-        seed: localStorage.getItem('golden_avatar_seed') || "carlos",
-        isVipMember: localStorage.getItem('cripta_vip') === 'true', 
-        
-        // 💾 Persistencia de la ropa y gafas equipadas actualmente
-        equipped: JSON.parse(localStorage.getItem('golden_equipped')) || { clothing: "", glasses: "" }
-    },
-    favorites: JSON.parse(localStorage.getItem('golden_favs')) || [], 
-    history: [], 
-    systemLogs: [],
-    
-    // 💾 Lista de IDs de ítems que el usuario ya ha comprado (Ej: ["cloth_1", "glass_4"])
-    purchasedItems: JSON.parse(localStorage.getItem('golden_purchased')) || [],
-    adminFilterOnly: false
-};
+            user: { 
+                username: "Invitado Anónimo", 
+                idTelegram: 12345678,
+                balance: 100, 
+                role: "user", 
+                range: 1,
+                pointsProgress: 25,
+                seed: "carlos",
+                isVipMember: false, 
+                equipped: { clothing: "", glasses: "" }
+            },
+            favorites: [], 
+            history: [], 
+            systemLogs: [],
+            purchasedItems: [],
+            adminFilterOnly: false
+        };
+
         let showFullHistory = false;
 
         const CATEGORIES = [
@@ -2080,94 +2051,46 @@ body.user-is-vip .no-vip {
         let activeCategoryFilter = "all";
 
         document.addEventListener("DOMContentLoaded", () => {
-    // 1. Primero capturamos el contexto de Telegram (ID, nombre, etc.)
-    initTelegramContext();
-    
-    // 2. 🌟 AHORA SÍ: Cargamos del LocalStorage. 
-    // Como Telegram ya inicializó el usuario, esta función reescribirá la ropa/gafas encima sin que nadie las pise.
-    loadFromLocalStorage();
-    
-    // 3. Validaciones de estado internas
-    checkVipInternalRegistration();
-    executeDailyCheckIn();
-    
-    // 4. Renderizado completo de la interfaz (Ya con los datos finales blindados)
-    renderAppUiComponents();
-    renderTopPodium();
-    renderShopCarrousels();
-    updateAdminToggleUI();
-    renderCategorySliders();
-    initDynamicSliders();
-    
-    // 5. Iconos y Logs
-    lucide.createIcons();
-    addLog("Ecosistema unificado bajo ID único de Telegram.");
-});
+            loadFromLocalStorage();
+            initTelegramContext();
+            checkVipInternalRegistration();
+            executeDailyCheckIn();
+            renderAppUiComponents();
+            renderTopPodium();
+            renderShopCarrousels();
+            updateAdminToggleUI();
+            renderCategorySliders();
+            initDynamicSliders();
+            lucide.createIcons();
+            addLog("Ecosistema unificado bajo ID único de Telegram.");
+        });
 
         function saveToLocalStorage() {
-    try {
-        // 🛡️ Filtro de seguridad: Si el estado global no existe, no hacemos nada para no romper la app
-        if (typeof state === 'undefined') return;
-
-        const dataToSave = {
-            // Guardamos el usuario o un objeto vacío si no se ha cargado
-            user: state.user || {},
-            
-            // 🌟 PROTECCIÓN ABSOLUTA: Si es un array válido lo guarda, si no, fuerza un array vacío []
-            favorites: Array.isArray(state.favorites) ? state.favorites : [],
-            history: Array.isArray(state.history) ? state.history : [],
-            systemLogs: Array.isArray(state.systemLogs) ? state.systemLogs : [],
-            purchasedItems: Array.isArray(state.purchasedItems) ? state.purchasedItems : []
-        };
-
-        // Guardamos de forma limpia en el disco local
-        localStorage.setItem('canales_top_state_v3', JSON.stringify(dataToSave));
-        
-        console.log("📝 Disco actualizado con éxito. Favoritos en memoria guardados:", dataToSave.favorites.length);
-    } catch (error) {
-        console.error("🚨 Error crítico al escribir en el LocalStorage:", error);
-    }
-}
+            localStorage.setItem('canales_top_state_v3', JSON.stringify({
+                user: state.user,
+                favorites: state.favorites,
+                history: state.history,
+                systemLogs: state.systemLogs,
+                purchasedItems: state.purchasedItems
+            }));
+        }
 
         function loadFromLocalStorage() {
-    const saved = localStorage.getItem('canales_top_state_v3');
-    if (saved) {
-        try {
-            const parsed = JSON.parse(saved);
-            
-            if (parsed.user) {
-                state.user = {
-                    ...state.user, 
-                    balance: parsed.user.balance !== undefined ? parsed.user.balance : state.user.balance,
-                    range: parsed.user.range || state.user.range,
-                    pointsProgress: parsed.user.pointsProgress || state.user.pointsProgress,
-                    seed: parsed.user.seed || state.user.seed,
-                    isVipMember: parsed.user.isVipMember !== undefined ? parsed.user.isVipMember : state.user.isVipMember,
-                    equipped: parsed.user.equipped || { clothing: "", glasses: "" }
-                };
+            const saved = localStorage.getItem('canales_top_state_v3');
+            if (saved) {
+                try {
+                    const parsed = JSON.parse(saved);
+                    state.user = parsed.user || state.user;
+                    state.favorites = parsed.favorites || state.favorites;
+                    state.history = parsed.history || state.history;
+                    state.systemLogs = parsed.systemLogs || state.systemLogs;
+                    state.purchasedItems = parsed.purchasedItems || state.purchasedItems;
+                } catch(e) {
+                    console.error("Error cargando localStorage", e);
+                }
             }
-            
-            // 🌟 COMPROBACIÓN LIMPIA Y SEGURA: Rompemos el operador "||" ciego.
-            // Si el almacenamiento guardó un array (aunque esté vacío), usamos ESE array. 
-            // Si no viene nada, forzamos un array limpio [], evitando resucitar datos de hace horas.
-            state.favorites = Array.isArray(parsed.favorites) ? parsed.favorites : [];
-            state.history = Array.isArray(parsed.history) ? parsed.history : [];
-            state.systemLogs = Array.isArray(parsed.systemLogs) ? parsed.systemLogs : [];
-            state.purchasedItems = Array.isArray(parsed.purchasedItems) ? parsed.purchasedItems : [];
-            
-            console.log("💾 Estado fusionado. Favoritos reales cargados:", state.favorites);
-        } catch(e) {
-            console.error("Error cargando localStorage", e);
-            // Salvavidas por si explota el JSON, para que la app pueda seguir guardando favoritos nuevos
-            if (!Array.isArray(state.favorites)) state.favorites = [];
-            if (!Array.isArray(state.history)) state.history = [];
         }
-    } else {
-        // Si es la primera vez que entra a la app y el LocalStorage está a cero:
-        if (!Array.isArray(state.favorites)) state.favorites = [];
-        if (!Array.isArray(state.history)) state.history = [];
-    }
-}
+
         // SISTEMA AUTOMÁTICO DE VERIFICACIÓN PREMIUM REQUERIDO
 function checkVipInternalRegistration() {
     // Lista de IDs de Telegram autorizados como VIP
@@ -2268,85 +2191,50 @@ function checkVipInternalRegistration() {
 }
 
         function initTelegramContext() {
-    try {
-        // Aseguramos que el esqueleto base exista antes de inyectar datos de Telegram
-        if (typeof state === 'undefined') window.state = {};
-        if (!state.user) state.user = {};
-
-        if (window.Telegram && window.Telegram.WebApp) {
-            const webApp = window.Telegram.WebApp;
-            webApp.ready();
-            webApp.expand();
-            if(webApp.colorScheme === 'light') document.documentElement.setAttribute('data-theme', 'light');
-            
-            if (webApp.initDataUnsafe?.user) {
-                const tgUser = webApp.initDataUnsafe.user;
-                state.user.username = tgUser.username ? `@${tgUser.username}` : `${tgUser.first_name}`;
-                state.user.idTelegram = tgUser.id;
-                state.user.seed = tgUser.username || "player";
-            }
+    if (window.Telegram && window.Telegram.WebApp) {
+        const webApp = window.Telegram.WebApp;
+        webApp.ready();
+        webApp.expand();
+        if(webApp.colorScheme === 'light') document.documentElement.setAttribute('data-theme', 'light');
+        if (webApp.initDataUnsafe?.user) {
+            const tgUser = webApp.initDataUnsafe.user;
+            state.user.username = tgUser.username ? `@${tgUser.username}` : `${tgUser.first_name}`;
+            state.user.idTelegram = tgUser.id;
+            state.user.seed = tgUser.username || "player";
         }
-
-        // Actualizamos los renders visuales del avatar del usuario actual
-        if (typeof updateAvatarRenderers === "function") {
-            updateAvatarRenderers();
-        }
-    } catch (e) {
-        console.error("🚨 Error grave en inicialización básica de Telegram:", e);
     }
+    updateAvatarRenderers();
+    saveToLocalStorage();
 
     // =========================================================================
-    // 🛡️ ZONA BLINDADA: Si algo falla aquí, no detendrá el apagado del loader
+    // INYECTORES ASÍNCRONOS: Se disparan cuando ya tenemos el ID de Telegram
     // =========================================================================
     
-    // 1. Banner dinámico GPlus
-    try {
-        if (typeof renderDynamicGPlusBanner === "function") {
-            renderDynamicGPlusBanner();
-        }
-    } catch (e) { 
-        console.warn("⚠️ No se pudo renderizar el banner GPlus en el arranque:", e); 
+    // 1. Dibuja el banner bloqueado (verde) o desbloqueado (morado) según tu ID
+    if (typeof renderDynamicGPlusBanner === "function") {
+        renderDynamicGPlusBanner();
     }
 
-    // 2. Validación de canal VIP (Confeti)
-    try {
-        if (typeof checkFirstSessionFeaturedCeleb === "function") {
-            checkFirstSessionFeaturedCeleb();
-        }
-    } catch (e) { 
-        console.warn("⚠️ No se pudo validar la sesión VIP destacada en el arranque:", e); 
+    // 2. Comprueba si eres dueño de un canal VIP activo para lanzar el confeti por primera vez
+    if (typeof checkFirstSessionFeaturedCeleb === "function") {
+        checkFirstSessionFeaturedCeleb();
     }
 
-    // 3. Sistema de Notificaciones y Buzón (Los sospechosos del crash)
-    try {
-        if (typeof asegurarNotifState === "function") {
-            asegurarNotifState(); 
-        }
-        if (typeof actualizarBuzonVisual === "function") {
-            actualizarBuzonVisual(); 
-        }
-    } catch (e) { 
-        console.warn("⚠️ El sistema de buzón/notificaciones falló (posible falta de LocalStorage aún):", e); 
+    // 🔥 3. SISTEMA DE NOTIFICACIONES: Procesa los datos de tu ID e inyecta el render visual
+    if (typeof asegurarNotifState === "function") {
+        asegurarNotifState(); // Ejecuta la lista interna de mensajes
+    }
+    if (typeof actualizarBuzonVisual === "function") {
+        actualizarBuzonVisual(); // Renderiza los mensajes dentro del contenedor y enciende la campanita
     }
 
-    // =========================================================================
-    // ❄️ FIN DE LA PANTALLA DE CARGA (Garantizado)
-    // =========================================================================
-    try {
-        if (typeof ocultarPantallaCargaApp === "function") {
-            ocultarPantallaCargaApp();
-            console.log("🔓 Pantalla de carga retirada con éxito.");
-        } else {
-            // Plan de contingencia por si la función no responde, la ocultamos por CSS directo
-            const loader = document.getElementById("loading-screen") || document.getElementById("loader");
-            if (loader) loader.style.display = "none";
-        }
-    } catch (e) {
-        console.error("🚨 Error crítico: No se pudo ocultar el loader de la app:", e);
+    // ❄ 4. PANTALLA DE CARGA: Apaga el telón oscuro suavemente ahora que todo está pintado
+    if (typeof ocultarPantallaCargaApp === "function") {
+        ocultarPantallaCargaApp();
     }
-}
+} // Llave de cierre de tu función initTelegramContext
         
-      function updateAvatarRenderers() {
+        function updateAvatarRenderers() {
             let queryParams = `?seed=${state.user.seed}&radius=50&backgroundColor=1e293b`;
             
             if (state.user.equipped.clothing) queryParams += `&clothing=${state.user.equipped.clothing}`;
@@ -2388,134 +2276,65 @@ function checkVipInternalRegistration() {
         }
 
         function renderEquippedChipsList() {
-    const container = document.getElementById("equipped-items-list");
-    if (!container) return;
-    container.innerHTML = "";
+            const container = document.getElementById("equipped-items-list");
+            if (!container) return;
+            container.innerHTML = "";
 
-    let hasAddons = false;
+            let hasAddons = false;
 
-    if (state.user.equipped.clothing) {
-        hasAddons = true;
-        const itemData = PREMIUM_SHOP_CATALOG.find(i => i.value === state.user.equipped.clothing);
-        container.innerHTML += `
-            <div class="equipped-chip">
-                <span>👕 ${itemData ? itemData.name : 'Ropa'}</span>
-                <button class="btn-unequip" onclick="unequipItem('clothing')">
-                    <i data-lucide="x" style="width:12px; height:12px;"></i>
-                </button>
-            </div>
-        `;
-    }
-    if (state.user.equipped.glasses) {
-        hasAddons = true;
-        const itemData = PREMIUM_SHOP_CATALOG.find(i => i.value === state.user.equipped.glasses);
-        container.innerHTML += `
-            <div class="equipped-chip">
-                <span>👓 ${itemData ? itemData.name : 'Gafas'}</span>
-                <button class="btn-unequip" onclick="unequipItem('glasses')">
-                    <i data-lucide="x" style="width:12px; height:12px;"></i>
-                </button>
-            </div>
-        `;
-    }
+            if (state.user.equipped.clothing) {
+                hasAddons = true;
+                const itemData = PREMIUM_SHOP_CATALOG.find(i => i.value === state.user.equipped.clothing);
+                container.innerHTML += `
+                    <div class="equipped-chip">
+                        <span>👕 ${itemData ? itemData.name : 'Ropa'}</span>
+                        <button class="btn-unequip" onclick="unequipItem('clothing')"><i data-lucide="x" style="width:12px; height:12px;"></i></button>
+                    </div>
+                `;
+            }
+            if (state.user.equipped.glasses) {
+                hasAddons = true;
+                const itemData = PREMIUM_SHOP_CATALOG.find(i => i.value === state.user.equipped.glasses);
+                container.innerHTML += `
+                    <div class="equipped-chip">
+                        <span>👓 ${itemData ? itemData.name : 'Gafas'}</span>
+                        <button class="btn-unequip" onclick="unequipItem('glasses')"><i data-lucide="x" style="width:12px; height:12px;"></i></button>
+                    </div>
+                `;
+            }
 
-    if(!hasAddons) {
-        container.innerHTML = `<span style="font-size:0.72rem; color:var(--text-muted);">Sin accesorios equipados</span>`;
-    }
-    
-    // Verificación por si Lucide no ha cargado en ventanas rápidas
-    if (typeof lucide !== 'undefined') lucide.createIcons();
-}
+            if(!hasAddons) {
+                container.innerHTML = `<span style="font-size:0.72rem; color:var(--text-muted);">Sin accesorios equipados</span>`;
+            }
+            lucide.createIcons();
+        }
 
-function unequipItem(type) {
-    state.user.equipped[type] = "";
-    
-    if (typeof showToast === 'function') showToast("Accesorio removido del avatar", "info");
-    
-    // 🔄 REPARACIÓN AQUÍ: Volvemos a renderizar la lista de chips 
-    // para que el accesorio desaparezca de la pantalla inmediatamente.
-    renderEquippedChipsList(); 
-    
-    // Logs del sistema opcionales para trazar qué se quitó
-    if (typeof addLog === 'function') addLog(`Accesorio removido: ${type}`);
+        function unequipItem(type) {
+            state.user.equipped[type] = "";
+            showToast("Accesorio removido del avatar", "info");
+            updateAvatarRenderers();
+            renderShopCatalog();
+            saveToLocalStorage();
+        }
 
-    if (typeof updateAvatarRenderers === 'function') updateAvatarRenderers();
-    if (typeof renderShopCatalog === 'function') renderShopCatalog();
-    
-    saveToLocalStorage();
-}
+        function addLog(msg) {
+            const timestamp = new Date().toLocaleTimeString();
+            state.systemLogs.unshift(`[${timestamp}] ${msg}`);
+            const container = document.getElementById("logs-terminal-box");
+            if (container) container.innerHTML = state.systemLogs.map(l => `<div class="log-line">${l}</div>`).join('');
+            saveToLocalStorage();
+        }
 
-function addLog(msg) {
-    const timestamp = new Date().toLocaleTimeString();
-    state.systemLogs.unshift(`[${timestamp}] ${msg}`);
-    
-    const container = document.getElementById("logs-terminal-box");
-    if (container) {
-        container.innerHTML = state.systemLogs.map(l => `<div class="log-line">${l}</div>`).join('');
-    }
-    saveToLocalStorage();
-}
-
-    if (limiteHistorial.length === 0) {
-        container.innerHTML = `
-            <div style="grid-column: 1 / -1; text-align:center; padding: 40px 20px; color: var(--text-muted); font-size: 0.8rem;">
-                <i data-lucide="folder-open" style="width:32px; height:32px; margin:0 auto 10px; display:block; opacity:0.5;"></i>
-                No hay transacciones ni accesos registrados.
-            </div>
-        `;
-        // Volvemos a procesar iconos por si se pinta el de 'folder-open'
-        if (typeof lucide !== 'undefined') lucide.createIcons();
-        return;
-    }
-
-    // Inyectamos las tarjetas dentro de tu "directory-grid"
-    container.innerHTML = limiteHistorial.map(item => `
-        <div class="history-card item-type-${item.type || 'info'}" style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-dark); padding: 12px; border-radius: 10px; display: flex; flex-direction: column; gap: 8px; position: relative;">
+        function registerActionToHistory(title, detail, type = "info") {
+            const icons = { info: "info", success: "check-circle", gold: "star", error: "alert-triangle" };
+            const actionIcon = icons[type] || "activity";
+            const now = new Date();
+            const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             
-            <div style="display: flex; align-items: center; justify-content: space-between;">
-                <div style="display: flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 6px; background: rgba(255,255,255,0.04); color: ${item.type === 'gold' ? 'var(--vip-gold)' : 'var(--text-main)'};">
-                    <i data-lucide="${item.icon || 'activity'}" style="width: 14px; height: 14px;"></i>
-                </div>
-                <span style="font-size: 0.65rem; color: var(--text-ghost); font-weight: bold;">
-                    ${item.time || item.date}
-                </span>
-            </div>
-
-            <div style="margin-top: 4px;">
-                <h4 style="margin: 0; font-size: 0.8rem; font-weight: 600; color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                    ${item.title}
-                </h4>
-                <p style="margin: 4px 0 0 0; font-size: 0.7rem; color: var(--text-muted); line-height: 1.3;">
-                    ${item.detail}
-                </p>
-            </div>
-            
-        </div>
-    `).join('');
-
-    // Transformamos las etiquetas data-lucide en iconos vectoriales reales
-    if (typeof lucide !== 'undefined') {
-        lucide.createIcons();
-    }
-}
-
-        function renderHistoryPagination() {
-    const pagContainer = document.getElementById("history-pagination-container");
-    if (!pagContainer) return;
-
-    if (state.history.length <= 10) {
-        pagContainer.innerHTML = ""; // Si hay pocos ítems, no hace falta paginar
-        return;
-    }
-
-    // Aquí podrás meter la lógica de páginas más adelante si lo necesitas
-    pagContainer.innerHTML = `
-        <div style="display:flex; justify-content:center; gap:10px; margin-top:15px;">
-            <button class="btn-nav" style="padding:5px 10px; font-size:0.7rem; background:#111; border:1px solid var(--border-dark); color:white; border-radius:4px;">Anterior</button>
-            <button class="btn-nav" style="padding:5px 10px; font-size:0.7rem; background:#111; border:1px solid var(--border-dark); color:white; border-radius:4px;">Siguiente</button>
-        </div>
-    `;
-}
+            state.history.unshift({ title, detail, time: timeString, icon: actionIcon, type });
+            document.getElementById("cnt-purchases").innerText = state.history.filter(h => h.type === 'gold').length;
+            saveToLocalStorage();
+        }
 
         function showToast(text, type = "info") {
             const container = document.getElementById("toast-container");
@@ -2611,59 +2430,24 @@ function checkDailyGachaStatus() {
 }
 
         function switchView(viewId) {
-    try {
-        state.adminFilterOnly = false; 
-        
-        // Desactivamos todas las vistas y pestañas anteriores
-        document.querySelectorAll('.app-view').forEach(v => v.classList.remove('active-view'));
-        document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active-tab'));
-        
-        // 1. Activamos la vista correspondiente
-        const targetView = document.getElementById(`view-${viewId}`);
-        if (targetView) {
-            targetView.classList.add('active-view');
-        } else {
-            console.warn(`⚠️ No se encontró la vista: view-${viewId}`);
-        }
-        
-        // 2. 🛡️ SEGURO CONTRA CRASHES: Solo añadimos la clase si el botón de la pestaña existe
-        const targetTab = document.getElementById(`tab-${viewId}`);
-        if (targetTab) {
-            targetTab.classList.add('active-tab');
-        }
+            state.adminFilterOnly = false; 
+            document.querySelectorAll('.app-view').forEach(v => v.classList.remove('active-view'));
+            document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active-tab'));
+            
+            const targetView = document.getElementById(`view-${viewId}`);
+            if (targetView) targetView.classList.add('active-view');
+            
+            const targetTab = document.getElementById(`tab-${viewId}`);
+            if (targetTab) targetTab.classList.add('active-tab');
 
-        // =========================================================================
-        // ROUTER DE ENRUTAMIENTO (Renders de cada pantalla)
-        // =========================================================================
-        if (viewId === 'directory') renderDirectoryList();
-        if (viewId === 'favorites') renderFavoritesList();
-        if (viewId === 'my-channels') renderMyOwnedChannelsList();
-        
-        // 🌟 CORRECCIÓN CRÍTICA: Cambiado de 'history' a 'view-history' para unificar con tu HTML 
-        // y llamamos a renderHistoryUI() que es tu función real.
-        if (viewId === 'view-history' || viewId === 'history') { 
-            showFullHistory = false; 
-            if (typeof renderHistoryUI === 'function') {
-                renderHistoryUI(); 
-            }
+            if (viewId === 'directory') renderDirectoryList();
+            if (viewId === 'favorites') renderFavoritesList();
+            if (viewId === 'my-channels') renderMyOwnedChannelsList();
+            if (viewId === 'history') { showFullHistory = false; renderHistoryList(); }
+            if (viewId === 'home') { renderVipSlider(); renderTopPodium(); }
+            if (viewId === 'shop') renderShopCatalog();
+            lucide.createIcons();
         }
-        
-        if (viewId === 'home') { 
-            if (typeof renderVipSlider === 'function') renderVipSlider(); 
-            if (typeof renderTopPodium === 'function') renderTopPodium(); 
-        }
-        
-        if (viewId === 'shop') {
-            if (typeof renderShopCatalog === 'function') renderShopCatalog();
-        }
-        
-        // Procesamos iconos vectoriales de la nueva vista abierta
-        if (typeof lucide !== 'undefined') lucide.createIcons();
-
-    } catch (error) {
-        console.error("🚨 Error crítico en el enrutador switchView:", error);
-    }
-}
 
         function toggleProfileDrawer() {
             document.getElementById("profile-drawer").classList.toggle("open");
@@ -3409,39 +3193,50 @@ function handleReSendChannel(id) {
         lucide.createIcons();
     }
 }
-        function registerActionToHistory(title, detail, type = "info") {
-    const icons = { info: "info", success: "check-circle", gold: "star", error: "alert-triangle" };
-    const actionIcon = icons[type] || "activity";
-    
-    const now = new Date();
-    const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    const dateString = now.toLocaleDateString([], { day: '2-digit', month: '2-digit' });
+        function renderHistoryList() {
+            const container = document.getElementById("history-list");
+            const paginationContainer = document.getElementById("history-pagination-container");
+            if (!container) return;
+            
+            if (state.history.length === 0) {
+                container.innerHTML = `<div class="empty-state-notice">Aún no hay transacciones registradas.</div>`;
+                if(paginationContainer) paginationContainer.innerHTML = "";
+                return;
+            }
+            
+            const totalToConsider = state.history.slice(0, 20);
+            const displayedItems = showFullHistory ? totalToConsider : totalToConsider.slice(0, 10);
+            
+            container.innerHTML = displayedItems.map(item => `
+                <div class="history-item-card">
+                    <div class="history-left-pane">
+                        <div class="history-icon-badge">
+                            <i data-lucide="${item.icon}" style="width:16px; height:16px; color: ${item.type === 'gold' ? 'var(--vip-gold)' : 'var(--telegram-blue)'}"></i>
+                        </div>
+                        <div>
+                            <h4 style="font-size:0.88rem; font-weight:700;">${item.title}</h4>
+                            <p style="font-size:0.75rem; color:var(--text-muted);">${item.detail}</p>
+                        </div>
+                    </div>
+                    <div class="history-timestamp">${item.time}</div>
+                </div>
+            `).join('');
 
-    // Guardamos con compatibilidad absoluta de propiedades
-    state.history.unshift({ 
-        title: title, 
-        detail: detail, 
-        text: `${title}: ${detail}`, 
-        time: timeString, 
-        date: dateString, 
-        icon: actionIcon, 
-        type: type 
-    });
-    
-    const counterEl = document.getElementById("cnt-purchases");
-    if (counterEl) {
-        counterEl.innerText = state.history.filter(h => h.type === 'gold').length;
-    }
-    
-    saveToLocalStorage();
+            if (totalToConsider.length > 10) {
+                if (!showFullHistory) {
+                    paginationContainer.innerHTML = `<button class="btn-history-loadmore" onclick="expandHistoryView()">👇 Mostrar registros del 11 al ${totalToConsider.length}</button>`;
+                } else {
+                    paginationContainer.innerHTML = `<button class="btn-history-loadmore" onclick="collapseHistoryView()">👆 Ocultar y mostrar solo los primeros 10</button>`;
+                }
+            } else {
+                paginationContainer.innerHTML = "";
+            }
+            lucide.createIcons();
+        }
 
-    // 🌟 CORRECCIÓN CRÍTICA: Ahora llama al nombre exacto de tu función
-    if (typeof renderHistoryList === 'function') {
-        renderHistoryList();
-    }
-    
-    console.log("📝 Acción guardada y vista actualizada.");
-}
+        function expandHistoryView() { showFullHistory = true; renderHistoryList(); }
+        function collapseHistoryView() { showFullHistory = false; renderHistoryList(); }
+
         function toggleAccordionEffect(id, prefix = '') {
     // Busca id="accordion-123" o id="accordion-fav-123"
     const accordion = document.getElementById(`accordion-${prefix}${id}`);
@@ -3464,17 +3259,6 @@ function handleReSendChannel(id) {
         accordion.classList.add('open-accordion');
     }
 }
-        
-        window.expandHistoryView = function() { 
-    showFullHistory = true; 
-    renderHistoryList(); 
-};
-
-window.collapseHistoryView = function() { 
-    showFullHistory = false; 
-    renderHistoryList(); 
-};
-        
 function toggleFavoriteChannel(id, event) {
     if (event) event.stopPropagation(); // 1. Evita que se abra el acordeón al pulsar la estrella
     
@@ -4475,20 +4259,10 @@ window.manejarClicTarjeta = function(urlDestino, tituloTarjeta) {
 };
 
         // 🚀 AQUÍ PEGAS EL NUEVO MOTOR DEL TOP 10
+// Cambia la primera línea para que quede así:
 function renderTopPodium(canales) {
     const container = document.getElementById('top-podium-container');
     if (!container) return;
-
-    // DATASET EXTENDIDO CON SOPORTE PARA ESTADOS OPERATIVOS
-    const INITIAL_CHANNELS_DATASET = [
-        { id: 1, name: "BetMasters VIP", user: "@BetMastersVIP", category: "apuestas", subs: 45200, lang: "Español", status: "Publicado", isVip: false, logo: "🎯", description: "Pronósticos de alta fidelidad deportivos analizados por expertos.", isPopular: true, isNew: false, isTrending: true, telegramUserId: 12345678 },
-        { id: 2, name: "Green Pickers", user: "@GreenPickers", category: "apuestas", subs: 18400, lang: "Español", status: "Publicado", isVip: false, logo: "⚽", description: "Estadísticas y picks de fútbol hispano en vivo.", isPopular: false, isNew: true, isTrending: false, telegramUserId: 12345678 },
-        { id: 3, name: "Emprende Academy", user: "@EmprendeAcademy", category: "marketing", subs: 89600, lang: "Español", status: "Publicado", isVip: false, logo: "💼", description: "Estrategias de monetización digital y negocios escalables.", isPopular: true, isNew: false, isTrending: false, telegramUserId: 11112222 },
-        { id: 4, name: "CryptoWhales Alert", user: "@CryptoWhalesAlert", category: "cripto", subs: 112000, lang: "Inglés", status: "Publicado", isVip: false, logo: "🐋", description: "Alertas institucionales del mercado blockchain en tiempo real.", isPopular: true, isNew: false, isTrending: false, telegramUserId: 33334444 },
-        { id: 5, name: "IA Revolucionaria", user: "@IaRevolucionaria", category: "tecnologia", subs: 67400, lang: "Español", status: "Publicado", isVip: true, logo: "🧠", description: "Aprende prompts avanzados y automatizaciones con Inteligencia Artificial.", isPopular: false, isNew: true, isTrending: true, telegramUserId: 1320417199 },
-        { id: 6, name: "Coloring Books PDF", user: "@ColoringBooksPDF", category: "tecnologia", subs: 32100, lang: "Español", status: "Publicado", isVip: false, logo: "🎨", description: "Libros artísticos listos para descargar e imprimir en alta resolución.", isPopular: false, isNew: true, isTrending: false, telegramUserId: 1320417199 },
-        { id: 7, name: "Lista Golden Official", user: "@ListaGolden", category: "marketing", subs: 68400, lang: "Español", status: "Publicado", isVip: true, logo: "👑", description: "El canal publicitario oficial de nuestra MiniApp de Telegram.", isPopular: true, isNew: false, isTrending: true, telegramUserId: 1320417199 }
-    ];
 
     // Si le pasamos los canales por el render DOM, los usa directamente
     const listaCanales = canales || (typeof INITIAL_CHANNELS_DATASET !== 'undefined' ? INITIAL_CHANNELS_DATASET : []);
@@ -4497,7 +4271,7 @@ function renderTopPodium(canales) {
         container.innerHTML = `<p style="color:#64748b; text-align:center; font-size:0.8rem; padding:20px;">Cargando posiciones del ranking...</p>`;
         return;
     }
-
+    // ... (El resto del código con el .sort y el .map se queda exactamente igual) ...
     const top10 = listaCanales.slice(0, 10);
     container.innerHTML = top10.map((canal, index) => {
         const posicion = index + 1;
@@ -4506,31 +4280,25 @@ function renderTopPodium(canales) {
         if (posicion === 1) rankClass = "rank-1";
         else if (posicion === 2) rankClass = "rank-2";
         else if (posicion === 3) rankClass = "rank-3";
-        
         const crecimientoSimulado = `+${(12.4 - (index * 0.9)).toFixed(1)}%`;
-
-        // 🌟 REPARACIÓN INTERNA DE ENLACES:
-        // Si no tiene url configurada, tomamos el @user y le quitamos el '@' si lo lleva para formar un link 't.me/' limpio
-        let urlCanal = canal.url;
-        if (!urlCanal && canal.user) {
-            const usuarioLimpio = canal.user.replace('@', '');
-            urlCanal = `https://t.me/${usuarioLimpio}`;
-        } else if (!urlCanal) {
-            urlCanal = 'https://t.me/ListaGolden'; // Enlace de respaldo por seguridad
-        }
-
         return `
-            <div class="top10-row ${rankClass}" onclick="window.manejarClicTarjeta('${urlCanal}', '${canal.name}')">
+            <div class="top10-row ${rankClass}" onclick="window.manejarClicTarjeta('${canal.url}', '${canal.name}')">
                 <div class="top10-badge">${posicion}</div>
                 <div class="top10-avatar" style="background-image: url('${canal.bg || canal.logo}');"></div>
                 <div class="top10-meta">
                     <h4 class="top10-title">${canal.name}</h4>
                     <p class="top10-user">${canal.user || '@ListaGolden'}</p>
+
                 </div>
+
                 <div class="top10-stats">${crecimientoSimulado}</div>
+
             </div>
+
         `;
+
     }).join('');
+
 }
     // ... (El resto de tu código con el .sort y el .map se queda exactamente igual) ...
 
@@ -4538,109 +4306,26 @@ function renderTopPodium(canales) {
 // 🏁 EL ORQUESTRADOR UNIFICADO DE ARRANQUE (Limpiado y Sincronizado)
 // =========================================================================
 document.addEventListener("DOMContentLoaded", () => {
-    console.log("🚀 Iniciando secuencia de arranque unificada...");
-
-    // 1. 🤖 CONTEXTO: Capturamos credenciales de Telegram (Sin guardar en LocalStorage)
-    try {
-        initTelegramContext();
-    } catch (e) {
-        console.error("🚨 Falló initTelegramContext:", e);
-    }
+    loadFromLocalStorage();
+    initTelegramContext();
+    checkVipInternalRegistration();
+    executeDailyCheckIn();
     
-    // 2. 💾 ALMACENAMIENTO: Recuperamos saldo, inventario, favoritos e historial real
-    try {
-        loadFromLocalStorage();
-    } catch (e) {
-        console.error("🚨 Falló loadFromLocalStorage:", e);
-    }
+    // 🏛️ Esta función ahora arrastrará el Top 10 asegurando que los datos existan
+    renderAppUiComponents(); 
     
-    // 3. ⚙️ VALIDACIONES: Estados internos, check-in diario y gacha
-    try {
-        if (typeof checkVipInternalRegistration === 'function') checkVipInternalRegistration();
-        if (typeof executeDailyCheckIn === 'function') executeDailyCheckIn();
-        if (typeof checkDailyGachaStatus === 'function') checkDailyGachaStatus();
-    } catch (e) {
-        console.warn("⚠️ Fallaron las comprobaciones de estado iniciales:", e);
-    }
+    renderShopCarrousels();
+    updateAdminToggleUI();
+    renderCategorySliders();
+    checkDailyGachaStatus();
     
-    // 4. 🏛️ ENRUTAMIENTO INICIAL: Forzamos la vista principal para activar el DOM correcto
-    try {
-        // Activamos la vista 'home' (o cambia por 'directory' si es tu pestaña principal)
-        // Esto ejecutará los renders necesarios de forma segura
-        switchView('home'); 
-    } catch (e) {
-        console.error("🚨 Falló el enrutamiento inicial de la vista:", e);
-    }
-
-    // Renders secundarios en segundo plano (Solo si las funciones existen)
-    try {
-        if (typeof renderShopCarrousels === 'function') renderShopCarrousels();
-        if (typeof updateAdminToggleUI === 'function') updateAdminToggleUI();
-        if (typeof renderCategorySliders === 'function') renderCategorySliders();
-        if (typeof renderAppUiComponents === 'function') renderAppUiComponents();
-    } catch (e) {
-        console.warn("⚠️ Falló algún renderizado secundario del DOM:", e);
-    }
+    // 🔥 EL MOTOR SIMULADOR: Inyecta vida al contador en cuanto abre la WebApp
+    initOnlineUsersSimulator('cont-usuarios-online'); 
     
-    // 📝 HISTORIAL: Renderizamos tu historial corregido y su paginación
-    try {
-        if (typeof renderHistoryUI === 'function') renderHistoryUI();
-        if (typeof renderHistoryPagination === 'function') renderHistoryPagination();
-    } catch (e) {
-        console.error("🚨 Falló el renderizado del historial en el arranque:", e);
-    }
-    
-    // 5. 🚀 ANIMACIONES Y COMPONENTES DINÁMICOS
-    try {
-        if (typeof initOnlineUsersSimulator === 'function') {
-            initOnlineUsersSimulator('cont-usuarios-online');
-        }
-        if (typeof initDynamicSliders === 'function') {
-            initDynamicSliders();
-        }
-    } catch (e) {
-        console.warn("⚠️ Fallaron los simuladores dinámicos:", e);
-    }
-    
-    // Convertimos las etiquetas data-lucide en SVG reales
-    if (typeof lucide !== 'undefined') {
-        try {
-            lucide.createIcons();
-        } catch (e) {
-            console.error("🚨 Error al procesar Lucide Icons:", e);
-        }
-    }
-    
-    if (typeof addLog === 'function') {
-        addLog("Ecosistema unificado y tráfico reactivo listo.");
-    }
-
-    // =========================================================================
-    // ❄️ APAGADO DE EMERGENCIA DEL LOADER (Garantizado)
-    // =========================================================================
-    setTimeout(() => {
-        try {
-            if (typeof ocultarPantallaCargaApp === "function") {
-                ocultarPantallaCargaApp();
-                console.log("🔓 Loader retirado mediante función original.");
-            } else {
-                // Si la función original no responde o se rompió, la fulminamos por CSS directo
-                const loader = document.getElementById("loading-screen") || 
-                               document.getElementById("loader") ||
-                               document.querySelector(".loading-screen") ||
-                               document.querySelector(".loader");
-                if (loader) {
-                    loader.style.opacity = "0";
-                    setTimeout(() => loader.style.display = "none", 300);
-                    console.log("🔓 Loader destruido por contingencia CSS.");
-                }
-            }
-        } catch (error) {
-            console.error("🚨 Fue imposible retirar el loader del inicio:", error);
-        }
-    }, 150); // Le damos 150ms al DOM para que respire tras los renders antes de abrir el telón
+    initDynamicSliders(); // 👈 Llama a tus sliders originales
+    lucide.createIcons();
+    addLog("Ecosistema unificado bajo ID único de Telegram y tráfico simulado activo.");
 });
-        
  // 🏁 AQUÍ TERMINA TU ARCHIVO JAVASCRIPT O EL BLOQUE DE TU SCRIPT
         </script>
 <div id="share-modal-overlay" class="share-overlay" style="display: none !important; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(10, 15, 26, 0.85); backdrop-filter: blur(6px); align-items: center; justify-content: center; z-index: 10000; padding: 16px;" onclick="closeShareModal()">
