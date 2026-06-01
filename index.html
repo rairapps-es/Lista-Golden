@@ -2235,19 +2235,43 @@ function checkVipInternalRegistration() {
 } // Llave de cierre de tu función initTelegramContext
         
         function updateAvatarRenderers() {
-            let queryParams = `?seed=${state.user.seed}&radius=50&backgroundColor=1e293b`;
-            
-            if (state.user.equipped.clothing) queryParams += `&clothing=${state.user.equipped.clothing}`;
-            if (state.user.equipped.glasses) queryParams += `&accessoriesProbability=100&accessories=${state.user.equipped.glasses}`;
+    // 🛡️ Evitamos que la función muera si state.user tarda en cargar
+    if (!state || !state.user) return;
 
-            const finalUrl = `https://api.dicebear.com/9.x/avataaars/svg${queryParams}`;
-            
-            document.getElementById("header-avatar").src = finalUrl;
-            document.getElementById("shop-ia-avatar-preview").src = finalUrl;
-            document.getElementById("drawer-avatar-render").src = finalUrl;
-            
-            renderEquippedChipsList();
-        }
+    // 1. Base de la query con la semilla elegida
+    let queryParams = `?seed=${state.user.seed}&radius=50&backgroundColor=1e293b`;
+    
+    // Configuración de complementos
+    if (state.user.equipped.clothing) {
+        queryParams += `&clothing=${state.user.equipped.clothing}`;
+    }
+    if (state.user.equipped.glasses) {
+        queryParams += `&accessoriesProbability=100&accessories=${state.user.equipped.glasses}`;
+    }
+
+    // 🌟 EL TRUCO MAESTRO PARA TELEGRAM: Cache Buster 🌟
+    // Añadimos un número único basado en la fecha y hora actual (ej: &cb=171728291).
+    // Esto rompe la caché de Telegram y le obliga a redibujar el SVG real con sus ropas.
+    const cacheBuster = new Date().getTime();
+    queryParams += `&cb=${cacheBuster}`;
+
+    // Construimos la URL final inyectable
+    const finalUrl = `https://api.dicebear.com/9.x/avataaars/svg${queryParams}`;
+    
+    // 2. Inyectamos de forma segura comprobando que los IDs existan en tu HTML
+    const imgHeader = document.getElementById("header-avatar");
+    const imgPreview = document.getElementById("shop-ia-avatar-preview");
+    const imgDrawer = document.getElementById("drawer-avatar-render");
+
+    if (imgHeader) imgHeader.src = finalUrl;
+    if (imgPreview) imgPreview.src = finalUrl;
+    if (imgDrawer) imgDrawer.src = finalUrl;
+    
+    // Redibujamos las etiquetas de accesorios equipados
+    if (typeof renderEquippedChipsList === 'function') {
+        renderEquippedChipsList();
+    }
+}
 
         function renderShopCarrousels() {
             const trackExplorers = document.getElementById("track-explorers");
