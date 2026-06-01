@@ -1812,11 +1812,11 @@ body.user-is-vip .no-vip {
 </div>
     </main>
 
-    <main id="view-history" class="app-view">
-        <h2 class="view-title"><i data-lucide="history" style="color:var(--success-green)"></i> Historial de Compras y Accesos</h2>
-        <div id="history-list" class="directory-grid"></div>
-        <div id="history-pagination-container"></div>
-    </main>
+    <main id="history" class="app-view">
+    <h2 class="view-title"><i data-lucide="history" style="color:var(--success-green)"></i> Historial de Compras y Accesos</h2>
+    <div id="history-list" class="directory-grid"></div>
+    <div id="history-pagination-container"></div>
+</main>
 
     <main id="view-shop" class="app-view">
         <h2 class="view-title"><i data-lucide="shopping-bag" style="color:var(--mystic-purple)"></i> Forja de Avatar RPG & Personalización</h2>
@@ -1976,7 +1976,7 @@ body.user-is-vip .no-vip {
         <div class="tab-item" id="tab-favorites" onclick="switchView('favorites')">
             <i data-lucide="star"></i><span>Favoritos</span>
         </div>
-        <div class="tab-item" id="tab-history" onclick="switchView('history')">
+        <div class="tab-item" id="tab-history" onclick="switchView('view-history')">
             <i data-lucide="history"></i><span>Historial</span>
         </div>
         <div class="tab-item" id="tab-energy" onclick="switchView('energy')">
