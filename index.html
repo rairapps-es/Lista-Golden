@@ -2320,38 +2320,61 @@ function checkVipInternalRegistration() {
         }
 
         function renderEquippedChipsList() {
-            const container = document.getElementById("equipped-items-list");
-            if (!container) return;
-            container.innerHTML = "";
+    const container = document.getElementById("equipped-items-list");
+    if (!container) return;
+    container.innerHTML = "";
 
-            let hasAddons = false;
+    let hasAddons = false;
 
-            if (state.user.equipped.clothing) {
-                hasAddons = true;
-                const itemData = PREMIUM_SHOP_CATALOG.find(i => i.value === state.user.equipped.clothing);
-                container.innerHTML += `
-                    <div class="equipped-chip">
-                        <span>👕 ${itemData ? itemData.name : 'Ropa'}</span>
-                        <button class="btn-unequip" onclick="unequipItem('clothing')"><i data-lucide="x" style="width:12px; height:12px;"></i></button>
-                    </div>
-                `;
-            }
-            if (state.user.equipped.glasses) {
-                hasAddons = true;
-                const itemData = PREMIUM_SHOP_CATALOG.find(i => i.value === state.user.equipped.glasses);
-                container.innerHTML += `
-                    <div class="equipped-chip">
-                        <span>👓 ${itemData ? itemData.name : 'Gafas'}</span>
-                        <button class="btn-unequip" onclick="unequipItem('glasses')"><i data-lucide="x" style="width:12px; height:12px;"></i></button>
-                    </div>
-                `;
-            }
+    // 👕 Procesamos la ropa de forma segura
+    if (state.user.equipped.clothing) {
+        hasAddons = true;
+        const itemData = PREMIUM_SHOP_CATALOG.find(i => i.value === state.user.equipped.clothing);
+        
+        // 🌟 CONTROL DE DAÑOS: Si itemData no existe, usamos un nombre por defecto en vez de romper la app
+        const nombreRopa = itemData ? itemData.name : `Ropa (${state.user.equipped.clothing})`;
+        
+        container.innerHTML += `
+            <div class="equipped-chip">
+                <span>👕 ${nombreRopa}</span>
+                <button class="btn-unequip" onclick="unequipItem('clothing')">
+                    <i data-lucide="x" style="width:12px; height:12px;"></i>
+                </button>
+            </div>
+        `;
+    }
 
-            if(!hasAddons) {
-                container.innerHTML = `<span style="font-size:0.72rem; color:var(--text-muted);">Sin accesorios equipados</span>`;
-            }
+    // 👓 Procesamos las gafas de forma segura
+    if (state.user.equipped.glasses) {
+        hasAddons = true;
+        const itemData = PREMIUM_SHOP_CATALOG.find(i => i.value === state.user.equipped.glasses);
+        
+        // 🌟 CONTROL DE DAÑOS: Si el accesorio viejo ya no existe en el catálogo, no revienta
+        const nombreGafas = itemData ? itemData.name : `Gafas (${state.user.equipped.glasses})`;
+        
+        container.innerHTML += `
+            <div class="equipped-chip">
+                <span>👓 ${nombreGafas}</span>
+                <button class="btn-unequip" onclick="unequipItem('glasses')">
+                    <i data-lucide="x" style="width:12px; height:12px;"></i>
+                </button>
+            </div>
+        `;
+    }
+
+    if (!hasAddons) {
+        container.innerHTML = `<span style="font-size:0.72rem; color:var(--text-muted);">Sin accesorios equipados</span>`;
+    }
+
+    // Renderizado seguro de iconos de Lucide
+    if (typeof lucide !== 'undefined' && typeof lucide.createIcons === 'function') {
+        try {
             lucide.createIcons();
+        } catch (e) {
+            console.warn("No se pudieron renderizar los iconos de las chips:", e);
         }
+    }
+}
 
         function unequipItem(type) {
             state.user.equipped[type] = "";
