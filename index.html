@@ -2400,10 +2400,24 @@ function addLog(msg) {
 function registerActionToHistory(title, detail, type = "info") {
     const icons = { info: "info", success: "check-circle", gold: "star", error: "alert-triangle" };
     const actionIcon = icons[type] || "activity";
+    
     const now = new Date();
     const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    
-    state.history.unshift({ title, detail, time: timeString, icon: actionIcon, type });
+    // Creamos también una fecha corta por si tu visor de historial la requiere
+    const dateString = now.toLocaleDateString([], { day: '2-digit', month: '2-digit' });
+
+    // 🌟 UNIFICACIÓN DE PROPIEDADES:
+    // Guardamos 'time', 'detail' y también 'date' y 'text' para que sea compatible 
+    // con todos los componentes y listados de la MiniApp.
+    state.history.unshift({ 
+        title: title, 
+        detail: detail, 
+        text: `${title}: ${detail}`, // Compatibilidad con lectores de texto plano
+        time: timeString, 
+        date: dateString,            // Compatibilidad con la versión de la Cripta
+        icon: actionIcon, 
+        type: type 
+    });
     
     // Protección por si el contador de compras no existe en la vista actual
     const counterEl = document.getElementById("cnt-purchases");
@@ -2411,7 +2425,16 @@ function registerActionToHistory(title, detail, type = "info") {
         counterEl.innerText = state.history.filter(h => h.type === 'gold').length;
     }
     
+    // Forzamos el guardado en el LocalStorage
     saveToLocalStorage();
+
+    // 🔄 RE-RENDER INMEDIATO: 
+    // Si tienes una función para pintar el historial en la interfaz, la ejecutamos aquí
+    if (typeof renderHistoryUI === 'function') {
+        renderHistoryUI();
+    }
+    
+    console.log("📝 Acción registrada en el historial unificado:", state.history[0]);
 }
 
         function showToast(text, type = "info") {
