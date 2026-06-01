@@ -2059,22 +2059,52 @@ const CAROUSEL_EXPLORERS_SEEDS = ["leo", "mia", "max", "zoe", "ian"];
 const CAROUSEL_OWNERS_SEEDS = ["alex", "ruby", "sam", "eva", "boss"];
 
 document.addEventListener("DOMContentLoaded", () => {
-    loadFromLocalStorage();
-    initTelegramContext();
-    checkVipInternalRegistration();
-    executeDailyCheckIn();
-    renderAppUiComponents();
-    renderTopPodium();
-    renderShopCarrousels();
-    updateAdminToggleUI();
-    renderCategorySliders();
-    initDynamicSliders();
+    // 1. Carga y contexto inicial obligatorios
+    try {
+        loadFromLocalStorage();
+        initTelegramContext();
+    } catch (e) {
+        console.error("🚨 Error en la carga de datos inicial:", e);
+    }
+
+    // 2. Procesos lógicos internos
+    try {
+        if (typeof checkVipInternalRegistration === 'function') checkVipInternalRegistration();
+        if (typeof executeDailyCheckIn === 'function') executeDailyCheckIn();
+    } catch (e) {
+        console.warn("⚠️ Advertencia en comprobaciones de inicio:", e);
+    }
+
+    // 3. Renderizado visual de la interfaz
+    try {
+        if (typeof renderAppUiComponents === 'function') renderAppUiComponents();
+        if (typeof renderTopPodium === 'function') renderTopPodium();
+        if (typeof renderShopCarrousels === 'function') renderShopCarrousels();
+        if (typeof updateAdminToggleUI === 'function') updateAdminToggleUI();
+        if (typeof renderCategorySliders === 'function') renderCategorySliders();
+        if (typeof initDynamicSliders === 'function') initDynamicSliders();
+    } catch (e) {
+        console.error("🚨 Error al dibujar componentes en el HTML:", e);
+    }
     
-    // Aseguramos que pinte el avatar correcto guardado al arrancar
-    if (typeof updateAvatarRenderers === 'function') updateAvatarRenderers();
+    // 4. Aseguramos que pinte el avatar correcto guardado al arrancar
+    if (typeof updateAvatarRenderers === 'function') {
+        try { updateAvatarRenderers(); } catch(e) { console.error(e); }
+    }
     
-    if (typeof lucide !== 'undefined') lucide.createIcons();
-    addLog("Ecosistema unificado bajo ID único de Telegram.");
+    // 5. 🌟 ¡EL ARREGLO CRÍTICO!: Blindamos Lucide con typeof para evitar el crash del loader
+    if (typeof lucide !== 'undefined' && typeof lucide.createIcons === 'function') {
+        try { 
+            lucide.createIcons(); 
+        } catch(e) { 
+            console.warn("⚠️ Lucide no pudo renderizar los iconos en este frame:", e); 
+        }
+    }
+    
+    // 6. Registro final en logs
+    if (typeof addLog === 'function') {
+        addLog("Ecosistema unificado bajo ID único de Telegram.");
+    }
 });
 
 function saveToLocalStorage() {
