@@ -2114,35 +2114,39 @@ body.user-is-vip .no-vip {
         try {
             const parsed = JSON.parse(saved);
             
-            // 🌟 LA REPARACIÓN MAESTRA: Fusión inteligente
-            // En vez de pisar state.user completo, combinamos lo que ya creó Telegram
-            // con lo que el usuario tenía comprado/equipado en LocalStorage.
             if (parsed.user) {
                 state.user = {
-                    ...state.user, // Mantiene IDTelegram, username actual, role, etc.
+                    ...state.user, 
                     balance: parsed.user.balance !== undefined ? parsed.user.balance : state.user.balance,
                     range: parsed.user.range || state.user.range,
                     pointsProgress: parsed.user.pointsProgress || state.user.pointsProgress,
                     seed: parsed.user.seed || state.user.seed,
-                    isVipMember: parsed.user.isVipMember || state.user.isVipMember,
-                    // Protegemos el sub-objeto de ropa y gafas
+                    isVipMember: parsed.user.isVipMember !== undefined ? parsed.user.isVipMember : state.user.isVipMember,
                     equipped: parsed.user.equipped || { clothing: "", glasses: "" }
                 };
             }
             
-            // Recuperar el resto de colecciones globales con normalidad
-            state.favorites = parsed.favorites || state.favorites;
-            state.history = parsed.history || state.history;
-            state.systemLogs = parsed.systemLogs || state.systemLogs;
-            state.purchasedItems = parsed.purchasedItems || state.purchasedItems;
+            // 🌟 COMPROBACIÓN LIMPIA Y SEGURA: Rompemos el operador "||" ciego.
+            // Si el almacenamiento guardó un array (aunque esté vacío), usamos ESE array. 
+            // Si no viene nada, forzamos un array limpio [], evitando resucitar datos de hace horas.
+            state.favorites = Array.isArray(parsed.favorites) ? parsed.favorites : [];
+            state.history = Array.isArray(parsed.history) ? parsed.history : [];
+            state.systemLogs = Array.isArray(parsed.systemLogs) ? parsed.systemLogs : [];
+            state.purchasedItems = Array.isArray(parsed.purchasedItems) ? parsed.purchasedItems : [];
             
-            console.log("💾 Estado fusionado con éxito en el arranque. Ropa actual:", state.user.equipped);
+            console.log("💾 Estado fusionado. Favoritos reales cargados:", state.favorites);
         } catch(e) {
             console.error("Error cargando localStorage", e);
+            // Salvavidas por si explota el JSON, para que la app pueda seguir guardando favoritos nuevos
+            if (!Array.isArray(state.favorites)) state.favorites = [];
+            if (!Array.isArray(state.history)) state.history = [];
         }
+    } else {
+        // Si es la primera vez que entra a la app y el LocalStorage está a cero:
+        if (!Array.isArray(state.favorites)) state.favorites = [];
+        if (!Array.isArray(state.history)) state.history = [];
     }
 }
-
         // SISTEMA AUTOMÁTICO DE VERIFICACIÓN PREMIUM REQUERIDO
 function checkVipInternalRegistration() {
     // Lista de IDs de Telegram autorizados como VIP
