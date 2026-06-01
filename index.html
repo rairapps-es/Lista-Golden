@@ -1562,7 +1562,7 @@
 </div>
 
         <!-- ESPACIO DE ANUNCIO PREMIUM CON TOOLTIP -->
-<div class="premium-ad-container" style="margin: 10px; position: relative; background: #0f172a; border: 1px solid rgba(168, 85, 247, 0.4); border-radius: 16px; padding: 20px; box-shadow: 0 0 15px rgba(168, 85, 247, 0.1); font-family: sans-serif; overflow: visible;">
+<div class="premium-ad-container admin-only" style="margin: 10px; position: relative; background: #0f172a; border: 1px solid rgba(168, 85, 247, 0.4); border-radius: 16px; padding: 20px; box-shadow: 0 0 15px rgba(168, 85, 247, 0.1); font-family: sans-serif; overflow: visible;">
     <!-- Botón de interrogación flotante -->
     <button onclick="toggleAdTooltip(event)" style="position: absolute; top: 12px; right: 12px; background: rgba(255,255,255,0.1); border: none; color: #a855f7; width: 24px; height: 24px; border-radius: 50%; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 10;">?</button>
 
@@ -1576,7 +1576,7 @@
     </div>
     
     <!-- Tooltip Flotante oculto por defecto con desenfoque de fondo -->
-    <div id="premium-ad-tooltip" style="display: none; position: absolute; top: 45px; right: 12px; width: 260px; background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(8px); border: 1px solid #a855f7; border-radius: 12px; padding: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); z-index: 100;">
+    <div id="premium-ad-tooltip admin-only" style="display: none; position: absolute; top: 45px; right: 12px; width: 260px; background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(8px); border: 1px solid #a855f7; border-radius: 12px; padding: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); z-index: 100;">
         <h4 style="color: #fff; margin: 0 0 6px 0; font-size: 0.9rem; font-weight: bold;">Anuncios Lista Golden</h4>
         <p style="color: #9ca3af; margin: 0 0 12px 0; font-size: 0.75rem; line-height: 1.4;">Llega a miles de usuarios activos en Telegram diariamente. Tu canal se posicionará en las secciones más vistas aumentando tus miembros orgánicos de forma inmediata.</p>
         <button onclick="openGPlusPanel()" style="background: linear-gradient(135deg, #a855f7, #7c3aed); color: #fff; border: none; padding: 8px 12px; font-size: 0.75rem; font-weight: bold; border-radius: 6px; width: 100%; cursor: pointer;">ANUNCIARME AQUÍ</button>
@@ -1646,7 +1646,7 @@
 
         <div class="directory-filters-box">
             <div>
-                <label style="font-size:0.68rem; color:var(--text-muted); display:block; margin-bottom:4px;">Filtrado Avanzado</label>
+                <label style="font-size:0.68rem; color:var(--text-muted); display:block; margin-bottom:4px;">Filtro Avanzado</label>
                 <select id="filter-sorting" class="filter-select" onchange="filterDirectory()">
                     <option value="all">⚡ Todos los Canales</option>
                     <option value="popular">🔥 Canales Populares</option>
@@ -1721,7 +1721,7 @@
     </div>
 </div>
 
-<div id="modal-feature-ads" class="ads-modal">
+<div id="modal-feature-ads admin-only" class="ads-modal">
     <div class="ads-modal-content">
         <h3 style="font-size:1.2rem; font-weight:800; margin-bottom:6px; color:#fff;">🚀 Destacar tu Canal</h3>
         <p style="font-size:0.78rem; color:#9ca3af; margin-bottom:16px;">Consigue tráfico orgánico masivo apareciendo en las posiciones más cotizadas.</p>
@@ -1755,7 +1755,7 @@
     </div>
 </div>
 
-<div id="modal-gplus-ads" class="ads-modal">
+<div id="modal-gplus-ads admin-only" class="ads-modal">
     <div class="ads-modal-content" style="border-color:#a855f7;">
         <h3 style="font-size:1.2rem; font-weight:800; margin-bottom:6px; color:#fff;">⚡ Suscripción GPlus VIP</h3>
         <p style="font-size:0.78rem; color:#9ca3af; margin-bottom:16px;">Domina el directorio completo con la membresía todo en uno.</p>
@@ -1809,11 +1809,11 @@
                 <div class="equipped-badges-container" id="equipped-items-list"></div>
 
                 <div class="carousel-wrapper">
-                    <div class="carousel-title">🏃 Carrusel Personajes Exploradores</div>
+                    <div class="carousel-title">🏃 Personajes Exploradores</div>
                     <div class="carousel-track" id="track-explorers"></div>
                 </div>
                 <div class="carousel-wrapper">
-                    <div class="carousel-title">👑 Carrusel Admin Owners</div>
+                    <div class="carousel-title">👑 Admin Owners</div>
                     <div class="carousel-track" id="track-owners"></div>
                 </div>
             </div>
@@ -2247,23 +2247,30 @@ function checkVipInternalRegistration() {
         }
 
         function renderShopCarrousels() {
-            const trackExplorers = document.getElementById("track-explorers");
-            const trackOwners = document.getElementById("track-owners");
+    const trackExplorers = document.getElementById("track-explorers");
+    const trackOwners = document.getElementById("track-owners");
 
-            trackExplorers.innerHTML = CAROUSEL_EXPLORERS_SEEDS.map(seed => `
-                <div class="carousel-item-avatar" onclick="selectCarouselSeed('${seed}')">
-                    <img src="https://api.dicebear.com/9.x/avataaars/svg?seed=${seed}&radius=50" style="width: 50px; height: 50px;" />
-                    <div style="font-size: 0.65rem; margin-top: 4px; color: var(--text-muted); font-weight:bold;">${seed}</div>
-                </div>
-            `).join('');
+    if (!trackExplorers || !trackOwners) return;
 
-            trackOwners.innerHTML = CAROUSEL_OWNERS_SEEDS.map(seed => `
-                <div class="carousel-item-avatar" onclick="selectCarouselSeed('${seed}')" style="border-color: var(--vip-gold);">
-                    <img src="https://api.dicebear.com/9.x/avataaars/svg?seed=${seed}&radius=50" style="width: 50px; height: 50px;" />
-                    <div style="font-size: 0.65rem; margin-top: 4px; color: var(--vip-gold); font-weight:bold;">${seed}</div>
-                </div>
-            `).join('');
-        }
+    // Generamos un timestamp único para este renderizado de carrusel
+    const carrouselBuster = new Date().getTime();
+
+    // 🌐 Render de Exploradores con el Cache Buster aplicado
+    trackExplorers.innerHTML = CAROUSEL_EXPLORERS_SEEDS.map(seed => `
+        <div class="carousel-item-avatar" onclick="selectCarouselSeed('${seed}')">
+            <img src="https://api.dicebear.com/9.x/avataaars/svg?seed=${seed}&radius=50&backgroundColor=1e293b&cb=${carrouselBuster}" style="width: 50px; height: 50px;" />
+            <div style="font-size: 0.65rem; margin-top: 4px; color: var(--text-muted); font-weight:bold;">${seed}</div>
+        </div>
+    `).join('');
+
+    // 🪙 Render de Owners (VIP) con el Cache Buster aplicado
+    trackOwners.innerHTML = CAROUSEL_OWNERS_SEEDS.map(seed => `
+        <div class="carousel-item-avatar" onclick="selectCarouselSeed('${seed}')" style="border-color: var(--vip-gold);">
+            <img src="https://api.dicebear.com/9.x/avataaars/svg?seed=${seed}&radius=50&backgroundColor=1e293b&cb=${carrouselBuster}" style="width: 50px; height: 50px;" />
+            <div style="font-size: 0.65rem; margin-top: 4px; color: var(--vip-gold); font-weight:bold;">${seed}</div>
+        </div>
+    `).join('');
+}
 
         function selectCarouselSeed(seed) {
             state.user.seed = seed;
