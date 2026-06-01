@@ -2611,24 +2611,59 @@ function checkDailyGachaStatus() {
 }
 
         function switchView(viewId) {
-            state.adminFilterOnly = false; 
-            document.querySelectorAll('.app-view').forEach(v => v.classList.remove('active-view'));
-            document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active-tab'));
-            
-            const targetView = document.getElementById(`view-${viewId}`);
-            if (targetView) targetView.classList.add('active-view');
-            
-            const targetTab = document.getElementById(`tab-${viewId}`);
-            if (targetTab) targetTab.classList.add('active-tab');
-
-            if (viewId === 'directory') renderDirectoryList();
-            if (viewId === 'favorites') renderFavoritesList();
-            if (viewId === 'my-channels') renderMyOwnedChannelsList();
-            if (viewId === 'history') { showFullHistory = false; renderHistoryList(); }
-            if (viewId === 'home') { renderVipSlider(); renderTopPodium(); }
-            if (viewId === 'shop') renderShopCatalog();
-            lucide.createIcons();
+    try {
+        state.adminFilterOnly = false; 
+        
+        // Desactivamos todas las vistas y pestañas anteriores
+        document.querySelectorAll('.app-view').forEach(v => v.classList.remove('active-view'));
+        document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active-tab'));
+        
+        // 1. Activamos la vista correspondiente
+        const targetView = document.getElementById(`view-${viewId}`);
+        if (targetView) {
+            targetView.classList.add('active-view');
+        } else {
+            console.warn(`⚠️ No se encontró la vista: view-${viewId}`);
         }
+        
+        // 2. 🛡️ SEGURO CONTRA CRASHES: Solo añadimos la clase si el botón de la pestaña existe
+        const targetTab = document.getElementById(`tab-${viewId}`);
+        if (targetTab) {
+            targetTab.classList.add('active-tab');
+        }
+
+        // =========================================================================
+        // ROUTER DE ENRUTAMIENTO (Renders de cada pantalla)
+        // =========================================================================
+        if (viewId === 'directory') renderDirectoryList();
+        if (viewId === 'favorites') renderFavoritesList();
+        if (viewId === 'my-channels') renderMyOwnedChannelsList();
+        
+        // 🌟 CORRECCIÓN CRÍTICA: Cambiado de 'history' a 'view-history' para unificar con tu HTML 
+        // y llamamos a renderHistoryUI() que es tu función real.
+        if (viewId === 'view-history' || viewId === 'history') { 
+            showFullHistory = false; 
+            if (typeof renderHistoryUI === 'function') {
+                renderHistoryUI(); 
+            }
+        }
+        
+        if (viewId === 'home') { 
+            if (typeof renderVipSlider === 'function') renderVipSlider(); 
+            if (typeof renderTopPodium === 'function') renderTopPodium(); 
+        }
+        
+        if (viewId === 'shop') {
+            if (typeof renderShopCatalog === 'function') renderShopCatalog();
+        }
+        
+        // Procesamos iconos vectoriales de la nueva vista abierta
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+
+    } catch (error) {
+        console.error("🚨 Error crítico en el enrutador switchView:", error);
+    }
+}
 
         function toggleProfileDrawer() {
             document.getElementById("profile-drawer").classList.toggle("open");
@@ -4503,44 +4538,107 @@ function renderTopPodium(canales) {
 // 🏁 EL ORQUESTRADOR UNIFICADO DE ARRANQUE (Limpiado y Sincronizado)
 // =========================================================================
 document.addEventListener("DOMContentLoaded", () => {
-    // 1. 🤖 CONTEXTO: Capturamos las credenciales reales de Telegram (ID, username, etc.)
-    // *Nota: Asegúrate de haberle quitado el saveToLocalStorage() interno que encontramos antes.
-    initTelegramContext();
-    
-    // 2. 💾 ALMACENAMIENTO: Recuperamos el inventario, saldo real, historial y favoritos del LocalStorage.
-    // Esta función combina los datos encima del usuario de Telegram de forma segura.
-    loadFromLocalStorage();
-    
-    // 3. ⚙️ VALIDACIONES: Verificaciones de estado, reseteos e ingresos internos periódicos
-    checkVipInternalRegistration();
-    executeDailyCheckIn();
-    checkDailyGachaStatus();
-    
-    // 4. 🏛️ INTERFAZ GRÁFICA: Renderizado de componentes del ecosistema principal (Top 10 y listas)
-    renderAppUiComponents(); 
-    renderShopCarrousels();
-    updateAdminToggleUI();
-    renderCategorySliders();
-    
-    // 🌟 CORRECCIÓN CRÍTICA DE NOMBRES: 
-    // Forzamos el renderizado de tu historial real y activamos los botones de su paginador
-    if (typeof renderHistoryUI === 'function') {
-        renderHistoryUI();
+    console.log("🚀 Iniciando secuencia de arranque unificada...");
+
+    // 1. 🤖 CONTEXTO: Capturamos credenciales de Telegram (Sin guardar en LocalStorage)
+    try {
+        initTelegramContext();
+    } catch (e) {
+        console.error("🚨 Falló initTelegramContext:", e);
     }
-    if (typeof renderHistoryPagination === 'function') {
-        renderHistoryPagination();
+    
+    // 2. 💾 ALMACENAMIENTO: Recuperamos saldo, inventario, favoritos e historial real
+    try {
+        loadFromLocalStorage();
+    } catch (e) {
+        console.error("🚨 Falló loadFromLocalStorage:", e);
+    }
+    
+    // 3. ⚙️ VALIDACIONES: Estados internos, check-in diario y gacha
+    try {
+        if (typeof checkVipInternalRegistration === 'function') checkVipInternalRegistration();
+        if (typeof executeDailyCheckIn === 'function') executeDailyCheckIn();
+        if (typeof checkDailyGachaStatus === 'function') checkDailyGachaStatus();
+    } catch (e) {
+        console.warn("⚠️ Fallaron las comprobaciones de estado iniciales:", e);
+    }
+    
+    // 4. 🏛️ ENRUTAMIENTO INICIAL: Forzamos la vista principal para activar el DOM correcto
+    try {
+        // Activamos la vista 'home' (o cambia por 'directory' si es tu pestaña principal)
+        // Esto ejecutará los renders necesarios de forma segura
+        switchView('home'); 
+    } catch (e) {
+        console.error("🚨 Falló el enrutamiento inicial de la vista:", e);
+    }
+
+    // Renders secundarios en segundo plano (Solo si las funciones existen)
+    try {
+        if (typeof renderShopCarrousels === 'function') renderShopCarrousels();
+        if (typeof updateAdminToggleUI === 'function') updateAdminToggleUI();
+        if (typeof renderCategorySliders === 'function') renderCategorySliders();
+        if (typeof renderAppUiComponents === 'function') renderAppUiComponents();
+    } catch (e) {
+        console.warn("⚠️ Falló algún renderizado secundario del DOM:", e);
+    }
+    
+    // 📝 HISTORIAL: Renderizamos tu historial corregido y su paginación
+    try {
+        if (typeof renderHistoryUI === 'function') renderHistoryUI();
+        if (typeof renderHistoryPagination === 'function') renderHistoryPagination();
+    } catch (e) {
+        console.error("🚨 Falló el renderizado del historial en el arranque:", e);
     }
     
     // 5. 🚀 ANIMACIONES Y COMPONENTES DINÁMICOS
-    initOnlineUsersSimulator('cont-usuarios-online'); // Inyecta vida al contador online simulado
-    initDynamicSliders();                            // Llama a tus sliders de banners originales
-    
-    // Transformamos las etiquetas data-lucide en iconos vectoriales SVG reales
-    if (typeof lucide !== 'undefined') {
-        lucide.createIcons();
+    try {
+        if (typeof initOnlineUsersSimulator === 'function') {
+            initOnlineUsersSimulator('cont-usuarios-online');
+        }
+        if (typeof initDynamicSliders === 'function') {
+            initDynamicSliders();
+        }
+    } catch (e) {
+        console.warn("⚠️ Fallaron los simuladores dinámicos:", e);
     }
     
-    addLog("Ecosistema unificado bajo ID único de Telegram y tráfico reactivo listo.");
+    // Convertimos las etiquetas data-lucide en SVG reales
+    if (typeof lucide !== 'undefined') {
+        try {
+            lucide.createIcons();
+        } catch (e) {
+            console.error("🚨 Error al procesar Lucide Icons:", e);
+        }
+    }
+    
+    if (typeof addLog === 'function') {
+        addLog("Ecosistema unificado y tráfico reactivo listo.");
+    }
+
+    // =========================================================================
+    // ❄️ APAGADO DE EMERGENCIA DEL LOADER (Garantizado)
+    // =========================================================================
+    setTimeout(() => {
+        try {
+            if (typeof ocultarPantallaCargaApp === "function") {
+                ocultarPantallaCargaApp();
+                console.log("🔓 Loader retirado mediante función original.");
+            } else {
+                // Si la función original no responde o se rompió, la fulminamos por CSS directo
+                const loader = document.getElementById("loading-screen") || 
+                               document.getElementById("loader") ||
+                               document.querySelector(".loading-screen") ||
+                               document.querySelector(".loader");
+                if (loader) {
+                    loader.style.opacity = "0";
+                    setTimeout(() => loader.style.display = "none", 300);
+                    console.log("🔓 Loader destruido por contingencia CSS.");
+                }
+            }
+        } catch (error) {
+            console.error("🚨 Fue imposible retirar el loader del inicio:", error);
+        }
+    }, 150); // Le damos 150ms al DOM para que respire tras los renders antes de abrir el telón
 });
         
  // 🏁 AQUÍ TERMINA TU ARCHIVO JAVASCRIPT O EL BLOQUE DE TU SCRIPT
