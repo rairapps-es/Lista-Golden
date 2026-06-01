@@ -2021,76 +2021,108 @@
         const CAROUSEL_OWNERS_SEEDS = ["alex", "ruby", "sam", "eva", "boss"];
 
         let state = {
-            user: { 
-                username: "Invitado Anónimo", 
-                idTelegram: 12345678,
-                balance: 100, 
-                role: "user", 
-                range: 1,
-                pointsProgress: 25,
-                seed: "carlos",
-                isVipMember: false, 
-                equipped: { clothing: "", glasses: "" }
-            },
-            favorites: [], 
-            history: [], 
-            systemLogs: [],
-            purchasedItems: [],
-            adminFilterOnly: false
-        };
+    user: { 
+        username: "Invitado Anónimo", 
+        idTelegram: 12345678,
+        balance: 100, 
+        role: "user", 
+        range: 1,
+        pointsProgress: 25,
+        seed: "carlos", // Tu semilla principal
+        isVipMember: false, 
+        equipped: { clothing: "", glasses: "" },
+        
+        // 🌟 NUEVA PROPIEDAD: Guarda el nombre del avatar del carrusel que el usuario pulse
+        activeCarouselAvatar: "carlos" 
+    },
+    favorites: [], 
+    history: [], 
+    systemLogs: [],
+    purchasedItems: [],
+    adminFilterOnly: false
+};
 
-        let showFullHistory = false;
+let showFullHistory = false;
 
-        const CATEGORIES = [
-            { id: "all", name: "🌐 Todos" },
-            { id: "apuestas", name: "🎯 Apuestas" },
-            { id: "marketing", name: "💼 Negocios" },
-            { id: "cripto", name: "🪙 Cripto" },
-            { id: "tecnologia", name: "🧠 IA & Tec" }
-        ];
-        let activeCategoryFilter = "all";
+const CATEGORIES = [
+    { id: "all", name: "🌐 Todos" },
+    { id: "apuestas", name: "🎯 Apuestas" },
+    { id: "marketing", name: "💼 Negocios" },
+    { id: "cripto", name: "🪙 Cripto" },
+    { id: "tecnologia", name: "🧠 IA & Tec" }
+];
+        
+let activeCategoryFilter = "all";
 
-        document.addEventListener("DOMContentLoaded", () => {
-            loadFromLocalStorage();
-            initTelegramContext();
-            checkVipInternalRegistration();
-            executeDailyCheckIn();
-            renderAppUiComponents();
-            renderTopPodium();
-            renderShopCarrousels();
-            updateAdminToggleUI();
-            renderCategorySliders();
-            initDynamicSliders();
-            lucide.createIcons();
-            addLog("Ecosistema unificado bajo ID único de Telegram.");
-        });
+// MOCKS ESTÁTICOS (Sirven como catálogo visual en tus carruseles)
+const CAROUSEL_EXPLORERS_SEEDS = ["leo", "mia", "max", "zoe", "ian"];
+const CAROUSEL_OWNERS_SEEDS = ["alex", "ruby", "sam", "eva", "boss"];
 
-        function saveToLocalStorage() {
-            localStorage.setItem('canales_top_state_v3', JSON.stringify({
-                user: state.user,
-                favorites: state.favorites,
-                history: state.history,
-                systemLogs: state.systemLogs,
-                purchasedItems: state.purchasedItems
-            }));
+document.addEventListener("DOMContentLoaded", () => {
+    loadFromLocalStorage();
+    initTelegramContext();
+    checkVipInternalRegistration();
+    executeDailyCheckIn();
+    renderAppUiComponents();
+    renderTopPodium();
+    renderShopCarrousels();
+    updateAdminToggleUI();
+    renderCategorySliders();
+    initDynamicSliders();
+    
+    // Aseguramos que pinte el avatar correcto guardado al arrancar
+    if (typeof updateAvatarRenderers === 'function') updateAvatarRenderers();
+    
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+    addLog("Ecosistema unificado bajo ID único de Telegram.");
+});
+
+function saveToLocalStorage() {
+    localStorage.setItem('canales_top_state_v3', JSON.stringify({
+        user: state.user,
+        favorites: state.favorites,
+        history: state.history,
+        systemLogs: state.systemLogs,
+        purchasedItems: state.purchasedItems
+    }));
+}
+
+function loadFromLocalStorage() {
+    const saved = localStorage.getItem('canales_top_state_v3');
+    if (saved) {
+        try {
+            const parsed = JSON.parse(saved);
+            state.user = parsed.user || state.user;
+            state.favorites = parsed.favorites || state.favorites;
+            state.history = parsed.history || state.history;
+            state.systemLogs = parsed.systemLogs || state.systemLogs;
+            state.purchasedItems = parsed.purchasedItems || state.purchasedItems;
+        } catch(e) {
+            console.error("Error cargando localStorage", e);
         }
+    }
+}
 
-        function loadFromLocalStorage() {
-            const saved = localStorage.getItem('canales_top_state_v3');
-            if (saved) {
-                try {
-                    const parsed = JSON.parse(saved);
-                    state.user = parsed.user || state.user;
-                    state.favorites = parsed.favorites || state.favorites;
-                    state.history = parsed.history || state.history;
-                    state.systemLogs = parsed.systemLogs || state.systemLogs;
-                    state.purchasedItems = parsed.purchasedItems || state.purchasedItems;
-                } catch(e) {
-                    console.error("Error cargando localStorage", e);
-                }
-            }
-        }
+        function seleccionarAvatarDeCarrusel(seedNombre) {
+    try {
+        // 1. Guardamos el cambio en el estado del usuario
+        state.user.activeCarouselAvatar = seedNombre;
+        
+        // 2. Sincronizamos la semilla del renderizador de Dicebear para cambiar la imagen actual
+        state.user.seed = seedNombre; 
 
+        // 3. Forzamos la actualización visual de avatares en el perfil/menús
+        if (typeof updateAvatarRenderers === 'function') updateAvatarRenderers();
+
+        // 4. 🔥 ¡Llamamos a tu guardado nativo! Ahora registrará el cambio de avatar
+        saveToLocalStorage();
+        
+        console.log(`💾 Guardada selección del carrusel: ${seedNombre}`);
+    } catch (e) {
+        console.error("🚨 Error al procesar selección de avatar de carrusel:", e);
+    }
+}
+        
         // SISTEMA AUTOMÁTICO DE VERIFICACIÓN PREMIUM REQUERIDO
 function checkVipInternalRegistration() {
     // Lista de IDs de Telegram autorizados como VIP
