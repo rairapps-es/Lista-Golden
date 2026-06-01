@@ -2437,6 +2437,77 @@ function registerActionToHistory(title, detail, type = "info") {
     console.log("📝 Acción registrada en el historial unificado:", state.history[0]);
 }
 
+        function renderHistoryUI() {
+    // 🌟 CORRECCIÓN CLAVE: Cambiado de 'history-list-container' a 'history-list'
+    const container = document.getElementById("history-list");
+    if (!container) return; 
+
+    container.innerHTML = "";
+
+    // Decidimos si mostramos todo o recortamos (por si usas el botón de expandir)
+    const limiteHistorial = (typeof showFullHistory !== 'undefined' && showFullHistory) ? state.history : state.history.slice(0, 10);
+
+    if (limiteHistorial.length === 0) {
+        container.innerHTML = `
+            <div style="grid-column: 1 / -1; text-align:center; padding: 40px 20px; color: var(--text-muted); font-size: 0.8rem;">
+                <i data-lucide="folder-open" style="width:32px; height:32px; margin:0 auto 10px; display:block; opacity:0.5;"></i>
+                No hay transacciones ni accesos registrados.
+            </div>
+        `;
+        // Volvemos a procesar iconos por si se pinta el de 'folder-open'
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+        return;
+    }
+
+    // Inyectamos las tarjetas dentro de tu "directory-grid"
+    container.innerHTML = limiteHistorial.map(item => `
+        <div class="history-card item-type-${item.type || 'info'}" style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-dark); padding: 12px; border-radius: 10px; display: flex; flex-direction: column; gap: 8px; position: relative;">
+            
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+                <div style="display: flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 6px; background: rgba(255,255,255,0.04); color: ${item.type === 'gold' ? 'var(--vip-gold)' : 'var(--text-main)'};">
+                    <i data-lucide="${item.icon || 'activity'}" style="width: 14px; height: 14px;"></i>
+                </div>
+                <span style="font-size: 0.65rem; color: var(--text-ghost); font-weight: bold;">
+                    ${item.time || item.date}
+                </span>
+            </div>
+
+            <div style="margin-top: 4px;">
+                <h4 style="margin: 0; font-size: 0.8rem; font-weight: 600; color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                    ${item.title}
+                </h4>
+                <p style="margin: 4px 0 0 0; font-size: 0.7rem; color: var(--text-muted); line-height: 1.3;">
+                    ${item.detail}
+                </p>
+            </div>
+            
+        </div>
+    `).join('');
+
+    // Transformamos las etiquetas data-lucide en iconos vectoriales reales
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
+}
+
+        function renderHistoryPagination() {
+    const pagContainer = document.getElementById("history-pagination-container");
+    if (!pagContainer) return;
+
+    if (state.history.length <= 10) {
+        pagContainer.innerHTML = ""; // Si hay pocos ítems, no hace falta paginar
+        return;
+    }
+
+    // Aquí podrás meter la lógica de páginas más adelante si lo necesitas
+    pagContainer.innerHTML = `
+        <div style="display:flex; justify-content:center; gap:10px; margin-top:15px;">
+            <button class="btn-nav" style="padding:5px 10px; font-size:0.7rem; background:#111; border:1px solid var(--border-dark); color:white; border-radius:4px;">Anterior</button>
+            <button class="btn-nav" style="padding:5px 10px; font-size:0.7rem; background:#111; border:1px solid var(--border-dark); color:white; border-radius:4px;">Siguiente</button>
+        </div>
+    `;
+}
+
         function showToast(text, type = "info") {
             const container = document.getElementById("toast-container");
             const toast = document.createElement("div");
