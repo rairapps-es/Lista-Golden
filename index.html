@@ -2732,21 +2732,43 @@ window.navegarACanalOficial = function(url, nombreCanal) {
         }
 
         function updateBalanceAndRpgUi() {
-    // 1. Inyección de textos básicos
+    // 🛡️ PARACHOQUES DE SEGURIDAD: Si el rango viene como texto ("Bronce"), lo pasamos a número (1)
+    if (typeof state.user.range === 'string' || !state.user.range) {
+        state.user.range = 1; 
+    }
+    if (typeof state.user.pointsProgress === 'undefined') {
+        state.user.pointsProgress = 0;
+    }
+
+    const puntosPorNivel = 50; 
+    
+    // =========================================================================
+    // 🚀 MOTOR DE LEVEL UP: Procesa tus 80 puntos y te sube de nivel automáticamente
+    // =========================================================================
+    let puntosObjetivoSiguienteNivel = state.user.range * puntosPorNivel;
+    
+    while (state.user.pointsProgress >= puntosObjetivoSiguienteNivel && state.user.range < 100) {
+        state.user.pointsProgress -= puntosObjetivoSiguienteNivel; // Consume los puntos del nivel anterior
+        state.user.range += 1;                                     // ¡Sube de nivel!
+        puntosObjetivoSiguienteNivel = state.user.range * puntosPorNivel; // Nueva meta
+        
+        console.log(`🎉 ¡Level Up! Subiste al Rango RPG Nivel ${state.user.range}`);
+        if (typeof saveToLocalStorage === 'function') saveToLocalStorage();
+    }
+
+    // 1. Inyección de textos básicos (Tal y como los tenías)
     document.getElementById("profile-balance").innerText = state.user.balance;
     document.getElementById("drawer-range").innerText = `[ Rango RPG Nivel ${state.user.range} ]`;
-    document.getElementById("cnt-favs").innerText = state.favorites.length;
+    document.getElementById("cnt-favs").innerText = state.favorites ? state.favorites.length : 0;
     document.getElementById("rpg-current-pts").innerText = state.user.pointsProgress;
     
-    // 2. 🟢 NUEVA MATEMÁTICA: Cálculo dinámico de la barra de progreso
-    // Queremos saber cuántos puntos necesita el nivel actual para completarse.
-    // Si usas la Opción A (50 pts por nivel), el objetivo de puntos es: Rango * 50
-    const puntosPorNivel = 50; 
-    const puntosObjetivoSiguienteNivel = state.user.range * puntosPorNivel;
-    
-    // Calculamos el porcentaje real en base a la meta de ese nivel
+    // 2. 🟢 MATEMÁTICA REAL DE LA BARRA: Ahora se calculará en base al nivel corregido
     const percentage = Math.min(100, Math.floor((state.user.pointsProgress / puntosObjetivoSiguienteNivel) * 100));
-    document.getElementById("rpg-bar-fill").style.width = `${percentage}%`;
+    
+    const fillBar = document.getElementById("rpg-bar-fill");
+    if (fillBar) {
+        fillBar.style.width = `${percentage}%`;
+    }
     
     // 3. Captura de elementos del DOM de tu interfaz
     const badge = document.getElementById("rpg-status-badge");
@@ -2754,7 +2776,7 @@ window.navegarACanalOficial = function(url, nombreCanal) {
     const lockIcon = document.getElementById("drawer-locked-icon");
     const drawerBtn = document.getElementById("epic-avatar-link");
 
-    // 4. 🛑 NUEVA CONDICIÓN DE TOPE: Ahora el Olimpo es el Nivel 100
+    // 4. 🛑 CONDICIÓN DE TOPE DE TU INTERFAZ
     if (state.user.range >= 100) {
         if (badge) {
             badge.innerText = "Nivel Máximo (Rango 100) 👑";
@@ -2771,13 +2793,12 @@ window.navegarACanalOficial = function(url, nombreCanal) {
             badge.style.color = "var(--telegram-blue)";
         }
         
-        // Opcional: Si quieres que el Taller IA se desbloquee antes (ej: al nivel 10), cambia el 100 de abajo:
+        // Desbloqueos intermedios (Nivel 10)
         if (state.user.range >= 10) {
             if (lockText) lockText.innerText = "✨ Taller de Avatar IA (Desbloqueado)";
             if (drawerBtn) drawerBtn.classList.remove("locked");
             if (lockIcon) lockIcon.style.display = "none";
         } else {
-            // Si está por debajo del nivel de desbloqueo, se mantiene cerrado
             if (lockText) lockText.innerText = `🔒 Bloqueado hasta Nivel 10`;
         }
     }
