@@ -1412,8 +1412,8 @@
         <div class="congrats-card">
             <div style="font-size: 3.5rem; margin-bottom: 10px; animation: pulseGlow 1.5s infinite alternate;">👑</div>
             <h2 style="color: var(--vip-gold); font-weight: 900; margin-bottom: 12px; font-size: 1.6rem;">¡ENHORABUENA!</h2>
-            <p style="color: #fff; font-size: 1rem; margin-bottom: 20px; line-height: 1.5;">Tu suscripción GPlus ha sido activada.<br><strong style="color: var(--telegram-blue);">¡Ya eres miembro Premium!</strong></p>
-            <button class="btn-subscribe-trigger" style="background: var(--vip-gold-gradient); color: #000;" onclick="closeCongratsPremiumModal()">Comenzar Experiencia VIP</button>
+            <p style="color: #fff; font-size: 1rem; margin-bottom: 20px; line-height: 1.5;">Disfrutas la suscripción GPlus<br><strong style="color: var(--telegram-blue);">¡Ya eres miembro Premium!</strong></p>
+            <button class="btn-subscribe-trigger" style="background: var(--vip-gold-gradient); color: #000;" onclick="closeCongratsPremiumModal()">Comenzar Experiencia</button>
         </div>
     </div>
 
@@ -4038,7 +4038,7 @@ function renderDynamicGPlusBanner() {
                 <div style="position:relative; z-index:2;">
                     <span style="background:#a855f7; color:#fff; font-size:0.65rem; font-weight:900; padding:3px 8px; border-radius:20px; text-transform:uppercase; letter-spacing:1px;">Suscripción GPlus</span>
                     <h3 style="font-size:1.3rem; font-weight:800; margin: 8px 0 4px 0; color:#fff;">⚡ El Plan Todo en Uno para Propietarios</h3>
-                    <p style="font-size:0.8rem; color:#cbd5e1; margin-bottom:14px;">Multiplica por x10 el alcance de tus canales, sin límites y con privilegios exclusivos de la Golden List.</p>
+                    <p style="font-size:0.8rem; color:#cbd5e1; margin-bottom:14px;">Multiplica por x10 el alcance de tu canal, sin límites y con privilegios exclusivos de la Golden List.</p>
                     <button onclick="openGPlusPanel()" style="background:#fff; color:#000; font-weight:800; border:none; padding:10px 16px; border-radius:8px; font-size:0.8rem; cursor:pointer; display:flex; align-items:center; gap:6px;">
                         <i data-lucide="sparkles" style="width:14px; height:14px;"></i> Ver Beneficios GPlus
                     </button>
@@ -4297,18 +4297,37 @@ window.manejarClicTarjeta = function(urlDestino, tituloTarjeta) {
     }
 };
 
-        function renderTopPodium(canales) {
+        
+Nose porque pero el diseño del top 10 se rompió
+
+
+
+<section class="top-podium-section" style="margin: 0; padding: 0 10px;">
+
+    <h3 style="color: #fff; font-size: 1.1rem; font-weight: 800; font-family: sans-serif; margin: 18px 0px 6px 0px; display: flex; align-items: center; gap: 8px;">
+
+        🔥 Ranking Top 10 Global
+
+    </h3>
+
+    <div id="top-podium-container" class="top10-ranking-container">
+
+        </div>
+
+</section>
+
+
+
+function renderTopPodium(canales) {
     const container = document.getElementById('top-podium-container');
     if (!container) return;
-
     // 1. Priorizamos los canales pasados por parámetro, si no, usamos el dataset global
     const listaCanales = canales || (typeof INITIAL_CHANNELS_DATASET !== 'undefined' ? INITIAL_CHANNELS_DATASET : []);
-    
+
     if (!listaCanales || listaCanales.length === 0) {
         container.innerHTML = `<p style="color:#64748b; text-align:center; font-size:0.8rem; padding:20px;">Cargando posiciones del ranking...</p>`;
         return;
     }
-
     // 2. SÚPER MEJORA: Ordenamos la lista por suscriptores (subs) de mayor a menor antes del corte
     const canalesOrdenados = [...listaCanales].sort((a, b) => (b.subs || 0) - (a.subs || 0));
 
@@ -4317,8 +4336,8 @@ window.manejarClicTarjeta = function(urlDestino, tituloTarjeta) {
 
     container.innerHTML = top10.map((canal, index) => {
         const posicion = index + 1;
-        
         // Asignación de clases CSS para el podio (1º, 2º y 3º puesto)
+
         let rankClass = "";
         if (posicion === 1) rankClass = "rank-1";
         else if (posicion === 2) rankClass = "rank-2";
@@ -4330,25 +4349,25 @@ window.manejarClicTarjeta = function(urlDestino, tituloTarjeta) {
         // 🌟 EXTRACCIÓN Y LIMPIEZA DE IDENTIFICADORES REALES:
         const idUsuarioTelegram = canal.telegramUserId || 0;
         const aliasOriginal = canal.user || '@ListaGolden';
-        
+    
         // Extraemos el alias puro sin la @ ni enlaces previos para armar la URL nativa infalible
         let limpioUsername = aliasOriginal.replace('@', '').replace('https://t.me/', '').trim();
         const urlTelegramNativa = `https://t.me/${limpioUsername}`;
 
         // Evaluamos si el logo es un emoji o una URL para pintarlo de forma segura
+
         const esImagenUrl = (typeof canal.logo === 'string' && (canal.logo.startsWith('http') || canal.logo.includes('/')));
         const estiloAvatar = esImagenUrl 
             ? `background-image: url('${canal.logo}'); background-size: cover; background-position: center;`
             : `display: flex; align-items: center; justify-content: center; font-size: 1.4rem; background: rgba(255,255,255,0.03);`;
-
         return `
             <div class="top10-row ${rankClass}" onclick="window.navegarACanalOficial('${idUsuarioTelegram}', '${urlTelegramNativa}', '${canal.name}')">
                 <div class="top10-badge">${posicion}</div>
-                
+              
                 <div class="top10-avatar" style="${estiloAvatar}">
                     ${esImagenUrl ? '' : (canal.logo || '👑')}
                 </div>
-                
+               
                 <div class="top10-meta">
                     <h4 class="top10-title">${canal.name || 'Canal Destacado'}</h4>
                     <p class="top10-user">${aliasOriginal}</p>
