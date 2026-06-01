@@ -2645,10 +2645,10 @@ function renderTopPodium() {
         return;
     }
 
-    // 2. SÚPER MEJORA: Ordenamos los canales por número de suscriptores (subs) de mayor a menor
+    // 2. Ordenamos los canales por número de suscriptores (subs) de mayor a menor
     const canalesOrdenados = [...listaCanales].sort((a, b) => b.subs - a.subs);
 
-    // 3. Tomamos los primeros 10 (en tu dataset hay 7, se adaptará dinámicamente)
+    // 3. Tomamos los primeros 10
     const top10 = canalesOrdenados.slice(0, 10);
 
     container.innerHTML = top10.map((canal, index) => {
@@ -2660,14 +2660,16 @@ function renderTopPodium() {
         else if (posicion === 2) rankClass = "rank-2";
         else if (posicion === 3) rankClass = "rank-3";
 
-        // Formateamos los suscriptores para que luzcan pro (ej: 112,000 -> 112K)
+        // Formateamos los suscriptores (ej: 112,000 -> 112K)
         const totalSubs = canal.subs >= 1000 ? (canal.subs / 1000).toFixed(0) + 'K' : canal.subs;
 
-        // Construimos una URL de búsqueda simulada o pasamos su alias directo para Telegram
-        const urlTelegram = `https://t.me/${canal.user.replace('@', '')}`;
+        // 🌟 LIMPIEZA ABSOLUTA DEL USERNAME:
+        // Quitamos la arroba, posibles espacios y si ya traía un "https://t.me/", nos quedamos solo con el alias puro.
+        let limpioUsername = canal.user.replace('@', '').replace('https://t.me/', '').trim();
+        const urlTelegram = `https://t.me/${limpioUsername}`;
 
         return `
-            <div class="top10-row ${rankClass}" onclick="window.manejarClicTarjeta('${urlTelegram}', '${canal.name}')">
+            <div class="top10-row ${rankClass}" onclick="window.navegarACanalOficial('${urlTelegram}', '${canal.name}')">
                 <div class="top10-badge">${posicion}</div>
                 
                 <div class="top10-avatar" style="display: flex; align-items: center; justify-content: center; font-size: 1.6rem; background: rgba(255,255,255,0.03);">
@@ -2687,6 +2689,25 @@ function renderTopPodium() {
     }).join('');
 }
 
+// 🌟 LA FUNCIÓN INTERCEPTORA OFICIAL DE TELEGRAM
+// Agrégala en tu script para asegurar que abra el chat/canal nativamente sin salir de la app de forma rota
+window.navegarACanalOficial = function(url, nombreCanal) {
+    console.log(`🔗 Intentando abrir canal: ${nombreCanal} -> ${url}`);
+    
+    // Si tenemos tracking o sistema de logs/historial, guardamos la acción primero
+    if (typeof registerActionToHistory === 'function') {
+        registerActionToHistory("Acceso a Canal", `Visitó el canal de ${nombreCanal}`, "info");
+    }
+
+    // 🤖 MÉTODO MAESTRO: Si estamos dentro de la MiniApp de Telegram, usamos su API nativa
+    if (window.Telegram && window.Telegram.WebApp && typeof window.Telegram.WebApp.openTelegramLink === 'function') {
+        window.Telegram.WebApp.openTelegramLink(url);
+    } else {
+        // Respaldo por si pruebas desde un navegador normal de PC fuera de Telegram
+        window.open(url, '_blank');
+    }
+};
+        
         function renderAppUiComponents() {
             document.getElementById("drawer-username").innerText = state.user.username;
             
