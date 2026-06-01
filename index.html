@@ -2268,58 +2268,84 @@ function checkVipInternalRegistration() {
 }
 
         function initTelegramContext() {
-    // Aseguramos que el esqueleto base exista antes de inyectar datos de Telegram
-    if (typeof state === 'undefined') window.state = {};
-    if (!state.user) state.user = {};
+    try {
+        // Aseguramos que el esqueleto base exista antes de inyectar datos de Telegram
+        if (typeof state === 'undefined') window.state = {};
+        if (!state.user) state.user = {};
 
-    if (window.Telegram && window.Telegram.WebApp) {
-        const webApp = window.Telegram.WebApp;
-        webApp.ready();
-        webApp.expand();
-        if(webApp.colorScheme === 'light') document.documentElement.setAttribute('data-theme', 'light');
-        
-        if (webApp.initDataUnsafe?.user) {
-            const tgUser = webApp.initDataUnsafe.user;
-            state.user.username = tgUser.username ? `@${tgUser.username}` : `${tgUser.first_name}`;
-            state.user.idTelegram = tgUser.id;
-            state.user.seed = tgUser.username || "player";
+        if (window.Telegram && window.Telegram.WebApp) {
+            const webApp = window.Telegram.WebApp;
+            webApp.ready();
+            webApp.expand();
+            if(webApp.colorScheme === 'light') document.documentElement.setAttribute('data-theme', 'light');
+            
+            if (webApp.initDataUnsafe?.user) {
+                const tgUser = webApp.initDataUnsafe.user;
+                state.user.username = tgUser.username ? `@${tgUser.username}` : `${tgUser.first_name}`;
+                state.user.idTelegram = tgUser.id;
+                state.user.seed = tgUser.username || "player";
+            }
         }
-    }
 
-    // 🌟 CORRECCIÓN CRÍTICA:
-    // Actualizamos los renders visuales del avatar del usuario actual
-    updateAvatarRenderers();
-    
-    // ❌ ELIMINADO: saveToLocalStorage(); 
-    // ¡NUNCA guardes en disco en el arranque antes de haber leído los datos viejos!
+        // Actualizamos los renders visuales del avatar del usuario actual
+        if (typeof updateAvatarRenderers === "function") {
+            updateAvatarRenderers();
+        }
+    } catch (e) {
+        console.error("🚨 Error grave en inicialización básica de Telegram:", e);
+    }
 
     // =========================================================================
-    // INYECTORES ASÍNCRONOS: Se disparan cuando ya tenemos el ID de Telegram
+    // 🛡️ ZONA BLINDADA: Si algo falla aquí, no detendrá el apagado del loader
     // =========================================================================
     
-    // 1. Dibuja el banner bloqueado (verde) o desbloqueado (morado) según tu ID
-    if (typeof renderDynamicGPlusBanner === "function") {
-        renderDynamicGPlusBanner();
+    // 1. Banner dinámico GPlus
+    try {
+        if (typeof renderDynamicGPlusBanner === "function") {
+            renderDynamicGPlusBanner();
+        }
+    } catch (e) { 
+        console.warn("⚠️ No se pudo renderizar el banner GPlus en el arranque:", e); 
     }
 
-    // 2. Comprueba si eres dueño de un canal VIP activo para lanzar el confeti por primera vez
-    if (typeof checkFirstSessionFeaturedCeleb === "function") {
-        checkFirstSessionFeaturedCeleb();
+    // 2. Validación de canal VIP (Confeti)
+    try {
+        if (typeof checkFirstSessionFeaturedCeleb === "function") {
+            checkFirstSessionFeaturedCeleb();
+        }
+    } catch (e) { 
+        console.warn("⚠️ No se pudo validar la sesión VIP destacada en el arranque:", e); 
     }
 
-    // 🔥 3. SISTEMA DE NOTIFICACIONES: Procesa los datos de tu ID e inyecta el render visual
-    if (typeof asegurarNotifState === "function") {
-        asegurarNotifState(); 
-    }
-    if (typeof actualizarBuzonVisual === "function") {
-        actualizarBuzonVisual(); 
+    // 3. Sistema de Notificaciones y Buzón (Los sospechosos del crash)
+    try {
+        if (typeof asegurarNotifState === "function") {
+            asegurarNotifState(); 
+        }
+        if (typeof actualizarBuzonVisual === "function") {
+            actualizarBuzonVisual(); 
+        }
+    } catch (e) { 
+        console.warn("⚠️ El sistema de buzón/notificaciones falló (posible falta de LocalStorage aún):", e); 
     }
 
-    // ❄ 4. PANTALLA DE CARGA: Apaga el telón oscuro suavemente ahora que todo está pintado
-    if (typeof ocultarPantallaCargaApp === "function") {
-        ocultarPantallaCargaApp();
+    // =========================================================================
+    // ❄️ FIN DE LA PANTALLA DE CARGA (Garantizado)
+    // =========================================================================
+    try {
+        if (typeof ocultarPantallaCargaApp === "function") {
+            ocultarPantallaCargaApp();
+            console.log("🔓 Pantalla de carga retirada con éxito.");
+        } else {
+            // Plan de contingencia por si la función no responde, la ocultamos por CSS directo
+            const loader = document.getElementById("loading-screen") || document.getElementById("loader");
+            if (loader) loader.style.display = "none";
+        }
+    } catch (e) {
+        console.error("🚨 Error crítico: No se pudo ocultar el loader de la app:", e);
     }
 }
+        
       function updateAvatarRenderers() {
             let queryParams = `?seed=${state.user.seed}&radius=50&backgroundColor=1e293b`;
             
