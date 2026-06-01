@@ -3365,50 +3365,39 @@ function handleReSendChannel(id) {
         lucide.createIcons();
     }
 }
-        function renderHistoryList() {
-            const container = document.getElementById("history-list");
-            const paginationContainer = document.getElementById("history-pagination-container");
-            if (!container) return;
-            
-            if (state.history.length === 0) {
-                container.innerHTML = `<div class="empty-state-notice">Aún no hay transacciones registradas.</div>`;
-                if(paginationContainer) paginationContainer.innerHTML = "";
-                return;
-            }
-            
-            const totalToConsider = state.history.slice(0, 20);
-            const displayedItems = showFullHistory ? totalToConsider : totalToConsider.slice(0, 10);
-            
-            container.innerHTML = displayedItems.map(item => `
-                <div class="history-item-card">
-                    <div class="history-left-pane">
-                        <div class="history-icon-badge">
-                            <i data-lucide="${item.icon}" style="width:16px; height:16px; color: ${item.type === 'gold' ? 'var(--vip-gold)' : 'var(--telegram-blue)'}"></i>
-                        </div>
-                        <div>
-                            <h4 style="font-size:0.88rem; font-weight:700;">${item.title}</h4>
-                            <p style="font-size:0.75rem; color:var(--text-muted);">${item.detail}</p>
-                        </div>
-                    </div>
-                    <div class="history-timestamp">${item.time}</div>
-                </div>
-            `).join('');
+        function registerActionToHistory(title, detail, type = "info") {
+    const icons = { info: "info", success: "check-circle", gold: "star", error: "alert-triangle" };
+    const actionIcon = icons[type] || "activity";
+    
+    const now = new Date();
+    const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const dateString = now.toLocaleDateString([], { day: '2-digit', month: '2-digit' });
 
-            if (totalToConsider.length > 10) {
-                if (!showFullHistory) {
-                    paginationContainer.innerHTML = `<button class="btn-history-loadmore" onclick="expandHistoryView()">👇 Mostrar registros del 11 al ${totalToConsider.length}</button>`;
-                } else {
-                    paginationContainer.innerHTML = `<button class="btn-history-loadmore" onclick="collapseHistoryView()">👆 Ocultar y mostrar solo los primeros 10</button>`;
-                }
-            } else {
-                paginationContainer.innerHTML = "";
-            }
-            lucide.createIcons();
-        }
+    // Guardamos con compatibilidad absoluta de propiedades
+    state.history.unshift({ 
+        title: title, 
+        detail: detail, 
+        text: `${title}: ${detail}`, 
+        time: timeString, 
+        date: dateString, 
+        icon: actionIcon, 
+        type: type 
+    });
+    
+    const counterEl = document.getElementById("cnt-purchases");
+    if (counterEl) {
+        counterEl.innerText = state.history.filter(h => h.type === 'gold').length;
+    }
+    
+    saveToLocalStorage();
 
-        function expandHistoryView() { showFullHistory = true; renderHistoryList(); }
-        function collapseHistoryView() { showFullHistory = false; renderHistoryList(); }
-
+    // 🌟 CORRECCIÓN CRÍTICA: Ahora llama al nombre exacto de tu función
+    if (typeof renderHistoryList === 'function') {
+        renderHistoryList();
+    }
+    
+    console.log("📝 Acción guardada y vista actualizada.");
+}
         function toggleAccordionEffect(id, prefix = '') {
     // Busca id="accordion-123" o id="accordion-fav-123"
     const accordion = document.getElementById(`accordion-${prefix}${id}`);
@@ -3431,6 +3420,17 @@ function handleReSendChannel(id) {
         accordion.classList.add('open-accordion');
     }
 }
+        
+        window.expandHistoryView = function() { 
+    showFullHistory = true; 
+    renderHistoryList(); 
+};
+
+window.collapseHistoryView = function() { 
+    showFullHistory = false; 
+    renderHistoryList(); 
+};
+        
 function toggleFavoriteChannel(id, event) {
     if (event) event.stopPropagation(); // 1. Evita que se abra el acordeón al pulsar la estrella
     
@@ -4494,18 +4494,31 @@ function renderTopPodium(canales) {
 // 🏁 EL ORQUESTRADOR UNIFICADO DE ARRANQUE (Limpiado y Sincronizado)
 // =========================================================================
 document.addEventListener("DOMContentLoaded", () => {
-    loadFromLocalStorage();
+    // 1. 🌟 PRIMERO: Capturamos las credenciales reales de Telegram (ID, username, etc.)
     initTelegramContext();
+    
+    // 2. 🌟 SEGUNDO: Recuperamos el inventario, saldo e historial del LocalStorage.
+    // Como el esqueleto del usuario ya existe gracias a Telegram, esta función 
+    // fusiona los datos encima de forma segura.
+    loadFromLocalStorage();
+    
+    // 3. Verificaciones de estado e ingresos internos
     checkVipInternalRegistration();
     executeDailyCheckIn();
     
     // 🏛️ Esta función ahora arrastrará el Top 10 asegurando que los datos existan
     renderAppUiComponents(); 
     
+    // 4. Renders de la tienda y sliders
     renderShopCarrousels();
     updateAdminToggleUI();
     renderCategorySliders();
     checkDailyGachaStatus();
+    
+    // 📝 AÑADIDO: Forzamos el renderizado de tu historial con su nombre correcto
+    if (typeof renderHistoryList === 'function') {
+        renderHistoryList();
+    }
     
     // 🔥 EL MOTOR SIMULADOR: Inyecta vida al contador en cuanto abre la WebApp
     initOnlineUsersSimulator('cont-usuarios-online'); 
@@ -4514,6 +4527,7 @@ document.addEventListener("DOMContentLoaded", () => {
     lucide.createIcons();
     addLog("Ecosistema unificado bajo ID único de Telegram y tráfico simulado activo.");
 });
+        
  // 🏁 AQUÍ TERMINA TU ARCHIVO JAVASCRIPT O EL BLOQUE DE TU SCRIPT
         </script>
 <div id="share-modal-overlay" class="share-overlay" style="display: none !important; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(10, 15, 26, 0.85); backdrop-filter: blur(6px); align-items: center; justify-content: center; z-index: 10000; padding: 16px;" onclick="closeShareModal()">
