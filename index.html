@@ -1425,7 +1425,7 @@
         <!-- ICONO CAMPANITA EN EL MENÚ SUPERIOR -->
 <div style="position: relative; cursor: pointer; display: inline-block; margin-right: 12px;" onclick="document.getElementById('notifications-sliding-panel').style.display = 'flex'; if(typeof actualizarBuzonVisual === 'function') actualizarBuzonVisual();">
     <!-- Icono SVG de una campanita elegante -->
-    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#e5e7eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"></path>
         <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"></path>
     </svg>
@@ -1494,7 +1494,7 @@
         </div>
 
         <div class="premium-balance-box">
-            <div class="balance-title">Saldo Acumulado</div>
+            <div class="balance-title">Saldo</div>
             <div class="balance-amount"><span id="profile-balance">0</span> <span style="color: var(--vip-gold)">✨ Pts</span></div>
         </div>
 
@@ -1784,7 +1784,7 @@
     <div class="ads-modal-content" style="max-width:440px; text-align:center; border-color:#fbbf24;">
         <span style="font-size:3rem; display:block; animation: shake-anim 0.5s infinite;">🎉</span>
         <h2 style="font-size:1.4rem; font-weight:900; color:#fbbf24; margin:10px 0 4px 0;">¡ENHORABUENA!</h2>
-        <p style="font-size:0.8rem; color:#cbd5e1; margin-bottom:16px;">Tu canal ha verificado el Destacado Activo correctamente.</p>
+        <p style="font-size:0.8rem; color:#cbd5e1; margin-bottom:16px;">Tu canal ha sido destacado Destacado correctamente.</p>
         
         <div id="congrats-card-target"></div>
 
@@ -1800,7 +1800,7 @@
     </main>
 
     <main id="view-shop" class="app-view">
-        <h2 class="view-title"><i data-lucide="shopping-bag" style="color:var(--mystic-purple)"></i> Forja de Avatar RPG & Personalización</h2>
+        <h2 class="view-title"><i data-lucide="shopping-bag" style="color:var(--mystic-purple)"></i> Forja tu Avatar</h2>
         <div class="shop-layout">
             
             <div class="avatar-canvas-area" id="canvas-area-wrapper">
@@ -1811,11 +1811,11 @@
                 <div class="equipped-badges-container" id="equipped-items-list"></div>
 
                 <div class="carousel-wrapper">
-                    <div class="carousel-title">🏃 Carrusel Personajes Exploradores</div>
+                    <div class="carousel-title">🏃 Personajes Exploradores</div>
                     <div class="carousel-track" id="track-explorers"></div>
                 </div>
                 <div class="carousel-wrapper">
-                    <div class="carousel-title">👑 Carrusel Admin Owners</div>
+                    <div class="carousel-title">👑 Admin Owners</div>
                     <div class="carousel-track" id="track-owners"></div>
                 </div>
             </div>
@@ -1856,11 +1856,10 @@
                 <tr><th>Acción del Usuario</th><th>Monto</th><th>Regla / Frecuencia</th></tr>
             </thead>
             <tbody>
-                <tr><td>Check-In por Sesión</td><td style="color:var(--success-green);">+15 Pts</td><td>Diario automático</td></tr>
+                <tr><td>Check-In Diario</td><td style="color:var(--success-green);">+15 Pts</td><td>Diario automático</td></tr>
                 <tr><td>Cofre Diario Sorpresa</td><td style="color:var(--success-green);">+5 a +50 Pts</td><td>Cada 24 horas</td></tr>
-                <tr><td>Añadir Canal a Favoritos</td><td style="color:var(--success-green);">+5 Pts</td><td>Por canal único</td></tr>
                 <tr><td>Visitar Canales del Directorio</td><td style="color:var(--success-green);">+2 Pts</td><td>Sin límite diario</td></tr>
-                <tr><td>Ruleta Aleatoria Premium</td><td style="color:#e74c3c;">-5 Pts</td><td>Por intento</td></tr>
+                <tr><td>Ruleta Aleatoria</td><td style="color:#e74c3c;">-5 Pts</td><td>Por intento</td></tr>
             </tbody>
         </table>
     </main>
