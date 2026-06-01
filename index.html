@@ -4346,16 +4346,22 @@ window.manejarClicTarjeta = function(urlDestino, tituloTarjeta) {
 
 // 🤖 FUNCIÓN INTERCEPTORA NATAL DE TELEGRAM (Evita pantallas 404)
 window.navegarACanalOficial = function(telegramUserId, urlFallback, nombreCanal) {
-    console.log(`📡 Abriendo canal: ${nombreCanal} | Owner ID: ${telegramUserId}`);
+    // console.log(`📡 Conectando con Canal: ${nombreCanal} | Owner ID: ${telegramUserId}`);
     
+    // 🌟 CORRECCIÓN CRÍTICA: Cambiamos 'telegramUserId' por 'urlFallback' en el detalle del registro
     if (typeof registerActionToHistory === 'function') {
-        registerActionToHistory("Acceso a Canal", `Visitó el canal de ${nombreCanal} (ID: ${telegramUserId})`, "info");
+        registerActionToHistory(
+            "Acceso a Canal", 
+            `Visitó el canal ${nombreCanal} (${urlFallback})`, 
+            "info"
+        );
     }
 
-    // Forzamos la apertura nativa dentro de la interfaz de Telegram
+    // 🤖 Ejecución nativa para abrir el canal dentro de Telegram sin romper la pantalla (Evita 404)
     if (window.Telegram && window.Telegram.WebApp && typeof window.Telegram.WebApp.openTelegramLink === 'function') {
         window.Telegram.WebApp.openTelegramLink(urlFallback);
     } else {
+        // Respaldo por si se abre desde un navegador web común fuera de Telegram
         window.open(urlFallback, '_blank');
     }
 };
