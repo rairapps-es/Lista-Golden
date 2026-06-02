@@ -5486,49 +5486,72 @@ function openCrmModal(id) { document.getElementById(id).classList.add("active");
 function closeCrmModal(id) { document.getElementById(id).classList.remove("active"); }
 
 function saveNewContactAction() {
-    const name = document.getElementById("form-cnt-name").value.trim();
-    const tg = document.getElementById("form-cnt-tg").value.trim().replace("@", "");
-    const category = document.getElementById("form-cnt-category").value;
-    const val = document.getElementById("form-cnt-value").value || 0;
-    const notes = document.getElementById("form-cnt-notes").value.trim() || "Sin anotaciones.";
+    try {
+        console.log("🎯 Iniciando guardado y refresco de contacto...");
+        
+        const nameEl = document.getElementById("form-cnt-name");
+        const tgEl = document.getElementById("form-cnt-tg");
+        const catEl = document.getElementById("form-cnt-category");
+        const valEl = document.getElementById("form-cnt-value");
+        const notesEl = document.getElementById("form-cnt-notes");
 
-    if (!name || !tg) {
-        alert("Completa los campos obligatorios para registrar al partner.");
-        return;
-    }
+        if (!nameEl || !tgEl) {
+            alert("❌ Error: No se encuentran los inputs obligatorios en el HTML.");
+            return;
+        }
 
-    const newContact = {
-        id: "cnt_" + Date.now(),
-        name: name,
-        tgUsername: tg,
-        category: category,
-        dealValue: parseInt(val) || 0,
-        notes: notes,
-        date: new Date().toISOString().split('T')[0]
-    };
+        const name = nameEl.value.trim();
+        const tg = tgEl.value.trim().replace("@", "");
+        const category = catEl ? catEl.value : "clientes";
+        const val = valEl ? valEl.value : 0;
+        const notes = notesEl ? notesEl.value.trim() : "Sin anotaciones.";
 
-    // 1. Garantizar estructura interna e inyectar en RAM
-    if (!state.crmContacts) state.crmContacts = [];
-    state.crmContacts.push(newContact);
-    
-    // 2. 🔥 EL CAMBIO DE ORO: Guardar directamente bajo la clave global indexada
-    localStorage.setItem('myMiniApp_CrmContacts_v1', JSON.stringify(state.crmContacts));
-    localStorage.setItem('myMiniApp_IncubatorIdeas_v1', JSON.stringify(state.incubatorIdeas || [])); 
-    
-    // 3. Cerramos el modal del formulario y actualizamos el panel
-    closeCrmModal('modal-add-contact');
-    renderCrmDashboard();
-    
-    // 4. Limpieza total y segura del formulario
-    document.getElementById("form-cnt-name").value = "";
-    document.getElementById("form-cnt-tg").value = "";
-    document.getElementById("form-cnt-category").value = "clientes"; // 🛡️ Corregido: 'clientes' sí existe en tu HTML
-    document.getElementById("form-cnt-value").value = "";
-    document.getElementById("form-cnt-notes").value = "";
+        if (!name || !tg) {
+            alert("⚠️ Completa los campos obligatorios para registrar al partner.");
+            return;
+        }
 
-    // Feedback táctil premium para Telegram
-    if (window.Telegram?.WebApp) {
-        window.Telegram.WebApp.HapticFeedback.notificationOccurred("success");
+        const newContact = {
+            id: "cnt_" + Date.now(),
+            name: name,
+            tgUsername: tg,
+            category: category,
+            dealValue: parseInt(val) || 0, // 🛡️ Evita NaN a toda costa devolviendo 0 si está vacío
+            notes: notes ? notes : "Sin anotaciones.",
+            date: new Date().toISOString().split('T')[0]
+        };
+
+        // 1. Garantizar estructura e inyectar en la memoria RAM
+        if (!state.crmContacts) state.crmContacts = [];
+        state.crmContacts.push(newContact);
+        
+        // 2. 🔥 PERSISTENCIA DIRECTA SIMULTÁNEA: Aseguramos escribir ambos arrays limpios
+        localStorage.setItem('myMiniApp_CrmContacts_v1', JSON.stringify(state.crmContacts));
+        localStorage.setItem('myMiniApp_IncubatorIdeas_v1', JSON.stringify(state.incubatorIdeas || [])); 
+        
+        // 3. Cerramos el modal de la interfaz
+        closeCrmModal('modal-add-contact');
+        
+        // 4. 🔥 REFRESCO EN CALIENTE: Obligamos al dashboard a redibujarse con el nuevo contacto
+        renderCrmDashboard();
+        
+        // 5. Limpieza total y segura de los campos del formulario
+        nameEl.value = "";
+        tgEl.value = "";
+        if (catEl) catEl.value = "clientes"; 
+        if (valEl) valEl.value = "";
+        if (notesEl) notesEl.value = "";
+
+        // Feedback háptico de Telegram
+        if (window.Telegram?.WebApp) {
+            window.Telegram.WebApp.HapticFeedback.notificationOccurred("success");
+        }
+
+        console.log("✅ Contacto renderizado y guardado en tiempo real.");
+
+    } catch (error) {
+        console.error("🚨 Error crítico en saveNewContactAction:", error);
+        alert("Hubo un problema al procesar el contacto visualmente: " + error.message);
     }
 }
 
