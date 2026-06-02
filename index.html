@@ -3492,7 +3492,7 @@ function toggleFavoriteChannel(id, event) {
 
     // Si manejas sistema RPG o de historial (como en los fragmentos anteriores), puedes dejar esto:
     if (typeof rewardPoints === "function") rewardPoints(2, `Visitaste el canal: ${channel.name}`);
-    if (typeof registerActionToHistory === "function") registerActionToHistory("ACCIÓN", `Visitaste el canal ${channel.name}`, "info");
+    if (typeof registerActionToHistory === "function") registerActionToHistory("ACCIÓN", `Ganaste 2 pts por Visitar el canal ${channel.name}`, "info");
 }
 
         function spinRoulette() {
