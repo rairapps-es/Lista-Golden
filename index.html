@@ -153,7 +153,7 @@
         }
         
         .balance-title { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted); margin-bottom: 5px; }
-        .balance-amount { font-size: 1.8rem; font-weight: 900; color: #111111; display: flex; justify-content: center; align-items: center; gap: 8px; }
+        .balance-amount { font-size: 1.8rem; font-weight: 900; color: #333333; display: flex; justify-content: center; align-items: center; gap: 8px; }
 
         .role-switch-container { display: flex; justify-content: space-between; align-items: center; background: #fafafa; padding: 12px 16px; border-radius: 14px; margin-bottom: 15px; border: 1px solid var(--border-color); }
         .switch-label { font-size: 0.9rem; font-weight: 600; }
@@ -351,13 +351,29 @@
             border-radius: 24px; padding: 24px; text-align: center; position: relative; 
             overflow: hidden; box-shadow: var(--shadow-neon);
         }
-        .ia-avatar-frame { 
-            width: 130px; height: 130px; margin: 0 auto 12px auto; 
-            border-radius: 50%; border: 4px solid var(--vip-gold); 
-            box-shadow: var(--shadow-gold); background: #1e293b; 
-            overflow: hidden; display: flex; align-items: center; justify-content: center;
-            position: relative; transition: var(--transition-smooth);
-        }
+        /* 🌟 El contenedor que envuelve la foto de perfil grande */
+.ia-avatar-frame {
+    position: relative;
+    border-radius: 50%;
+    overflow: hidden; /* Corta cualquier parte de la imagen que se salga del círculo */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 12px auto; /* Centra el marco horizontalmente y añade espacio abajo */
+    
+    /* Efecto premium: un borde azul Telegram y un sombreado sutil de fondo */
+    border: 3px solid var(--telegram-blue, #24a1de);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+/* 👤 La imagen interna del perfil (Sincronizada por JS) */
+#drawer-avatar-render {
+    width: 100%;       /* Ocupa el 100% de los 120px del contenedor */
+    height: 100%;      /* Ocupa el 100% de los 120px del contenedor */
+    object-fit: cover; /* Evita que la foto se estire o se deforme si no es perfectamente cuadrada */
+    display: block;
+}
+
         .ia-avatar-frame img { width: 100%; height: 100%; object-fit: cover; }
 
         .equipped-badges-container {
@@ -1471,6 +1487,36 @@
     object-fit: cover;
     border: 2px solid var(--telegram-blue, #24a1de);
     background-color: #1e293b; /* Fondo neutro mientras carga la imagen real */
+}
+
+        /* 📑 AVATAR DE LA BARRA SUPERIOR (HEADER) - Pequeño y discreto */
+#header-avatar {
+    width: 36px;           /* 📏 Tamaño compacto para la barra superior */
+    height: 36px;
+    border-radius: 50%;    /* Lo mantiene perfectamente circular */
+    object-fit: cover;
+    border: 1.5px solid var(--glass-border); /* Un borde sutil */
+    transition: transform 0.2s ease;
+}
+
+#header-avatar:active {
+    transform: scale(0.92); /* Efecto de pulsación sutil al hacer clic */
+}
+
+
+/* 👤 AVATAR DE LA SECCIÓN DE PERFIL / DRAWER - Grande y Protagonista */
+#drawer-avatar-render, #shop-ia-avatar-preview {
+    width: 110px;          /* 🚀 Tamaño grande e imponente para ver los detalles */
+    height: 110px;
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
+    margin: 0 auto 12px auto; /* Lo centra horizontalmente y le da espacio abajo */
+    
+    /* Opcional: Un sombreado premium para que resalte en la sección */
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3), 
+                0 0 0 3px rgba(255, 255, 255, 0.05); 
+    border: 2px solid var(--telegram-blue, #24a1de);
 }
 
     </style>
