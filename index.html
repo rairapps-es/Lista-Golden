@@ -1411,6 +1411,32 @@
     padding: 4px 8px;
     border-radius: 8px;
 }
+
+        /* Asegura que el contenedor del avatar en el header se comporte como un botón interactivo */
+.avatar-container {
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+/* Efecto sutil de pulsación cuando el usuario lo toque en Telegram */
+.avatar-container:active {
+    transform: scale(0.92);
+    opacity: 0.8;
+}
+
+/* Estilo base para la imagen del avatar para que no rompa el diseño circular */
+.avatar-img {
+    width: 40px;  /* Ajusta el tamaño que desees para tu header */
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--telegram-blue, #24a1de);
+    background-color: #1e293b; /* Fondo neutro mientras carga la imagen real */
+}
+
     </style>
 </head>
 <body>
