@@ -106,6 +106,29 @@
             border-radius: 0 0 32px 32px; transition: top 0.6s cubic-bezier(0.19, 1, 0.22, 1);
             overflow-y: auto; box-shadow: 0 20px 50px rgba(0,0,0,0.3);
         }
+
+        /* Adaptación del perfil para que actúe como página completa individual */
+#view-profile.app-view {
+    display: none; /* Empieza oculto por defecto */
+    width: 100%;
+    min-height: 100vh;
+    background: var(--bg-principal, #0f172a); /* El fondo oscuro de tu app */
+    padding: 16px;
+    box-sizing: border-box;
+    position: relative;
+    top: 0;
+    left: 0;
+    transform: none; /* Eliminamos el desplazamiento lateral del viejo drawer */
+    box-shadow: none;
+    overflow-y: auto; /* Permite scroll hacia abajo si añades misiones/FAQs */
+}
+
+/* 🌟 IMPORTANTE: Cuando tu script le ponga la clase activa, se mostrará en pantalla */
+#view-profile.active-view,
+#view-profile.open {
+    display: block !important;
+}
+
         .profile-drawer.open { top: 0; }
         .drawer-identity { display: flex; flex-direction: column; align-items: center; text-align: center; margin-bottom: 15px; }
         .drawer-username-tag { font-size: 1.2rem; font-weight: 800; color: var(--text-main); display: flex; align-items: center; gap: 6px; flex-direction: column; }
@@ -876,7 +899,7 @@
         .history-timeline {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 5px;
         }
 
         .history-item {
@@ -1276,7 +1299,7 @@
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 20px;
     padding: 6px;
-    margin: 15px 0;
+    margin: 11px 0;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
 }
 
@@ -1413,7 +1436,7 @@
             <div style="font-size: 3.5rem; margin-bottom: 10px; animation: pulseGlow 1.5s infinite alternate;">👑</div>
             <h2 style="color: var(--vip-gold); font-weight: 900; margin-bottom: 12px; font-size: 1.6rem;">¡ENHORABUENA!</h2>
             <p style="color: #fff; font-size: 1rem; margin-bottom: 20px; line-height: 1.5;">Disfrutas la suscripción GPlus<br><strong style="color: var(--telegram-blue);">¡Ya eres miembro Premium!</strong></p>
-            <button class="btn-subscribe-trigger" style="background: var(--vip-gold-gradient); color: #000;" onclick="closeCongratsPremiumModal()">Comenzar Experiencia</button>
+            <button class="btn-subscribe-trigger" style="background: var(--vip-gold-gradient); color: #000;" onclick="closeCongratsPremiumModal()">Continuar Experiencia</button>
         </div>
     </div>
 
@@ -1437,7 +1460,7 @@
         </div>
     </header>
 
-    <div id="profile-drawer" class="profile-drawer">
+    <div id="view-profile" class="profile-drawer app-view">
         <div class="drawer-identity">
             <div class="ia-avatar-frame" style="width: 80px; height: 80px; margin-bottom: 8px;">
                 <img id="drawer-avatar-render" src="" alt="Avatar Realtime">
@@ -2568,8 +2591,32 @@ function checkDailyGachaStatus() {
         }
 
         function toggleProfileDrawer() {
-            document.getElementById("profile-drawer").classList.toggle("open");
-        }
+    // 1. Usamos tu propia lógica existente para cambiar a la vista del perfil
+    if (typeof switchView === 'function') {
+        switchView('profile'); // Esto activará el contenedor #view-profile automáticamente
+    }
+
+    // 2. Sincronizamos el avatar y el username real por seguridad
+    if (typeof sincronizarFotoRealTelegram === 'function') {
+        sincronizarFotoRealTelegram();
+    }
+
+    // 3. 🔙 Activamos el botón "Atrás" nativo de Telegram para una experiencia premium
+    if (window.Telegram && window.Telegram.WebApp) {
+        const backButton = window.Telegram.WebApp.BackButton;
+        
+        backButton.show(); // Aparece la flecha de volver en la interfaz de Telegram
+        backButton.offClick(); // Limpiamos preventivamente hilos sueltos
+        
+        backButton.onClick(() => {
+            // Al pulsar atrás, regresamos a la Home usando tu propio sistema de pestañas
+            if (typeof switchView === 'function') {
+                switchView('home'); // 🏠 Regresa a la pestaña de inicio de tu app
+            }
+            backButton.hide(); // Escondemos el botón atrás
+        });
+    }
+}
 
         function handlePremiumDrawerAccess() {
             if(state.user.range < 5) {
