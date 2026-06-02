@@ -5364,7 +5364,6 @@ function checkCrmSeedDataset() {
 // =========================================================================
 
 function renderCrmDashboard() {
-    // 1. Forzar inicialización segura de los filtros si no existen
     if (!state.uiFilters) {
         state.uiFilters = { crmCategory: "all", ideaStatus: "all", searchQuery: "" };
     }
@@ -5376,22 +5375,18 @@ function renderCrmDashboard() {
     const catFilter = state.uiFilters.crmCategory || "all";
     const ideaFilter = state.uiFilters.ideaStatus || "all";
 
-    // Asegurar que los arrays existan
     if (!state.crmContacts) state.crmContacts = [];
     if (!state.incubatorIdeas) state.incubatorIdeas = [];
 
-    // --- RENDERIZADO: SECCIÓN CARTERA DE CONTACTOS ---
+    // --- RE-RENDER CARTERA DE CONTACTOS ---
     if (gridContacts) {
         let filteredContacts = state.crmContacts.filter(c => {
             if (!c) return false;
-            // 🛡️ Salvaguarda: Evitamos .toLowerCase() en campos que puedan ser undefined o null
             const name = (c.name || "").toLowerCase();
             const tg = (c.tgUsername || "").toLowerCase();
             const notes = (c.notes || "").toLowerCase();
-
-            const matchesSearch = name.includes(query) || tg.includes(query) || notes.includes(query);
-            const matchesCat = (catFilter === "all") || (c.category === catFilter);
-            return matchesSearch && matchesCat;
+            return (name.includes(query) || tg.includes(query) || notes.includes(query)) && 
+                   (catFilter === "all" || c.category === catFilter);
         });
 
         gridContacts.innerHTML = filteredContacts.map(c => `
@@ -5401,41 +5396,33 @@ function renderCrmDashboard() {
                 <span style="color:var(--text-muted, #94a3b8); font-size:0.75rem;">@${c.tgUsername || ''}</span>
                 <p style="color:#94a3b8; font-size:0.75rem; margin:6px 0; background:rgba(0,0,0,0.15); padding:6px; border-radius:6px;">${c.notes || 'Sin anotaciones'}</p>
                 <div style="font-weight:800; font-size:0.85rem; color:#22c55e;">Inversión: ${c.dealValue || 0}€</div>
-                
                 <div class="contact-row-actions">
-                    <button class="btn-tg-chat" onclick="openTelegramPrivateChat('${c.tgUsername || ''}')">
-                        💬 Abrir Chat
-                    </button>
-                    <button class="btn-pitch" title="Mensaje Rápido" onclick="launchQuickPitch('${c.id}')">⚡</button>
+                    <button class="btn-tg-chat" onclick="openTelegramPrivateChat('${c.tgUsername || ''}')">💬 Chat</button>
+                    <button class="btn-pitch" onclick="launchQuickPitch('${c.id}')">⚡</button>
                 </div>
             </div>
         `).join('');
     }
 
-    // --- RENDERIZADO: SECCIÓN INCUBADORA DE IDEAS ---
+    // --- RE-RENDER INCUBADORA DE IDEAS ---
     if (gridIdeas) {
         let filteredIdeas = state.incubatorIdeas.filter(i => {
             if (!i) return false;
-            // 🛡️ Salvaguarda contra textos vacíos
             const title = (i.title || "").toLowerCase();
             const desc = (i.description || "").toLowerCase();
-
             const matchesSearch = title.includes(query) || desc.includes(query);
             
             let matchesStatus = true;
             if (ideaFilter === "en-proceso") matchesStatus = (i.status === "en-proceso");
             if (ideaFilter === "critica") matchesStatus = (i.priority === "critica" && i.status !== "hecho");
-            
             return matchesSearch && matchesStatus;
         });
 
-        // Ordenar de forma segura protegiendo contra elementos sin 'score'
-        filteredIdeas.sort((a, b) => (b.score || 0) - (a.score || 0));
+        // 🔥 CORRECCIÓN CRÍTICA: Ordenamos sobre una COPIA [...filteredIdeas] para no congelar el render
+        let sortedIdeas = [...filteredIdeas].sort((a, b) => (b.score || 0) - (a.score || 0));
 
-        gridIdeas.innerHTML = filteredIdeas.map(i => {
-            // 🛡️ Control de seguridad para el formateo de números
+        gridIdeas.innerHTML = sortedIdeas.map(i => {
             const finalScore = typeof i.score === 'number' ? i.score.toFixed(1) : "0.0";
-            
             return `
                 <div class="idea-card prio-${i.priority || 'baja'} ${i.status === 'hecho' ? 'status-done' : ''}">
                     <div style="display:flex; justify-content:space-between; align-items:start;">
@@ -5458,7 +5445,6 @@ function renderCrmDashboard() {
         }).join('');
     }
 
-    // Ejecutar métricas Bento (Con un condicional por seguridad)
     if (typeof calculateLiveDashboardMetrics === 'function') {
         calculateLiveDashboardMetrics();
     }
@@ -5590,18 +5576,36 @@ function saveNewIdeaAction() {
 }
 
 function changeIdeaStatusAction(id, targetStatus) {
-    const idea = state.incubatorIdeas.find(i => i.id === id);
-    if (idea) {
+    try {
+        console.log(`🔄 Cambiando estado de la idea ${id} a -> ${targetStatus}`);
+        
+        // 1. Buscamos la idea en la memoria RAM
+        const idea = state.incubatorIdeas.find(i => i.id === id);
+        if (!idea) {
+            console.warn("⚠️ No se encontró la idea con ID:", id);
+            return;
+        }
+
+        // 2. Modificamos el estado
         idea.status = targetStatus;
-        saveCrmDataToLocalStorage();
+        
+        // 3. Guardamos físicamente en las claves que lee tu app al arrancar
+        localStorage.setItem('myMiniApp_IncubatorIdeas_v1', JSON.stringify(state.incubatorIdeas));
+        localStorage.setItem('myMiniApp_CrmContacts_v1', JSON.stringify(state.crmContacts || []));
+        
+        // 4. 🔥 LA SOLUCIÓN EN TIEMPO REAL: Forzamos el redibujado de las tarjetas
         renderCrmDashboard();
         
-        // Si el usuario está en Telegram y marca la idea como "hecho", el móvil vibra en señal de éxito
-        if (targetStatus === 'hecho' && window.Telegram?.WebApp) {
+        // Efecto haptico premium si estás dentro de Telegram
+        if (window.Telegram?.WebApp) {
             window.Telegram.WebApp.HapticFeedback.notificationOccurred("success");
         }
+
+    } catch (error) {
+        console.error("🚨 Error en changeIdeaStatusAction:", error);
     }
 }
+
 
 // =========================================================================
 // 5. CONECTORES NATIVOS TELEGRAM (INTEGRACIÓN CHAT + QUICK-PITCH)
