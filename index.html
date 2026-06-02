@@ -5670,17 +5670,22 @@ function launchQuickPitch(contactId) {
 // ARRANQUE SANO, EXPOSICIÓN GLOBAL Y PERSISTENCIA INTEGRADA
 // =========================================================================
 document.addEventListener("DOMContentLoaded", () => {
-    console.log("📥 [CRM] Leyendo almacenamiento local...");
+    console.log("📥 [CRM] Inicializando almacenamiento y base de datos local...");
     
+    // 🛡️ CORRECCIÓN CRÍTICA: Si 'state' no existe en el entorno global, lo creamos de inmediato
+    if (typeof state === 'undefined') {
+        window.state = {};
+    }
+
     // 1. Intentamos rescatar las strings del almacenamiento del dispositivo
     const savedContacts = localStorage.getItem('myMiniApp_CrmContacts_v1');
     const savedIdeas = localStorage.getItem('myMiniApp_IncubatorIdeas_v1');
 
-    // 2. Si existen, los parseamos a objetos reales; si no, inicializamos el array vacío
+    // 2. Sincronización estricta y segura dentro del objeto state
     state.crmContacts = savedContacts ? JSON.parse(savedContacts) : [];
     state.incubatorIdeas = savedIdeas ? JSON.parse(savedIdeas) : [];
 
-    // 3. Verificación de datos semilla (Solo se inyectan si el usuario no tiene NADA guardado)
+    // 3. Verificación de datos semilla de manera independiente
     if (typeof checkCrmSeedDataset === 'function') {
         checkCrmSeedDataset();
     }
