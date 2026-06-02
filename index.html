@@ -99,7 +99,7 @@
     display: flex; 
     align-items: center;       /* ↕️ Centrado vertical perfecto */
     margin-left: auto;         /* ➡️ Empuja el icono por completo a la derecha */
-    padding-right: 15px;       /* 📏 El espacio libre que dejas a la derecha del todo */
+    padding-right: 10px;       /* 📏 El espacio libre que dejas a la derecha del todo */
 }
 
         .header-center-icon:hover { color: var(--vip-gold); transform: scale(1.1) rotate(15deg); }
@@ -153,7 +153,7 @@
         }
         
         .balance-title { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted); margin-bottom: 5px; }
-        .balance-amount { font-size: 1.8rem; font-weight: 900; color: #fff; display: flex; justify-content: center; align-items: center; gap: 8px; }
+        .balance-amount { font-size: 1.8rem; font-weight: 900; color: #111111; display: flex; justify-content: center; align-items: center; gap: 8px; }
 
         .role-switch-container { display: flex; justify-content: space-between; align-items: center; background: #fafafa; padding: 12px 16px; border-radius: 14px; margin-bottom: 15px; border: 1px solid var(--border-color); }
         .switch-label { font-size: 0.9rem; font-weight: 600; }
@@ -163,13 +163,13 @@
         .toggle-btn.active::after { left: 29px; }
 
         .status-counters { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 15px; }
-        .counter-card { background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: 14px; padding: 12px 6px; text-align: center; display: flex; flex-direction: column; justify-content: center; cursor: pointer; transition: var(--transition-smooth); }
+        .counter-card { background: #fafafa; border: 1px solid var(--border-color); border-radius: 14px; padding: 12px 6px; text-align: center; display: flex; flex-direction: column; justify-content: center; cursor: pointer; transition: var(--transition-smooth); }
         .counter-card:hover { background: rgba(255,255,255,0.05); border-color: var(--telegram-blue); transform: translateY(-2px); }
         .counter-card span:first-child { font-size: 1.2rem; font-weight: 800; color: var(--text-main); }
         .counter-card span:last-child { font-size: 0.7rem; color: var(--text-muted); margin-top: 4px; font-weight: 600; }
 
         .drawer-links { display: flex; flex-direction: column; gap: 8px; }
-        .drawer-btn { width: 100%; background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); color: var(--text-main); padding: 14px 18px; border-radius: 14px; font-size: 0.95rem; font-weight: 600; display: flex; align-items: center; justify-content: space-between; cursor: pointer; transition: var(--transition-smooth); }
+        .drawer-btn { width: 100%; background: #fafafa; border: 1px solid var(--border-color); color: var(--text-main); padding: 14px 18px; border-radius: 14px; font-size: 0.95rem; font-weight: 600; display: flex; align-items: center; justify-content: space-between; cursor: pointer; transition: var(--transition-smooth); }
         .drawer-btn:hover { background: rgba(255,255,255,0.06); border-color: var(--text-muted); transform: translateX(4px); }
         .drawer-btn.locked { opacity: 0.5; background: rgba(0,0,0,0.4); border-color: transparent; cursor: not-allowed; }
 
@@ -281,9 +281,9 @@
         }
         .channel-card.vip-border { 
     border: 1.5px solid var(--vip-gold); 
-    background: linear-gradient(180deg, rgba(245, 158, 11, 0.1) 0%, transparent 100%);
+    background: #fafafa;
     /* Esto hace que la tarjeta destaque sobre el fondo sin ensuciarlo */
-    box-shadow: 0 4px 15px rgba(245, 158, 11, 0.1); 
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.1); 
 }
 
         .card-main-row { display: flex; align-items: center; justify-content: space-between; cursor: pointer; }
@@ -327,17 +327,17 @@
     display: flex; 
     align-items: center; 
     justify-content: space-between; 
-    gap: 12px; 
+    gap: 10px; 
     
     margin-bottom: 2px; /* 📏 Espacio mínimo de seguridad entre tarjetas */
 }
 
 .history-left-pane { display: flex; align-items: center; gap: 12px; }
-        .history-icon-badge { width: 46px; height: 46px; border-radius: 10px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.03); }
+        .history-icon-badge { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.03); }
         .history-timestamp { font-size: 0.75rem; color: var(--text-muted); font-family: monospace; }
         .empty-state-notice { text-align: center; padding: 40px 20px; color: var(--text-muted); font-size: 0.95rem; }
         
-        .btn-history-loadmore { background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); color: var(--text-main); font-weight: 700; width: 100%; padding: 12px; border-radius: 12px; cursor: pointer; margin-top: 5px; transition: var(--transition-smooth); }
+        .btn-history-loadmore { background: #fafafa; border: 1px solid var(--border-color); color: var(--text-main); font-weight: 700; width: 100%; padding: 12px; border-radius: 12px; cursor: pointer; margin-top: 5px; transition: var(--transition-smooth); }
         .btn-history-loadmore:hover { background: rgba(255,255,255,0.1); }
 
         /* ==========================================================================
@@ -563,8 +563,8 @@
 
 /* SPINNER CSS NATIVO */
 .loading-spinner {
-    width: 27px;
-    height: 27px;
+    width: 47px;
+    height: 47px;
     border: 2px solid #ffffff;
     border-bottom-color: transparent;
     border-radius: 50%;
@@ -1249,28 +1249,6 @@
 }
 .custom-snap-slider::-webkit-scrollbar {
     display: none; /* Oculta scroll en Chrome/Safari */
-}
-
-/* Tarjeta Base del Slider 1 (Ocupa todo el ancho) */
-.slider-card {
-    /* 🔥 CAMBIO CLAVE: Obligamos a la tarjeta a ocupar el 100% del ancho del dispositivo */
-    flex: 0 0 100%; 
-    height: 180px;
-    border-radius: 16px;
-    position: relative;
-    overflow: hidden;
-    scroll-snap-align: start; /* Alinea perfectamente al inicio izquierdo */
-    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-    background-size: cover;
-    background-position: center;
-    font-family: sans-serif;
-    box-sizing: border-box;
-}
-
-/* Tarjeta Base del Slider 2 (Ocupa todo el ancho pero más bajita) */
-.custom-snap-slider.panoramic .slider-card {
-    flex: 0 0 100%; /* 🔥 Ocupa también el 100% de ancho */
-    height: 120px;
 }
 /* Tarjeta Base del Slider 1 (Grandes y Envolventes) */
 .slider-card {
