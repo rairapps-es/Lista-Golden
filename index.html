@@ -319,9 +319,21 @@
         .logs-terminal { background: #04060a; border: 1px solid #141b26; border-radius: 12px; padding: 14px; max-height: 250px; overflow-y: auto; font-family: monospace; font-size: 0.75rem; color: #4ade80; text-align: left; }
         .log-line { padding: 5px 0; border-bottom: 1px solid rgba(74,222,128,0.05); }
 
-        .history-item-card { background: var(--bg-tarjeta); border: 1px solid var(--border-color); padding: 14px 18px; border-radius: 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
-        .history-left-pane { display: flex; align-items: center; gap: 12px; }
-        .history-icon-badge { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.03); }
+        .history-item-card { 
+    background: var(--bg-tarjeta); 
+    border: 1px solid var(--border-color); 
+    padding: 12px 18px; 
+    border-radius: 14px; 
+    display: flex; 
+    align-items: center; 
+    justify-content: space-between; 
+    gap: 12px; 
+    
+    margin-bottom: 2px; /* 📏 Espacio mínimo de seguridad entre tarjetas */
+}
+
+.history-left-pane { display: flex; align-items: center; gap: 12px; }
+        .history-icon-badge { width: 46px; height: 46px; border-radius: 10px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.03); }
         .history-timestamp { font-size: 0.75rem; color: var(--text-muted); font-family: monospace; }
         .empty-state-notice { text-align: center; padding: 40px 20px; color: var(--text-muted); font-size: 0.95rem; }
         
@@ -551,8 +563,8 @@
 
 /* SPINNER CSS NATIVO */
 .loading-spinner {
-    width: 17px;
-    height: 17px;
+    width: 27px;
+    height: 27px;
     border: 2px solid #ffffff;
     border-bottom-color: transparent;
     border-radius: 50%;
@@ -1903,13 +1915,13 @@
 <!-- 🌟 Cambiado a etiqueta <section> con clase app-view y display oculto de inicio -->
 <main id="profile-drawer" class="app-view" style="display: none; width: 100%; position: relative; transform: none; box-shadow: none;">
     <div class="drawer-identity">
-        <div class="ia-avatar-frame" style="width: 80px; height: 80px; margin-bottom: 8px;">
+        <div class="ia-avatar-frame" style="width: 120px; height: 120px; margin-bottom: 8px;">
             <img id="drawer-avatar-render" src="" alt="Avatar Realtime">
         </div>
         <div class="drawer-username-tag">
             <span id="drawer-username">@Anónimo</span>
             <div id="user-premium-tag" class="user-badge-status badge-free" onclick="toggleBenefitsSection()">
-                <i data-lucide="award" style="width:14px; height:14px;"></i> <span id="tag-label-text">GRATIS</span>
+                <i data-lucide="award" style="width:15px; height:15px;"></i> <span id="tag-label-text">GRATIS</span>
             </div>
             
             <div id="hidden-benefits-box" class="premium-modal-overlay" style="display: none;">
