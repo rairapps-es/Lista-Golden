@@ -2310,20 +2310,7 @@
             </button>
         </div>
     </div>
-<button onclick="switchView('shop')">🛍️ Visitar Tienda</button>
 
-<button onclick="switchView('home')">🏠 Volver al Inicio</button>
-
-<button onclick="switchView('directory')">📂 Ver Directorio</button>
-    
-<button class="btn-subscribe-trigger" 
-        style="background: var(--vip-gold); color: black; width: auto; margin: 0 auto; padding: 8px 16px; font-weight: bold; border: none; border-radius: 8px; cursor: pointer;" 
-        onclick="if(typeof switchView === 'function') { switchView('view-profile-page'); } else { openProfileAsPage(); }">
-   👤 Ver mi Perfil
-</button>
-
-    <button onclick="switchView('crm-dashboard')">📊 Panel & CRM</button>
-    
     <main id="view-crm-dashboard" class="app-view">
     <div class="crm-header-dashboard">
         <h2 class="view-title"><i data-lucide="layout-dashboard" style="color:var(--mystic-purple)"></i> Panel de Control & CRM</h2>
@@ -2458,7 +2445,21 @@
         </div>
     </div>
 </main>
+<button onclick="switchView('shop')">🛍️ Visitar Tienda</button>
 
+<button onclick="switchView('home')">🏠 Volver al Inicio</button>
+
+<button onclick="switchView('directory')">📂 Ver Directorio</button>
+    
+<button class="btn-subscribe-trigger" 
+        style="background: var(--vip-gold); color: black; width: auto; margin: 0 auto; padding: 8px 16px; font-weight: bold; border: none; border-radius: 8px; cursor: pointer;" 
+        onclick="if(typeof switchView === 'function') { switchView('view-profile-page'); } else { openProfileAsPage(); }">
+   👤 Ver mi Perfil
+</button>
+
+    <button onclick="switchView('crm-dashboard')">📊 Panel & CRM</button>
+    
+    
     
 <a href="#" onclick="switchView('favorites'); return false;">⭐ Mis Favoritos</a>
     <nav class="tab-bar">
