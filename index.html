@@ -91,7 +91,7 @@
             100% { filter: drop-shadow(0 0 8px rgba(168,85,247,0.6)); }
         }
 
-        .header-center-icon { cursor: pointer; color: var(--text-muted); transition: var(--transition-smooth); display: flex; align-items: right; }
+        .header-center-icon { cursor: pointer; color: var(--text-muted); transition: var(--transition-smooth); display: flex; align-items: rigth; }
         .header-center-icon:hover { color: var(--vip-gold); transform: scale(1.1) rotate(15deg); }
 
         .avatar-container { width: 40px; height: 40px; position: relative; cursor: pointer; transition: var(--transition-smooth); }
@@ -185,7 +185,7 @@
     display: flex;                 /* Cambiamos de grid a flex */
     justify-content: center;       /* Los empuja a todos hacia el centro */
     align-items: center;
-    gap: 12px;                     /* El espacio real exacto que quieres que haya entre botón y botón (ajústalo a tu gusto) */
+    gap: 7px;                     /* El espacio real exacto que quieres que haya entre botón y botón (ajústalo a tu gusto) */
 }
         .tab-item { 
     display: flex; 
@@ -201,7 +201,7 @@
     position: relative; 
 
     /* 🌟 Añade esto para que cada botón tenga su propio espacio equilibrado */
-    width: 65px;                  /* Le da un ancho fijo a cada botón para que respiren uniformemente */
+    width: 55px;                  /* Le da un ancho fijo a cada botón para que respiren uniformemente */
     height: 100%;
 }
         .tab-item.active-tab { color: var(--telegram-blue); }
@@ -220,7 +220,7 @@
         .toast-leave { animation: toastFadeOut 0.3s ease forwards; }
         @keyframes toastFadeOut { to { opacity: 0; transform: scale(0.8) translateY(-20px); } }
 
-        .top-podium-section { margin-bottom: 30px; }
+        .top-podium-section { margin-bottom: 32px; }
         .podium-grid { display: flex; flex-direction: column; gap: 14px; position: relative; }
         .podium-card { background: linear-gradient(145deg, #161f30 0%, var(--bg-tarjeta) 100%); border: 1px solid var(--border-color); border-radius: 20px; padding: 18px; position: relative; transition: var(--transition-smooth); overflow: hidden; display: flex; flex-direction: column; gap: 12px; box-shadow: 0 10px 20px rgba(0,0,0,0.15); }
         .podium-card.rank-1 { border: 1.5px solid var(--vip-gold); box-shadow: var(--shadow-gold); background: linear-gradient(145deg, #241a08 0%, var(--bg-tarjeta) 100%); }
@@ -270,9 +270,11 @@
             position: relative; 
         }
         .channel-card.vip-border { 
-            border: 1.5px solid var(--vip-gold); 
-            background: linear-gradient(180deg, var(--bg-tarjeta) 0%, rgba(245,158,11,0.05) 100%); 
-        }
+    border: 1.5px solid var(--vip-gold); 
+    background: linear-gradient(180deg, rgba(245, 158, 11, 0.1) 0%, transparent 100%);
+    /* Esto hace que la tarjeta destaque sobre el fondo sin ensuciarlo */
+    box-shadow: 0 4px 15px rgba(245, 158, 11, 0.1); 
+}
 
         .card-main-row { display: flex; align-items: center; justify-content: space-between; cursor: pointer; }
         .card-identity-box { display: flex; align-items: center; gap: 14px; }
@@ -1501,7 +1503,11 @@
     </div>
 
     <header class="app-header">
-        <div class="header-logo">CANALES TOP 🚀</div>
+        <div class="header-logo">
+        <div class="balance-amount">
+            <span id="header-balance">0</span> <span style="color: var(--vip-gold)">✨ Pts</span>
+        </div>
+        </div>
         <div class="header-center-icon" onclick="switchView('shop')">
             <i data-lucide="shopping-bag"></i>
         </div>
