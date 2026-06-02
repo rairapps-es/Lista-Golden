@@ -91,7 +91,7 @@
             100% { filter: drop-shadow(0 0 8px rgba(168,85,247,0.6)); }
         }
 
-        .header-center-icon { cursor: pointer; color: var(--text-muted); transition: var(--transition-smooth); display: flex; align-items: center; }
+        .header-center-icon { cursor: pointer; color: var(--text-muted); transition: var(--transition-smooth); display: flex; align-items: right; }
         .header-center-icon:hover { color: var(--vip-gold); transform: scale(1.1) rotate(15deg); }
 
         .avatar-container { width: 40px; height: 40px; position: relative; cursor: pointer; transition: var(--transition-smooth); }
@@ -110,7 +110,7 @@
         .drawer-identity { display: flex; flex-direction: column; align-items: center; text-align: center; margin-bottom: 15px; }
         .drawer-username-tag { font-size: 1.2rem; font-weight: 800; color: var(--text-main); display: flex; align-items: center; gap: 6px; flex-direction: column; }
 
-        .rpg-progress-container { width: 100%; margin: 5px 0 15px 0; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); padding: 12px; border-radius: 16px; }
+        .rpg-progress-container { width: 100%; margin: 5px 0 15px 0; background: #fafafa; border: 1px solid var(--border-color); padding: 12px; border-radius: 16px; }
         .rpg-labels { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 6px; }
 
         .premium-balance-box {
@@ -122,7 +122,7 @@
         .balance-title { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted); margin-bottom: 5px; }
         .balance-amount { font-size: 1.8rem; font-weight: 900; color: #fff; display: flex; justify-content: center; align-items: center; gap: 8px; }
 
-        .role-switch-container { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.2); padding: 12px 16px; border-radius: 14px; margin-bottom: 15px; border: 1px solid var(--border-color); }
+        .role-switch-container { display: flex; justify-content: space-between; align-items: center; background: #fafafa; padding: 12px 16px; border-radius: 14px; margin-bottom: 15px; border: 1px solid var(--border-color); }
         .switch-label { font-size: 0.9rem; font-weight: 600; }
         .toggle-btn { position: relative; width: 54px; height: 28px; background-color: var(--border-color); border-radius: 50px; cursor: pointer; transition: var(--transition-smooth); }
         .toggle-btn::after { content: ''; position: absolute; width: 22px; height: 22px; border-radius: 50%; background-color: #fff; top: 3px; left: 3px; transition: var(--transition-smooth); box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
@@ -1590,7 +1590,7 @@
 </div>
 
         <section class="top-podium-section" style="margin: 0; padding: 0 10px;">
-    <h3 style="color: #fff; font-size: 1.1rem; font-weight: 800; font-family: sans-serif; margin: 18px 0px 6px 0px; display: flex; align-items: center; gap: 8px;">
+    <h3 style="color: #111111; font-size: 1.1rem; font-weight: 800; font-family: sans-serif; margin: 18px 0px 6px 0px; display: flex; align-items: center; gap: 8px;">
         🔥 Ranking Top 10 Global
     </h3>
     <div id="top-podium-container" class="top10-ranking-container">
@@ -1800,7 +1800,7 @@
     </section>
 
 <!-- 🌟 Cambiado a etiqueta <section> con clase app-view y display oculto de inicio -->
-<main id="profile-drawer" class="profile-drawer app-view" style="display: none; width: 100%; position: relative; transform: none; box-shadow: none;">
+<main id="profile-drawer" class="app-view" style="display: none; width: 100%; position: relative; transform: none; box-shadow: none;">
     <div class="drawer-identity">
         <div class="ia-avatar-frame" style="width: 80px; height: 80px; margin-bottom: 8px;">
             <img id="drawer-avatar-render" src="" alt="Avatar Realtime">
