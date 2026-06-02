@@ -2415,7 +2415,8 @@
             </div>
             <div class="modal-actions">
                 <button class="btn-modal-cancel" onclick="closeCrmModal('modal-add-contact')">Cancelar</button>
-                <button class="btn-modal-save" onclick="saveNewContactAction()">Añadir a Cartera</button>
+                <button type="button" id="btn-submit-new-contact" class="btn-modal-save">Añadir a Cartera</button>
+
             </div>
         </div>
     </div>
@@ -5362,31 +5363,46 @@ function checkCrmSeedDataset() {
 // =========================================================================
 
 function renderCrmDashboard() {
+    // 1. Forzar inicialización segura de los filtros si no existen
+    if (!state.uiFilters) {
+        state.uiFilters = { crmCategory: "all", ideaStatus: "all", searchQuery: "" };
+    }
+
     const gridContacts = document.getElementById("grid-crm-contacts");
     const gridIdeas = document.getElementById("grid-crm-ideas");
     
-    const query = state.uiFilters.searchQuery.toLowerCase().trim();
-    const catFilter = state.uiFilters.crmCategory;
-    const ideaFilter = state.uiFilters.ideaStatus;
+    const query = (state.uiFilters.searchQuery || "").toLowerCase().trim();
+    const catFilter = state.uiFilters.crmCategory || "all";
+    const ideaFilter = state.uiFilters.ideaStatus || "all";
+
+    // Asegurar que los arrays existan
+    if (!state.crmContacts) state.crmContacts = [];
+    if (!state.incubatorIdeas) state.incubatorIdeas = [];
 
     // --- RENDERIZADO: SECCIÓN CARTERA DE CONTACTOS ---
     if (gridContacts) {
         let filteredContacts = state.crmContacts.filter(c => {
-            const matchesSearch = c.name.toLowerCase().includes(query) || c.tgUsername.toLowerCase().includes(query) || c.notes.toLowerCase().includes(query);
+            if (!c) return false;
+            // 🛡️ Salvaguarda: Evitamos .toLowerCase() en campos que puedan ser undefined o null
+            const name = (c.name || "").toLowerCase();
+            const tg = (c.tgUsername || "").toLowerCase();
+            const notes = (c.notes || "").toLowerCase();
+
+            const matchesSearch = name.includes(query) || tg.includes(query) || notes.includes(query);
             const matchesCat = (catFilter === "all") || (c.category === catFilter);
             return matchesSearch && matchesCat;
         });
 
         gridContacts.innerHTML = filteredContacts.map(c => `
             <div class="contact-card">
-                <span class="contact-badge badge-${c.category}">${c.category}</span>
-                <h4 style="color:#fff; margin:0; font-size:0.95rem; font-weight:700;">${c.name}</h4>
-                <span style="color:var(--text-muted); font-size:0.75rem;">@${c.tgUsername}</span>
-                <p style="color:#94a3b8; font-size:0.75rem; margin:6px 0; background:rgba(0,0,0,0.15); padding:6px; border-radius:6px;">${c.notes}</p>
-                <div style="font-weight:800; font-size:0.85rem; color:#22c55e;">Inversión: ${c.dealValue}€</div>
+                <span class="contact-badge badge-${c.category || 'clientes'}">${c.category || 'clientes'}</span>
+                <h4 style="color:#fff; margin:0; font-size:0.95rem; font-weight:700;">${c.name || 'Sin Nombre'}</h4>
+                <span style="color:var(--text-muted, #94a3b8); font-size:0.75rem;">@${c.tgUsername || ''}</span>
+                <p style="color:#94a3b8; font-size:0.75rem; margin:6px 0; background:rgba(0,0,0,0.15); padding:6px; border-radius:6px;">${c.notes || 'Sin anotaciones'}</p>
+                <div style="font-weight:800; font-size:0.85rem; color:#22c55e;">Inversión: ${c.dealValue || 0}€</div>
                 
                 <div class="contact-row-actions">
-                    <button class="btn-tg-chat" onclick="openTelegramPrivateChat('${c.tgUsername}')">
+                    <button class="btn-tg-chat" onclick="openTelegramPrivateChat('${c.tgUsername || ''}')">
                         💬 Abrir Chat
                     </button>
                     <button class="btn-pitch" title="Mensaje Rápido" onclick="launchQuickPitch('${c.id}')">⚡</button>
@@ -5398,39 +5414,53 @@ function renderCrmDashboard() {
     // --- RENDERIZADO: SECCIÓN INCUBADORA DE IDEAS ---
     if (gridIdeas) {
         let filteredIdeas = state.incubatorIdeas.filter(i => {
-            const matchesSearch = i.title.toLowerCase().includes(query) || i.description.toLowerCase().includes(query);
+            if (!i) return false;
+            // 🛡️ Salvaguarda contra textos vacíos
+            const title = (i.title || "").toLowerCase();
+            const desc = (i.description || "").toLowerCase();
+
+            const matchesSearch = title.includes(query) || desc.includes(query);
+            
             let matchesStatus = true;
             if (ideaFilter === "en-proceso") matchesStatus = (i.status === "en-proceso");
             if (ideaFilter === "critica") matchesStatus = (i.priority === "critica" && i.status !== "hecho");
+            
             return matchesSearch && matchesStatus;
         });
 
-        // Ordenar automáticamente por el score de prioridad calculado (RICE de mayor a menor)
-        filteredIdeas.sort((a, b) => b.score - a.score);
+        // Ordenar de forma segura protegiendo contra elementos sin 'score'
+        filteredIdeas.sort((a, b) => (b.score || 0) - (a.score || 0));
 
-        gridIdeas.innerHTML = filteredIdeas.map(i => `
-            <div class="idea-card prio-${i.priority} ${i.status === 'hecho' ? 'status-done' : ''}">
-                <div style="display:flex; justify-content:space-between; align-items:start;">
-                    <span class="rice-badge">⚡ Prioridad RICE: ${i.score.toFixed(1)}</span>
-                    <span style="font-size:0.6rem; color:#64748b;">${i.date}</span>
+        gridIdeas.innerHTML = filteredIdeas.map(i => {
+            // 🛡️ Control de seguridad para el formateo de números
+            const finalScore = typeof i.score === 'number' ? i.score.toFixed(1) : "0.0";
+            
+            return `
+                <div class="idea-card prio-${i.priority || 'baja'} ${i.status === 'hecho' ? 'status-done' : ''}">
+                    <div style="display:flex; justify-content:space-between; align-items:start;">
+                        <span class="rice-badge">⚡ Prioridad RICE: ${finalScore}</span>
+                        <span style="font-size:0.6rem; color:#64748b;">${i.date || ''}</span>
+                    </div>
+                    <h4 style="color:#fff; margin:6px 0 4px 0; font-size:0.9rem; font-weight:700;">${i.title || 'Sin Título'}</h4>
+                    <p style="color:var(--text-muted, #94a3b8); font-size:0.75rem; margin:0 0 10px 0;">${i.description || 'Sin descripción'}</p>
+                    
+                    <div style="display:flex; gap:6px; margin-top:auto;">
+                        ${i.status === 'en-proceso' ? `
+                            <button onclick="changeIdeaStatusAction('${i.id}', 'hecho')" style="flex:1; border:none; background:#22c55e; color:#fff; padding:6px; border-radius:6px; font-weight:700; font-size:0.7rem; cursor:pointer;">✔ Hecho</button>
+                            <button onclick="changeIdeaStatusAction('${i.id}', 'cancelado')" style="border:none; background:#334155; color:#94a3b8; padding:6px; border-radius:6px; font-size:0.7rem; cursor:pointer;">❌ Descartar</button>
+                        ` : `
+                            <button onclick="changeIdeaStatusAction('${i.id}', 'en-proceso')" style="flex:1; border:none; background:#475569; color:#fff; padding:6px; border-radius:6px; font-size:0.7rem; cursor:pointer;">🔄 Reactivar Idea</button>
+                        `}
+                    </div>
                 </div>
-                <h4 style="color:#fff; margin:6px 0 4px 0; font-size:0.9rem; font-weight:700;">${i.title}</h4>
-                <p style="color:var(--text-muted); font-size:0.75rem; margin:0 0 10px 0;">${i.description}</p>
-                
-                <div style="display:flex; gap:6px; margin-top:auto;">
-                    ${i.status === 'en-proceso' ? `
-                        <button onclick="changeIdeaStatusAction('${i.id}', 'hecho')" style="flex:1; border:none; background:#22c55e; color:#fff; padding:6px; border-radius:6px; font-weight:700; font-size:0.7rem; cursor:pointer;">✔ Hecho</button>
-                        <button onclick="changeIdeaStatusAction('${i.id}', 'cancelado')" style="border:none; background:#334155; color:#94a3b8; padding:6px; border-radius:6px; font-size:0.7rem; cursor:pointer;">❌ Descartar</button>
-                    ` : `
-                        <button onclick="changeIdeaStatusAction('${i.id}', 'en-proceso')" style="flex:1; border:none; background:#475569; color:#fff; padding:6px; border-radius:6px; font-size:0.7rem; cursor:pointer;">🔄 Reactivar Idea</button>
-                    `}
-                </div>
-            </div>
-        `).join('');
+            `;
+        }).join('');
     }
 
-    // Actualizar las Métrica Bento del Dashboard en vivo
-    calculateLiveDashboardMetrics();
+    // Ejecutar métricas Bento (Con un condicional por seguridad)
+    if (typeof calculateLiveDashboardMetrics === 'function') {
+        calculateLiveDashboardMetrics();
+    }
 }
 
 // =========================================================================
@@ -5608,11 +5638,24 @@ function launchQuickPitch(contactId) {
     }
 }
 
-// Arranque en cascada al cargar la pestaña
+// =========================================================================
+// 5. ARRANQUE SEGURO EN CASCADA (MÓDULO CRM) -- ¡CORREGIDO!
+// =========================================================================
 document.addEventListener("DOMContentLoaded", () => {
-    checkCrmSeedDataset();
-    renderCrmDashboard();
+    console.log("🚀 Inicializando base de datos en memoria...");
+    
+    // 1. Cargamos los datos guardados de LocalStorage en el 'state'
+    if (typeof loadCrmDataFromLocalStorage === 'function') {
+        loadCrmDataFromLocalStorage();
+    } else {
+        checkCrmSeedDataset(); // Si no usas LocalStorage aún, levantamos las semillas
+    }
+
+    // ❌ ELIMINADO: renderCrmDashboard();
+    // Ya no lo dibujamos aquí al arrancar la app para evitar que se rompa el script.
+    console.log("💤 Módulo CRM en espera hasta que el usuario abra la pestaña.");
 });
+
 
   </script>
     
