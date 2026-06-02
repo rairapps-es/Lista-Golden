@@ -2132,16 +2132,17 @@
 
         let state = {
             user: { 
-                username: "Invitado Anónimo", 
-                idTelegram: 12345678,
-                balance: 0, 
-                role: "user", 
-                range: 1,
-                pointsProgress: 0,
-                seed: "carlos",
-                isVipMember: false, 
-                equipped: { clothing: "", glasses: "" }
-            },
+    username: "Invitado Anónimo", 
+    idTelegram: 12345678,
+    balance: 0, 
+    role: "user", 
+    range: 1,
+    pointsProgress: 0,
+    // 🌟 En lugar de "carlos", usamos el ID de Telegram como semilla única
+    seed: window.Telegram?.WebApp?.initDataUnsafe?.user?.id || "user_" + Math.floor(Math.random() * 999999),
+    isVipMember: false, 
+    equipped: { clothing: "", glasses: "" }
+},
             favorites: [], 
             history: [], 
             systemLogs: [],
