@@ -5343,18 +5343,18 @@ if (!state.uiFilters) {
     state.uiFilters = { crmCategory: "all", ideaStatus: "all", searchQuery: "" };
 }
 
-// Datos semilla automáticos (Solo se cargan si el almacenamiento está vacío la primera vez)
 function checkCrmSeedDataset() {
+    // Solo metemos datos de prueba si de verdad no hay NADA guardado en el estado
     if (state.crmContacts.length === 0) {
         state.crmContacts = [
             { id: "cnt_1", name: "Marcos Blockchain", tgUsername: "marcos_blocks", category: "sponsors", dealValue: 500, notes: "Patrocinador principal banner de carga.", date: "2026-05-15" },
             { id: "cnt_2", name: "Agencia NeoAds", tgUsername: "neoads_tg", category: "anunciantes", dealValue: 120, notes: "Compraron 3 menciones push en canales.", date: "2026-05-28" }
         ];
     }
+    
     if (state.incubatorIdeas.length === 0) {
         state.incubatorIdeas = [
-            { id: "idea_1", title: "Lanzador de Webhooks TON", description: "Avisar al privado cuando un anunciante compre espacio TON.", priority: "critica", impact: 5, effort: 2, score: 2.5, status: "en-proceso", date: "2026-06-01" },
-            { id: "idea_2", title: "Rediseño de Logotipos GIF", description: "Convertir avatares estáticos a renders animados RoboHash.", priority: "baja", impact: 2, effort: 1, score: 2.0, status: "hecho", date: "2026-05-20" }
+            { id: "idea_1", title: "Lanzador de Webhooks TON", description: "Avisar al privado cuando un anunciante compre espacio TON.", priority: "critica", impact: 5, effort: 2, score: 2.5, status: "en-proceso", date: "2026-06-01" }
         ];
     }
 }
@@ -5516,16 +5516,18 @@ function saveNewContactAction() {
         name: name,
         tgUsername: tg,
         category: category,
-        dealValue: parseInt(val),
+        dealValue: parseInt(val) || 0,
         notes: notes,
         date: new Date().toISOString().split('T')[0]
     };
 
-    // 1. Guardamos en el estado global (RAM)
+    // 1. Garantizar estructura interna e inyectar en RAM
+    if (!state.crmContacts) state.crmContacts = [];
     state.crmContacts.push(newContact);
     
-    // 2. 🔥 CORRECCIÓN: Guardamos físicamente en LocalStorage
-    saveCrmDataToLocalStorage(); 
+    // 2. 🔥 EL CAMBIO DE ORO: Guardar directamente bajo la clave global indexada
+    localStorage.setItem('myMiniApp_CrmContacts_v1', JSON.stringify(state.crmContacts));
+    localStorage.setItem('myMiniApp_IncubatorIdeas_v1', JSON.stringify(state.incubatorIdeas || [])); 
     
     // 3. Cerramos el modal del formulario y actualizamos el panel
     closeCrmModal('modal-add-contact');
@@ -5534,11 +5536,11 @@ function saveNewContactAction() {
     // 4. Limpieza total y segura del formulario
     document.getElementById("form-cnt-name").value = "";
     document.getElementById("form-cnt-tg").value = "";
-    document.getElementById("form-cnt-category").value = "partner"; // Restablece al valor por defecto que uses
+    document.getElementById("form-cnt-category").value = "clientes"; // 🛡️ Corregido: 'clientes' sí existe en tu HTML
     document.getElementById("form-cnt-value").value = "";
     document.getElementById("form-cnt-notes").value = "";
 
-    // Opcional: Feedback táctil en Telegram al añadir un contacto con éxito
+    // Feedback táctil premium para Telegram
     if (window.Telegram?.WebApp) {
         window.Telegram.WebApp.HapticFeedback.notificationOccurred("success");
     }
@@ -5556,7 +5558,6 @@ function saveNewIdeaAction() {
         return;
     }
 
-    // Ecuación matemática simplificada de orden RICE: Impacto entre Esfuerzo
     const calculatedScore = (imp / eff);
 
     const newIdea = {
@@ -5571,22 +5572,21 @@ function saveNewIdeaAction() {
         date: new Date().toISOString().split('T')[0]
     };
 
-    // 1. Lo metemos al estado en memoria RAM
+    // 1. Añadir a la memoria interna
+    if (!state.incubatorIdeas) state.incubatorIdeas = [];
     state.incubatorIdeas.push(newIdea);
     
-    // 2. 🔥 LA CLAVE: Lo guardamos físicamente en el almacenamiento del dispositivo
-    saveCrmDataToLocalStorage();
+    // 2. 🔥 EL CAMBIO DE ORO: Guardar directamente en el disco duro del navegador
+    localStorage.setItem('myMiniApp_IncubatorIdeas_v1', JSON.stringify(state.incubatorIdeas));
+    localStorage.setItem('myMiniApp_CrmContacts_v1', JSON.stringify(state.crmContacts || []));
     
-    // 3. Cerramos interfaz y redibujamos las tarjetas Bento
+    // 3. Cerrar UI y renderizar
     closeCrmModal('modal-add-idea');
     renderCrmDashboard();
 
-    // 4. Limpieza total del formulario (Evita que queden datos residuales al reabrirlo)
+    // 4. Limpiar
     document.getElementById("form-idea-title").value = "";
     document.getElementById("form-idea-desc").value = "";
-    document.getElementById("form-idea-priority").value = "baja";
-    document.getElementById("form-idea-impact").value = "3";
-    document.getElementById("form-idea-effort").value = "2";
 }
 
 function changeIdeaStatusAction(id, targetStatus) {
@@ -5640,29 +5640,33 @@ function launchQuickPitch(contactId) {
 }
 
 // =========================================================================
-// 5. ARRANQUE SEGURO EN CASCADA (MÓDULO CRM) -- ¡CORREGIDO!
+// ARRANQUE SANO, EXPOSICIÓN GLOBAL Y PERSISTENCIA INTEGRADA
 // =========================================================================
 document.addEventListener("DOMContentLoaded", () => {
-    console.log("🚀 Inicializando base de datos en memoria...");
+    console.log("📥 [CRM] Leyendo almacenamiento local...");
     
-    // 1. Cargamos los datos guardados de LocalStorage en el 'state'
-    if (typeof loadCrmDataFromLocalStorage === 'function') {
-        loadCrmDataFromLocalStorage();
-    } else {
-        checkCrmSeedDataset(); // Si no usas LocalStorage aún, levantamos las semillas
+    // 1. Intentamos rescatar las strings del almacenamiento del dispositivo
+    const savedContacts = localStorage.getItem('myMiniApp_CrmContacts_v1');
+    const savedIdeas = localStorage.getItem('myMiniApp_IncubatorIdeas_v1');
+
+    // 2. Si existen, los parseamos a objetos reales; si no, inicializamos el array vacío
+    state.crmContacts = savedContacts ? JSON.parse(savedContacts) : [];
+    state.incubatorIdeas = savedIdeas ? JSON.parse(savedIdeas) : [];
+
+    // 3. Verificación de datos semilla (Solo se inyectan si el usuario no tiene NADA guardado)
+    if (typeof checkCrmSeedDataset === 'function') {
+        checkCrmSeedDataset();
     }
 
-    // ❌ ELIMINADO: renderCrmDashboard();
-    // Ya no lo dibujamos aquí al arrancar la app para evitar que se rompa el script.
-    console.log("💤 Módulo CRM en espera hasta que el usuario abra la pestaña.");
+    console.log(`💾 [CRM] Base de datos sincronizada: ${state.crmContacts.length} contactos, ${state.incubatorIdeas.length} ideas.`);
 });
 
-// Forzamos el enlace global con el HTML de la MiniApp
+// 🔗 Forzamos el enlace global inequívoco con el HTML de la MiniApp de Telegram
 window.saveNewContactAction = saveNewContactAction;
 window.saveNewIdeaAction = saveNewIdeaAction;
 window.changeIdeaStatusAction = changeIdeaStatusAction;
 
-console.log("🔗 Funciones CRM expuestas globalmente en el objeto Window.");
+console.log("🚀 Módulo CRM completamente blindado, persistente y expuesto en Window.");
 
   </script>
     
