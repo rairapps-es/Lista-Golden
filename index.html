@@ -2430,22 +2430,37 @@ function checkVipInternalRegistration() {
 }
 
 function updateAvatarRenderers() {
-    // 👤 Icono o silueta de reserva (por si el usuario no tiene foto pública o estás en PC)
+    // 👤 1. Gestión del Avatar (Foto de Telegram o Silueta)
     const siluetaPorDefecto = "https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/1f464.svg";
-    
-    // 🌟 Si existe la foto real de Telegram en el estado, usamos esa. Si no, la silueta.
     const finalUrl = state.user.telegramPhotoUrl || siluetaPorDefecto;
     
-    // Asignamos la foto real a tus tres elementos clave
+    // Buscamos los elementos del DOM
     const headerImg = document.getElementById("header-avatar");
     const shopImg = document.getElementById("shop-ia-avatar-preview");
     const drawerImg = document.getElementById("drawer-avatar-render");
 
+    // Asignamos las imágenes de forma segura solo si existen en la página actual
     if (headerImg) headerImg.src = finalUrl;
     if (shopImg) shopImg.src = finalUrl;
     if (drawerImg) drawerImg.src = finalUrl;
     
-    // Si mantienes la lista de chips de ropa/gafas, la dibuja
+    // 💰 2. Sincronización del Saldo Acumulado (¡Añadido aquí!)
+    // Controlamos que state.user.balance exista, si no ponemos 0
+    const saldoActual = (state.user && state.user.balance !== undefined) ? state.user.balance : 0;
+    
+    // Inyectamos el saldo en el nuevo contenedor que pusiste en tu Header
+    const balanceHeader = document.getElementById("header-balance");
+    if (balanceHeader) {
+        balanceHeader.innerText = saldoActual;
+    }
+
+    // Inyectamos también en el perfil por si acaso usas profile-balance o drawer-balance
+    const balanceProfile = document.getElementById("profile-balance") || document.getElementById("drawer-balance");
+    if (balanceProfile) {
+        balanceProfile.innerText = saldoActual;
+    }
+
+    // 👕 3. Lógica original de los cosméticos equipados
     if (typeof renderEquippedChipsList === "function") {
         renderEquippedChipsList();
     }
