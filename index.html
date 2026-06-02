@@ -5490,16 +5490,27 @@ function saveNewContactAction() {
         date: new Date().toISOString().split('T')[0]
     };
 
+    // 1. Guardamos en el estado global (RAM)
     state.crmContacts.push(newContact);
-    saveToLocalStorage(); // Persistencia automática integrada en tu app
+    
+    // 2. 🔥 CORRECCIÓN: Guardamos físicamente en LocalStorage
+    saveCrmDataToLocalStorage(); 
+    
+    // 3. Cerramos el modal del formulario y actualizamos el panel
     closeCrmModal('modal-add-contact');
     renderCrmDashboard();
     
-    // Limpiar formulario
+    // 4. Limpieza total y segura del formulario
     document.getElementById("form-cnt-name").value = "";
     document.getElementById("form-cnt-tg").value = "";
+    document.getElementById("form-cnt-category").value = "partner"; // Restablece al valor por defecto que uses
     document.getElementById("form-cnt-value").value = "";
     document.getElementById("form-cnt-notes").value = "";
+
+    // Opcional: Feedback táctil en Telegram al añadir un contacto con éxito
+    if (window.Telegram?.WebApp) {
+        window.Telegram.WebApp.HapticFeedback.notificationOccurred("success");
+    }
 }
 
 function saveNewIdeaAction() {
@@ -5529,21 +5540,35 @@ function saveNewIdeaAction() {
         date: new Date().toISOString().split('T')[0]
     };
 
+    // 1. Lo metemos al estado en memoria RAM
     state.incubatorIdeas.push(newIdea);
-    saveToLocalStorage();
+    
+    // 2. 🔥 LA CLAVE: Lo guardamos físicamente en el almacenamiento del dispositivo
+    saveCrmDataToLocalStorage();
+    
+    // 3. Cerramos interfaz y redibujamos las tarjetas Bento
     closeCrmModal('modal-add-idea');
     renderCrmDashboard();
 
+    // 4. Limpieza total del formulario (Evita que queden datos residuales al reabrirlo)
     document.getElementById("form-idea-title").value = "";
     document.getElementById("form-idea-desc").value = "";
+    document.getElementById("form-idea-priority").value = "baja";
+    document.getElementById("form-idea-impact").value = "3";
+    document.getElementById("form-idea-effort").value = "2";
 }
 
 function changeIdeaStatusAction(id, targetStatus) {
     const idea = state.incubatorIdeas.find(i => i.id === id);
     if (idea) {
         idea.status = targetStatus;
-        saveToLocalStorage();
+        saveCrmDataToLocalStorage();
         renderCrmDashboard();
+        
+        // Si el usuario está en Telegram y marca la idea como "hecho", el móvil vibra en señal de éxito
+        if (targetStatus === 'hecho' && window.Telegram?.WebApp) {
+            window.Telegram.WebApp.HapticFeedback.notificationOccurred("success");
+        }
     }
 }
 
