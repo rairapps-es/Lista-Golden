@@ -21,8 +21,8 @@
             --telegram-blue: #24A1DE;
             --success-green: #2ecc71;
             --mystic-purple: #a855f7;
-            --vip-gold: #f59e0b;
-            --vip-gold-gradient: linear-gradient(135deg, #f59e0b 0%, #eab308 100%);
+            --vip-gold: #fbbf24;
+            --vip-gold-gradient: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
             --premium-gradient: linear-gradient(135deg, #24A1DE 0%, #a855f7 50%, #f59e0b 100%);
 
             --text-main: #f8fafc;          
@@ -80,7 +80,7 @@
         }
 
         .header-logo {
-            font-weight: 900; font-size: 1.3rem; letter-spacing: 1px;
+            font-weight: 900; font-size: 17pt; letter-spacing: 1px;
             background: var(--premium-gradient);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
             animation: pulseGlow 3s infinite alternate;
@@ -91,7 +91,17 @@
             100% { filter: drop-shadow(0 0 8px rgba(168,85,247,0.6)); }
         }
 
-        .header-center-icon { cursor: pointer; color: var(--text-muted); transition: var(--transition-smooth); display: flex; align-items: rigth; }
+        .header-center-icon { 
+    cursor: pointer; 
+    color: var(--text-muted); 
+    transition: var(--transition-smooth); 
+    
+    display: flex; 
+    align-items: center;       /* ↕️ Centrado vertical perfecto */
+    margin-left: auto;         /* ➡️ Empuja el icono por completo a la derecha */
+    padding-right: 16px;       /* 📏 El espacio libre que dejas a la derecha del todo */
+}
+
         .header-center-icon:hover { color: var(--vip-gold); transform: scale(1.1) rotate(15deg); }
 
         .avatar-container { width: 40px; height: 40px; position: relative; cursor: pointer; transition: var(--transition-smooth); }
