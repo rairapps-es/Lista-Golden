@@ -1489,9 +1489,10 @@
 
     <div id="view-profile" class="profile-drawer app-view">
         <div class="drawer-identity">
-            <div class="ia-avatar-frame" style="width: 80px; height: 80px; margin-bottom: 8px;">
-                <img id="drawer-avatar-render" src="" alt="Avatar Realtime">
-            </div>
+            <div class="avatar-container" onclick="switchView('profile')">
+    <img src="" id="header-avatar" class="avatar-img" alt="Avatar">
+</div>
+
             <div class="drawer-username-tag">
                 <span id="drawer-username">@Anónimo</span>
                 <div id="user-premium-tag" class="user-badge-status badge-free" onclick="toggleBenefitsSection()">
@@ -2123,6 +2124,11 @@
         <div class="tab-item" id="tab-energy" onclick="switchView('energy')">
             <i data-lucide="zap"></i><span>Puntos</span>
         </div>
+        <div id="tab-profile" class="tab-item" onclick="switchView('profile')">
+    <i data-lucide="user" style="width: 20px; height: 20px;"></i>
+    <span style="font-size: 0.7rem; margin-top: 4px;">Perfil</span>
+</div>
+
     </nav>
 
     <script>
@@ -2593,50 +2599,55 @@ function checkDailyGachaStatus() {
 }
 
         function switchView(viewId) {
-            state.adminFilterOnly = false; 
-            document.querySelectorAll('.app-view').forEach(v => v.classList.remove('active-view'));
-            document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active-tab'));
-            
-            const targetView = document.getElementById(`view-${viewId}`);
-            if (targetView) targetView.classList.add('active-view');
-            
-            const targetTab = document.getElementById(`tab-${viewId}`);
-            if (targetTab) targetTab.classList.add('active-tab');
+    state.adminFilterOnly = false; 
+    document.querySelectorAll('.app-view').forEach(v => v.classList.remove('active-view'));
+    document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active-tab'));
+    
+    const targetView = document.getElementById(`view-${viewId}`);
+    if (targetView) targetView.classList.add('active-view');
+    
+    const targetTab = document.getElementById(`tab-${viewId}`);
+    if (targetTab) targetTab.classList.add('active-tab');
 
-            if (viewId === 'directory') renderDirectoryList();
-            if (viewId === 'favorites') renderFavoritesList();
-            if (viewId === 'my-channels') renderMyOwnedChannelsList();
-            if (viewId === 'history') { showFullHistory = false; renderHistoryList(); }
-            if (viewId === 'home') { renderVipSlider(); renderTopPodium(); }
-            if (viewId === 'shop') renderShopCatalog();
-            lucide.createIcons();
+    // 🌟 NUEVO: Lógica al entrar a la sección de perfil
+    if (viewId === 'profile') {
+        if (typeof updateAvatarRenderers === 'function') {
+            updateAvatarRenderers(); // Sincroniza la foto real de Telegram
         }
+        
+        // 🔙 Activamos el botón "Atrás" nativo de Telegram al entrar por menú inferior
+        if (window.Telegram && window.Telegram.WebApp) {
+            const backButton = window.Telegram.WebApp.BackButton;
+            backButton.show();
+            backButton.offClick();
+            backButton.onClick(() => {
+                switchView('home'); // Regresa a la home al pulsar atrás
+                backButton.hide();
+            });
+        }
+    } else {
+        // 🔄 Si entra a cualquier OTRA pestaña (home, shop...), ocultamos el botón atrás de Telegram
+        if (window.Telegram && window.Telegram.WebApp) {
+            window.Telegram.WebApp.BackButton.hide();
+        }
+    }
+
+    // Tu lógica original de renderizado intacta:
+    if (viewId === 'directory') renderDirectoryList();
+    if (viewId === 'favorites') renderFavoritesList();
+    if (viewId === 'my-channels') renderMyOwnedChannelsList();
+    if (viewId === 'history') { showFullHistory = false; renderHistoryList(); }
+    if (viewId === 'home') { renderVipSlider(); renderTopPodium(); }
+    if (viewId === 'shop') renderShopCatalog();
+    
+    // Aseguramos que los iconos (incluido el nuevo del perfil) se dibujen bien
+    if (window.lucide) lucide.createIcons();
+}
 
         function toggleProfileDrawer() {
-    // 1. Usamos tu propia lógica existente para cambiar a la vista del perfil
+    // 🌟 Ahora solo actúa como un puente directo al sistema centralizado de navegación
     if (typeof switchView === 'function') {
-        switchView('profile'); // Esto activará el contenedor #view-profile automáticamente
-    }
-
-    // 2. Sincronizamos el avatar y el username real por seguridad
-    if (typeof sincronizarFotoRealTelegram === 'function') {
-        sincronizarFotoRealTelegram();
-    }
-
-    // 3. 🔙 Activamos el botón "Atrás" nativo de Telegram para una experiencia premium
-    if (window.Telegram && window.Telegram.WebApp) {
-        const backButton = window.Telegram.WebApp.BackButton;
-        
-        backButton.show(); // Aparece la flecha de volver en la interfaz de Telegram
-        backButton.offClick(); // Limpiamos preventivamente hilos sueltos
-        
-        backButton.onClick(() => {
-            // Al pulsar atrás, regresamos a la Home usando tu propio sistema de pestañas
-            if (typeof switchView === 'function') {
-                switchView('home'); // 🏠 Regresa a la pestaña de inicio de tu app
-            }
-            backButton.hide(); // Escondemos el botón atrás
-        });
+        switchView('profile'); 
     }
 }
 
