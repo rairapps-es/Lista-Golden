@@ -2312,6 +2312,33 @@
     </div>
 
     <main id="view-crm-dashboard" class="app-view">
+        <!-- 1. Botones de Navegación (Tabs) -->
+<div class="crm-tabs-nav" style="display: flex; gap: 10px; margin-bottom: 20px; padding: 0 10px;">
+    <button id="tab-btn-contacts" class="tab-link active" onclick="switchCrmTab('contacts')" style="flex: 1; padding: 12px; border: none; border-radius: 8px; font-weight: bold; background: #2563eb; color: #fff; cursor: pointer;">
+        👥 Cartera de Partners
+    </button>
+    <button id="tab-btn-ideas" class="tab-link" onclick="switchCrmTab('ideas')" style="flex: 1; padding: 12px; border: none; border-radius: 8px; font-weight: bold; background: #1e293b; color: #94a3b8; cursor: pointer;">
+        💡 Incubadora RICE
+    </button>
+</div>
+
+<!-- 2. Contenedor de Secciones -->
+<div class="crm-tabs-content">
+    
+    <!-- SECCIÓN A: CONTACTOS (Visible por defecto) -->
+    <div id="tab-content-contacts" class="tab-panel">
+        <h3 style="color: #fff; margin: 0 0 12px 10px; font-size: 1.1rem;">Mis Contactos y Sponsors</h3>
+        <div id="grid-crm-contacts" class="crm-grid"></div>
+    </div>
+
+    <!-- SECCIÓN B: IDEAS (Oculta por defecto) -->
+    <div id="tab-content-ideas" class="tab-panel" style="display: none;">
+        <h3 style="color: #fff; margin: 0 0 12px 10px; font-size: 1.1rem;">Ideas de Negocio</h3>
+        <div id="grid-crm-ideas" class="crm-grid"></div>
+    </div>
+
+</div>
+
     <div class="crm-header-dashboard">
         <h2 class="view-title"><i data-lucide="layout-dashboard" style="color:var(--mystic-purple)"></i> Panel de Control & CRM</h2>
         <p class="crm-subtitle">Gestiona tu cartera de partners e incuba tus ideas de desarrollo al instante.</p>
@@ -5476,6 +5503,41 @@ function renderCrmDashboard() {
     }
 }
 
+       function switchCrmTab(targetTab) {
+    const contactsPanel = document.getElementById("tab-content-contacts");
+    const ideasPanel = document.getElementById("tab-content-ideas");
+    const contactsBtn = document.getElementById("tab-btn-contacts");
+    const ideasBtn = document.getElementById("tab-btn-ideas");
+
+    if (targetTab === 'contacts') {
+        // Mostrar contactos, ocultar ideas
+        if (contactsPanel) contactsPanel.style.display = "block";
+        if (ideasPanel) ideasPanel.style.display = "none";
+        
+        // Estilos de botones (Activo vs Inactivo)
+        if (contactsBtn) { contactsBtn.style.background = "#2563eb"; contactsBtn.style.color = "#fff"; }
+        if (ideasBtn) { ideasBtn.style.background = "#1e293b"; ideasBtn.style.color = "#94a3b8"; }
+        
+    } else if (targetTab === 'ideas') {
+        // Mostrar ideas, ocultar contactos
+        if (contactsPanel) contactsPanel.style.display = "none";
+        if (ideasPanel) ideasPanel.style.display = "block";
+        
+        // Estilos de botones (Activo vs Inactivo)
+        if (contactsBtn) { contactsBtn.style.background = "#1e293b"; contactsBtn.style.color = "#94a3b8"; }
+        if (ideasBtn) { ideasBtn.style.background = "#2563eb"; ideasBtn.style.color = "#fff"; }
+    }
+
+    // Opcional: Vibración sutil de Telegram al cambiar de pestaña
+    if (window.Telegram?.WebApp) {
+        window.Telegram.WebApp.HapticFeedback.impactOccurred("light");
+    }
+}
+
+// 🔗 No olvides exponerla globalmente para que el HTML la detecte
+window.switchCrmTab = switchCrmTab;
+ 
+
         function deleteContactAction(id) {
     if (!confirm("¿Estás seguro de que quieres eliminar este contacto? Esta acción es irreversible.")) {
         return;
@@ -5762,6 +5824,7 @@ document.addEventListener("DOMContentLoaded", () => {
 window.saveNewContactAction = saveNewContactAction;
 window.saveNewIdeaAction = saveNewIdeaAction;
 window.changeIdeaStatusAction = changeIdeaStatusAction;
+window.switchCrmTab = switchCrmTab;
 
 console.log("🚀 Módulo CRM completamente blindado, persistente y expuesto en Window.");
 
