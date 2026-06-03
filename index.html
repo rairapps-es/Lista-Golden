@@ -2332,23 +2332,6 @@
         </div>
     </div>
 
-    <div class="crm-filter-bar">
-        <div class="search-wrapper">
-            <i data-lucide="search" class="search-icon"></i>
-            <input type="text" id="crm-search-input" placeholder="Buscar cliente, idea o tag..." oninput="executeGlobalCrmFilter()">
-        </div>
-        <div class="filter-pills-scroll">
-            <button class="pill-btn active" data-filter="all-contacts" onclick="setUiFilter('crmCategory', 'all')">👥 Todos Partners</button>
-            <button class="pill-btn" data-filter="clientes" onclick="setUiFilter('crmCategory', 'clientes')">💎 Clientes</button>
-            <button class="pill-btn" data-filter="sponsors" onclick="setUiFilter('crmCategory', 'sponsors')">👑 Sponsors</button>
-            <button class="pill-btn" data-filter="anunciantes" onclick="setUiFilter('crmCategory', 'anunciantes')">📢 Anunciantes</button>
-            <button class="pill-btn" data-filter="colaboracion" onclick="setUiFilter('crmCategory', 'colaboracion')">🤝 Alianzas</button>
-            <span class="filter-divider">|</span>
-            <button class="pill-btn" data-filter="ideas-all" onclick="setUiFilter('ideaStatus', 'all')">💡 Todas Ideas</button>
-            <button class="pill-btn" data-filter="ideas-proc" onclick="setUiFilter('ideaStatus', 'en-proceso')">🟡 En Proceso</button>
-            <button class="pill-btn" data-filter="ideas-crit" onclick="setUiFilter('ideaStatus', 'critica')">🔥 Críticas</button>
-        </div>
-    </div>
         <!-- 1. Botones de Navegación (Tabs) -->
 <div class="crm-tabs-nav" style="display: flex; gap: 10px; margin-bottom: 20px; padding: 0 10px;">
     <button id="tab-btn-contacts" class="tab-link active" onclick="switchCrmTab('contacts')" style="flex: 1; padding: 12px; border: none; border-radius: 8px; font-weight: bold; background: #2563eb; color: #fff; cursor: pointer;">
@@ -2362,14 +2345,26 @@
 <!-- 2. Contenedor de Secciones -->
 <div class="crm-tabs-content">
     
-    <!-- SECCIÓN A: CONTACTOS (Visible por defecto) -->
-    <div class="crm-tabs-content">
-    
     <div id="tab-content-contacts" class="tab-panel">
+        
+        <div class="crm-filter-bar" style="margin-bottom: 15px;">
+            <div class="search-wrapper">
+                <i data-lucide="search" class="search-icon"></i>
+                <input type="text" id="crm-search-input-contacts" placeholder="Buscar partner, notas o tag..." oninput="executeGlobalCrmFilter()">
+            </div>
+            <div class="filter-pills-scroll">
+                <button class="pill-btn active" data-filter="all-contacts" onclick="setUiFilter('crmCategory', 'all')">👥 Todos Partners</button>
+                <button class="pill-btn" data-filter="clientes" onclick="setUiFilter('crmCategory', 'clientes')">💎 Clientes</button>
+                <button class="pill-btn" data-filter="sponsors" onclick="setUiFilter('crmCategory', 'sponsors')">👑 Sponsors</button>
+                <button class="pill-btn" data-filter="anunciantes" onclick="setUiFilter('crmCategory', 'anunciantes')">📢 Anunciantes</button>
+                <button class="pill-btn" data-filter="colaboracion" onclick="setUiFilter('crmCategory', 'colaboracion')">🤝 Alianzas</button>
+            </div>
+        </div>
+
         <div class="crm-modules-layout">
             <div class="crm-section-block">
                 <div class="section-block-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                    <h3 style="color: #333; margin: 0; font-size: 1.1rem; display: flex; align-items: center; gap: 8px;">
+                    <h3 style="color: #fff; margin: 0; font-size: 1.1rem; display: flex; align-items: center; gap: 8px;">
                         <i data-lucide="users" style="color:#3b82f6;"></i> Cartera de Contactos VIP
                     </h3>
                     <button class="btn-add-quick" onclick="openCrmModal('modal-add-contact')">+ Nuevo Contacto</button>
@@ -2381,10 +2376,23 @@
     </div>
 
     <div id="tab-content-ideas" class="tab-panel" style="display: none;">
+        
+        <div class="crm-filter-bar" style="margin-bottom: 15px;">
+            <div class="search-wrapper">
+                <i data-lucide="search" class="search-icon"></i>
+                <input type="text" id="crm-search-input-ideas" placeholder="Buscar idea o requerimiento..." oninput="executeGlobalCrmFilter()">
+            </div>
+            <div class="filter-pills-scroll">
+                <button class="pill-btn active" data-filter="ideas-all" onclick="setUiFilter('ideaStatus', 'all')">💡 Todas Ideas</button>
+                <button class="pill-btn" data-filter="ideas-proc" onclick="setUiFilter('ideaStatus', 'en-proceso')">🟡 En Proceso</button>
+                <button class="pill-btn" data-filter="ideas-crit" onclick="setUiFilter('ideaStatus', 'critica')">🔥 Críticas</button>
+            </div>
+        </div>
+
         <div class="crm-modules-layout">
             <div class="crm-section-block">
                 <div class="section-block-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                    <h3 style="color: #333; margin: 0; font-size: 1.1rem; display: flex; align-items: center; gap: 8px;">
+                    <h3 style="color: #fff; margin: 0; font-size: 1.1rem; display: flex; align-items: center; gap: 8px;">
                         <i data-lucide="lightbulb" style="color:#eab308;"></i> Incubadora de Ideas (RICE)
                     </h3>
                     <button class="btn-add-quick" onclick="openCrmModal('modal-add-idea')" style="background: linear-gradient(90deg, #eab308, #ca8a04);">+ Nueva Idea</button>
