@@ -5378,7 +5378,7 @@ function renderCrmDashboard() {
     if (!state.crmContacts) state.crmContacts = [];
     if (!state.incubatorIdeas) state.incubatorIdeas = [];
 
-    // --- RE-RENDER CARTERA DE CONTACTOS ---
+        // --- RE-RENDER CARTERA DE CONTACTOS ---
     if (gridContacts) {
         let filteredContacts = state.crmContacts.filter(c => {
             if (!c) return false;
@@ -5389,19 +5389,40 @@ function renderCrmDashboard() {
                    (catFilter === "all" || c.category === catFilter);
         });
 
-        gridContacts.innerHTML = filteredContacts.map(c => `
-            <div class="contact-card">
-                <span class="contact-badge badge-${c.category || 'clientes'}">${c.category || 'clientes'}</span>
-                <h4 style="color:#fff; margin:0; font-size:0.95rem; font-weight:700;">${c.name || 'Sin Nombre'}</h4>
-                <span style="color:var(--text-muted, #94a3b8); font-size:0.75rem;">@${c.tgUsername || ''}</span>
-                <p style="color:#94a3b8; font-size:0.75rem; margin:6px 0; background:rgba(0,0,0,0.15); padding:6px; border-radius:6px;">${c.notes || 'Sin anotaciones'}</p>
-                <div style="font-weight:800; font-size:0.85rem; color:#22c55e;">Inversión: ${c.dealValue || 0}€</div>
-                <div class="contact-row-actions">
-                    <button class="btn-tg-chat" onclick="openTelegramPrivateChat('${c.tgUsername || ''}')">💬 Chat</button>
-                    <button class="btn-pitch" onclick="launchQuickPitch('${c.id}')">⚡</button>
+        // 🔥 CLAVE: Ordenamos para que los destacados (featured === true) vayan ARRIBA DEL TODO
+        let sortedContacts = [...filteredContacts].sort((a, b) => {
+            return (b.featured === true ? 1 : 0) - (a.featured === true ? 1 : 0);
+        });
+
+        gridContacts.innerHTML = sortedContacts.map(c => {
+            const esDestacado = c.featured === true;
+            
+            return `
+                <div class="contact-card ${esDestacado ? 'contact-highlighted' : ''}" 
+                     style="${esDestacado ? 'border: 1px solid #f59e0b; background: rgba(245, 158, 11, 0.08);' : ''}">
+                    
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                        <span class="contact-badge badge-${c.category || 'clientes'}">${c.category || 'clientes'}</span>
+                        ${esDestacado ? '<span style="color:#f59e0b; font-size:0.7rem; font-weight:800; background:rgba(245,158,11,0.2); padding:2px 6px; border-radius:4px;">🔥 EN PROCESO</span>' : ''}
+                    </div>
+
+                    <h4 style="color:#fff; margin:4px 0 0 0; font-size:0.95rem; font-weight:700;">${c.name || 'Sin Nombre'}</h4>
+                    <span style="color:var(--text-muted, #94a3b8); font-size:0.75rem;">@${c.tgUsername || ''}</span>
+                    
+                    <p style="color:#94a3b8; font-size:0.75rem; margin:6px 0; background:rgba(0,0,0,0.15); padding:6px; border-radius:6px;">${c.notes || 'Sin anotaciones'}</p>
+                    <div style="font-weight:800; font-size:0.85rem; color:#22c55e; margin-bottom:8px;">Inversión: ${c.dealValue || 0}€</div>
+                    
+                    <div class="contact-row-actions" style="display:flex; gap:6px;">
+                        <button class="btn-tg-chat" onclick="openTelegramPrivateChat('${c.tgUsername || ''}')" style="flex:1;">💬 Chat</button>
+                        
+                        <button class="btn-pitch" onclick="launchQuickPitch('${c.id}')" 
+                                style="background: ${esDestacado ? '#f59e0b' : '#334155'}; color: ${esDestacado ? '#000' : '#fff'}; font-weight:bold; border-radius:6px; padding:6px 10px; cursor:pointer; border:none;">
+                            ${esDestacado ? '📌' : '⚡'}
+                        </button>
+                    </div>
                 </div>
-            </div>
-        `).join('');
+            `;
+        }).join('');
     }
 
     // --- RE-RENDER INCUBADORA DE IDEAS ---
@@ -5629,7 +5650,6 @@ function changeIdeaStatusAction(id, targetStatus) {
     }
 }
 
-
 // =========================================================================
 // 5. CONECTORES NATIVOS TELEGRAM (INTEGRACIÓN CHAT + QUICK-PITCH)
 // =========================================================================
@@ -5644,59 +5664,45 @@ function openTelegramPrivateChat(username) {
 
 function launchQuickPitch(id) {
     try {
-        console.log(`⚡ Iniciando Quick Pitch para el contacto: ${id}`);
+        console.log(`⚡ Cambiando estado de destacado para el contacto: ${id}`);
 
-        // 1. Buscamos al contacto real en la base de datos por su ID
         if (!state.crmContacts) state.crmContacts = [];
+        
+        // 1. Buscamos al contacto por su ID
         const contact = state.crmContacts.find(c => c.id === id);
 
         if (!contact) {
-            alert("⚠️ No se pudo encontrar la información de este contacto.");
+            console.warn("⚠️ No se encontró el contacto.");
             return;
         }
 
-        // 2. Definimos plantillas de mensajes automatizados según su Clasificación / Rol
-        let mensajePitch = "";
-        const nombreSocio = contact.name || "partner";
+        // 2. Conmutamos el estado: si era destacado deja de serlo, y viceversa
+        contact.featured = !contact.featured;
 
-        switch (contact.category) {
-            case "sponsors":
-                mensajePitch = `¡Hola ${nombreSocio}! 👋 Quería comentarte que estamos cerrando las métricas de esta semana y tenemos nuevos espacios VIP disponibles para patrocinadores. Avísame si te cuadra que te pase la propuesta de renovación para este mes. 🚀`;
-                break;
-            case "anunciantes":
-                mensajePitch = `¡Buenas ${nombreSocio}! 📢 Lanzamos una nueva campaña de difusión en nuestros canales comerciales con descuento especial para anunciantes recurrentes. ¿Te interesa que reservemos un slot para tu marca esta semana?`;
-                break;
-            case "clientes":
-                mensajePitch = `¡Hola ${nombreSocio}! 💎 Espero que todo vaya genial. Te escribo para hacer seguimiento de nuestro acuerdo y ver si necesitas algún ajuste en el volumen de puntos/trato económico actual. ¡Seguimos sumando!`;
-                break;
-            case "colaboracion":
-                mensajePitch = `¡Qué tal ${nombreSocio}! 🤝 Quería darte un toque rápido para revisar cómo llevamos las últimas tareas técnicas del equipo y coordinar el siguiente sprint. ¡Hablamos!`;
-                break;
-            default:
-                mensajePitch = `¡Hola ${nombreSocio}! 👋 Te escribo desde el panel de control para hacer un seguimiento rápido de nuestro último acuerdo. ¡Espero que todo vaya excelente!`;
-        }
+        // 3. Guardamos físicamente en el disco de inmediato
+        localStorage.setItem('myMiniApp_CrmContacts_v1', JSON.stringify(state.crmContacts));
+        localStorage.setItem('myMiniApp_IncubatorIdeas_v1', JSON.stringify(state.incubatorIdeas || []));
 
-        // 3. LA ACCIÓN: Copiar el texto automáticamente al portapapeles del usuario
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-            navigator.clipboard.writeText(mensajePitch).then(() => {
-                // Alerta premium o feedback visual
-                alert(`📋 ¡Mensaje personalizado copiado al portapapeles!\n\nAhora ve al chat de @${contact.tgUsername} y pégalo.`);
-                
-                // Si estás en Telegram, abre el chat privado directamente después de copiarlo
-                if (typeof openTelegramPrivateChat === 'function' && contact.tgUsername) {
-                    openTelegramPrivateChat(contact.tgUsername);
-                }
-            }).catch(err => {
-                throw new Error("No se pudo copiar automáticamente: " + err.message);
-            });
+        // 4. Refrescamos la pantalla en tiempo real
+        renderCrmDashboard();
+
+        // 5. Feedback visual y táctil
+        const subio = contact.featured;
+        
+        if (window.Telegram?.WebApp) {
+            window.Telegram.WebApp.HapticFeedback.impactOccurred("medium");
+            // Telegram no permite alertas personalizadas largas sin bloquear, usamos el ShowAlert nativo
+            window.Telegram.WebApp.showAlert(
+                subio 
+                ? `📌 ${contact.name} se ha marcado como DESTACADO (En proceso) y subirá al top.` 
+                : `🔄 ${contact.name} ya no está destacado.`
+            );
         } else {
-            // Alternativa de emergencia si el navegador de Telegram bloquea el portapapeles directo
-            alert(`💡 Propuesta generada para @${contact.tgUsername}:\n\n"${mensajePitch}"\n\n(Cópialo manualmente para enviarlo)`);
+            alert(subio ? `📌 ${contact.name} sube al top como destacado.` : `🔄 ${contact.name} quitado de destacados.`);
         }
 
     } catch (error) {
-        console.error("🚨 Error en launchQuickPitch:", error);
-        alert("El botón de Pitch falló: " + error.message);
+        console.error("🚨 Error al destacar contacto:", error);
     }
 }
 
