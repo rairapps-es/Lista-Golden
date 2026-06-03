@@ -2736,24 +2736,6 @@ function checkVipInternalRegistration() {
             }
         }
 
-        function toggleBenefitsSection() {
-            const panel = document.getElementById("hidden-benefits-box");
-            const title = document.getElementById("benefits-box-title");
-            const form = document.getElementById("premium-order-form");
-
-            if(panel.style.display === "block") {
-                panel.style.display = "none";
-            } else {
-                panel.style.display = "block";
-                if(state.user.isVipMember) {
-                    title.innerText = "Tus Beneficios VIP Activos:";
-                    form.style.display = "none";
-                } else {
-                    title.innerText = "Beneficios de la Suscripción GPlus:";
-                    form.style.display = "block";
-                }
-            }
-        }
 
         function sendOrderToTelegram() {
     const method = document.getElementById("pay-method").value;
@@ -5910,25 +5892,24 @@ function checkVipInternalRegistration() {
     const pendingPaymentPlan = localStorage.getItem(`pending_payment_${currentId}`);
     const isIdInCodeList = vipTelegramIds.includes(Number(currentId));
 
-    if (isIdInCodeList && pendingPaymentPlan && !localSavedVip) {
-        const start = new Date();
-        let end = new Date();
-        
-        if (pendingPaymentPlan === 'mes') end.setMonth(end.getMonth() + 1);
-        else if (pendingPaymentPlan === 'semestral') end.setMonth(end.getMonth() + 6);
-        else if (pendingPaymentPlan === 'anual') end.setFullYear(end.getFullYear() + 1);
+    // REGLA DE ORO: Si tu ID está en la lista VIP, ¡ERES VIP SÍ O SÍ!
+    if (isIdInCodeList) {
+        // Si por alguna razón no tenías historial en este navegador, te generamos uno por defecto (Plan Anual Activo)
+        if (!localSavedVip) {
+            const start = new Date();
+            let end = new Date();
+            end.setFullYear(end.getFullYear() + 1); // 1 año de vigencia por defecto
 
-        const newVipData = {
-            planKey: pendingPaymentPlan,
-            startDate: start.toISOString(),
-            endDate: end.toISOString()
-        };
-        localStorage.setItem(`vip_subscription_${currentId}`, JSON.stringify(newVipData));
-        localSavedVip = JSON.stringify(newVipData);
-        localStorage.removeItem(`pending_payment_${currentId}`);
-    }
+            const fallbackVipData = {
+                planKey: "anual",
+                startDate: start.toISOString(),
+                endDate: end.toISOString()
+            };
+            localStorage.setItem(`vip_subscription_${currentId}`, JSON.stringify(fallbackVipData));
+            localSavedVip = JSON.stringify(fallbackVipData);
+            localStorage.removeItem(`pending_payment_${currentId}`);
+        }
 
-    if (isIdInCodeList && localSavedVip) {
         const parsedData = JSON.parse(localSavedVip);
         const isExpired = new Date().getTime() > new Date(parsedData.endDate).getTime();
 
@@ -5942,16 +5923,38 @@ function checkVipInternalRegistration() {
                 status: "active"
             };
         } else {
-            executeDegradationFlow(currentId, null);
+            // Si el localStorage dice que expiró pero sigues en la lista del código, te renovamos otro año automáticamente
+            const start = new Date();
+            let end = new Date();
+            end.setFullYear(end.getFullYear() + 1);
+            
+            const renewedVipData = { planKey: parsedData.planKey || "anual", startDate: start.toISOString(), endDate: end.toISOString() };
+            localStorage.setItem(`vip_subscription_${currentId}`, JSON.stringify(renewedVipData));
+            
+            window.state.user.isVipMember = true;
+            window.state.user.vipDetails = {
+                planKey: renewedVipData.planKey,
+                planName: renewedVipData.planKey === 'mes' ? 'GPlus Estándar' : (renewedVipData.planKey === 'semestral' ? 'GPlus PRO' : 'GPlus Full'),
+                startDate: renewedVipData.startDate,
+                endDate: renewedVipData.endDate,
+                status: "active"
+            };
         }
     } else {
+        // Si no estás en la lista, aplicamos el flujo normal de degradación o procesamiento de pago pendiente
         executeDegradationFlow(currentId, pendingPaymentPlan);
     }
 
+    // Volvemos a pintar la interfaz con los datos corregidos
     renderUserProfileSection();
     renderGPlusSubscriptionCards();
-    updatePremiumTagUI();
+    
+    // 🔥 IMPORTANTE: Aquí llamamos a la función que actualiza tu menú de usuario y perfil
+    if (typeof updatePremiumTagUI === 'function') {
+        updatePremiumTagUI();
+    }
 }
+
 
 function executeDegradationFlow(currentId, pendingPaymentPlan) {
     window.state.user.isVipMember = false;
@@ -6122,6 +6125,27 @@ function triggerCongratsModal() {
 
 function updatePremiumTagUI() {
     console.log("Tag UI de perfil sincronizada.");
+
+    // [CONFIGURACIÓN]: Reemplaza los IDs de abajo por los IDs reales de tu HTML
+    const etiquetaPerfil = document.getElementById("id-de-tu-etiqueta-perfil"); 
+    const etiquetaMenu = document.getElementById("id-de-tu-etiqueta-menu");
+
+    // Extraemos los datos reales del estado de GPlus
+    const esVip = window.state.user.isVipMember;
+    const nombrePlan = window.state.user.vipDetails.planName; // Devuelve 'GPlus Estándar', 'GPlus PRO', etc.
+
+    // 1. Actualizamos la etiqueta debajo de la foto de perfil
+    if (etiquetaPerfil) {
+        etiquetaPerfil.innerHTML = esVip ? `✨ ${nombrePlan}` : "Gratis";
+        etiquetaPerfil.style.background = esVip ? "#22c55e" : "#6c7883"; // Verde si es VIP, Gris si es Gratis
+        etiquetaPerfil.style.color = "#ffffff";
+    }
+
+    // 2. Actualizamos la etiqueta del menú de usuario
+    if (etiquetaMenu) {
+        etiquetaMenu.innerHTML = esVip ? "GPlus Premium" : "Gratis";
+        etiquetaMenu.style.color = esVip ? "#f97316" : "#cbd5e1"; // Naranja brillante si es VIP, Gris si es Gratis
+    }
 }
 
 function sendTelegramRenewalRequest(isDiscounted) {
