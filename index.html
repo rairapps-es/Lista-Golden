@@ -2327,6 +2327,27 @@
     
     <!-- SECCIÓN A: CONTACTOS (Visible por defecto) -->
     <div id="tab-content-contacts" class="tab-panel">
+        <div class="crm-modules-layout">
+        
+        <div class="crm-section-block">
+            <div class="section-block-header">
+                <h3><i data-lucide="users" style="color:#3b82f6;"></i> Cartera de Contactos VIP</h3>
+                <button class="btn-add-quick" onclick="openCrmModal('modal-add-contact')">+ Nuevo Contacto</button>
+            </div>
+            <div class="crm-grid" id="grid-crm-contacts">
+                </div>
+        </div>
+
+        <div class="crm-section-block">
+            <div class="section-block-header">
+                <h3><i data-lucide="lightbulb" style="color:#eab308;"></i> Incubadora de Ideas (RICE)</h3>
+                <button class="btn-add-quick" onclick="openCrmModal('modal-add-idea')" style="background: linear-gradient(90deg, #eab308, #ca8a04);">+ Nueva Idea</button>
+            </div>
+            <div class="crm-grid" id="grid-crm-ideas">
+                </div>
+        </div>
+
+    </div>
         <h3 style="color: #fff; margin: 0 0 12px 10px; font-size: 1.1rem;">Mis Contactos y Sponsors</h3>
         <div id="grid-crm-contacts" class="crm-grid"></div>
     </div>
@@ -2375,28 +2396,6 @@
             <button class="pill-btn" data-filter="ideas-proc" onclick="setUiFilter('ideaStatus', 'en-proceso')">🟡 En Proceso</button>
             <button class="pill-btn" data-filter="ideas-crit" onclick="setUiFilter('ideaStatus', 'critica')">🔥 Críticas</button>
         </div>
-    </div>
-
-    <div class="crm-modules-layout">
-        
-        <div class="crm-section-block">
-            <div class="section-block-header">
-                <h3><i data-lucide="users" style="color:#3b82f6;"></i> Cartera de Contactos VIP</h3>
-                <button class="btn-add-quick" onclick="openCrmModal('modal-add-contact')">+ Nuevo Contacto</button>
-            </div>
-            <div class="crm-grid" id="grid-crm-contacts">
-                </div>
-        </div>
-
-        <div class="crm-section-block">
-            <div class="section-block-header">
-                <h3><i data-lucide="lightbulb" style="color:#eab308;"></i> Incubadora de Ideas (RICE)</h3>
-                <button class="btn-add-quick" onclick="openCrmModal('modal-add-idea')" style="background: linear-gradient(90deg, #eab308, #ca8a04);">+ Nueva Idea</button>
-            </div>
-            <div class="crm-grid" id="grid-crm-ideas">
-                </div>
-        </div>
-
     </div>
 
     <div class="crm-modal-backdrop" id="modal-add-contact">
