@@ -2312,6 +2312,43 @@
     </div>
 
     <main id="view-crm-dashboard" class="app-view">
+        <div class="crm-header-dashboard">
+        <h2 class="view-title"><i data-lucide="layout-dashboard" style="color:var(--mystic-purple)"></i> Panel de Control & CRM</h2>
+        <p class="crm-subtitle">Gestiona tu cartera de partners e incuba tus ideas de desarrollo al instante.</p>
+    </div>
+
+    <div class="crm-bento-metrics">
+        <div class="metric-card">
+            <span class="metric-label">💼 Valor de Cartera</span>
+            <div class="metric-value" id="meta-portfolio-value">0€</div>
+        </div>
+        <div class="metric-card">
+            <span class="metric-label">🤖 Ideas Activas</span>
+            <div class="metric-value" id="meta-active-ideas" style="color: var(--vip-gold, #eab308);">0</div>
+        </div>
+        <div class="metric-card">
+            <span class="metric-label">🟢 Ideas Hechas</span>
+            <div class="metric-value" id="meta-completed-ideas" style="color: #22c55e;">0</div>
+        </div>
+    </div>
+
+    <div class="crm-filter-bar">
+        <div class="search-wrapper">
+            <i data-lucide="search" class="search-icon"></i>
+            <input type="text" id="crm-search-input" placeholder="Buscar cliente, idea o tag..." oninput="executeGlobalCrmFilter()">
+        </div>
+        <div class="filter-pills-scroll">
+            <button class="pill-btn active" data-filter="all-contacts" onclick="setUiFilter('crmCategory', 'all')">👥 Todos Partners</button>
+            <button class="pill-btn" data-filter="clientes" onclick="setUiFilter('crmCategory', 'clientes')">💎 Clientes</button>
+            <button class="pill-btn" data-filter="sponsors" onclick="setUiFilter('crmCategory', 'sponsors')">👑 Sponsors</button>
+            <button class="pill-btn" data-filter="anunciantes" onclick="setUiFilter('crmCategory', 'anunciantes')">📢 Anunciantes</button>
+            <button class="pill-btn" data-filter="colaboracion" onclick="setUiFilter('crmCategory', 'colaboracion')">🤝 Alianzas</button>
+            <span class="filter-divider">|</span>
+            <button class="pill-btn" data-filter="ideas-all" onclick="setUiFilter('ideaStatus', 'all')">💡 Todas Ideas</button>
+            <button class="pill-btn" data-filter="ideas-proc" onclick="setUiFilter('ideaStatus', 'en-proceso')">🟡 En Proceso</button>
+            <button class="pill-btn" data-filter="ideas-crit" onclick="setUiFilter('ideaStatus', 'critica')">🔥 Críticas</button>
+        </div>
+    </div>
         <!-- 1. Botones de Navegación (Tabs) -->
 <div class="crm-tabs-nav" style="display: flex; gap: 10px; margin-bottom: 20px; padding: 0 10px;">
     <button id="tab-btn-contacts" class="tab-link active" onclick="switchCrmTab('contacts')" style="flex: 1; padding: 12px; border: none; border-radius: 8px; font-weight: bold; background: #2563eb; color: #fff; cursor: pointer;">
@@ -2358,45 +2395,7 @@
         <div id="grid-crm-ideas" class="crm-grid"></div>
     </div>
 
-</div>
-
-    <div class="crm-header-dashboard">
-        <h2 class="view-title"><i data-lucide="layout-dashboard" style="color:var(--mystic-purple)"></i> Panel de Control & CRM</h2>
-        <p class="crm-subtitle">Gestiona tu cartera de partners e incuba tus ideas de desarrollo al instante.</p>
-    </div>
-
-    <div class="crm-bento-metrics">
-        <div class="metric-card">
-            <span class="metric-label">💼 Valor de Cartera</span>
-            <div class="metric-value" id="meta-portfolio-value">0€</div>
-        </div>
-        <div class="metric-card">
-            <span class="metric-label">🤖 Ideas Activas</span>
-            <div class="metric-value" id="meta-active-ideas" style="color: var(--vip-gold, #eab308);">0</div>
-        </div>
-        <div class="metric-card">
-            <span class="metric-label">🟢 Ideas Hechas</span>
-            <div class="metric-value" id="meta-completed-ideas" style="color: #22c55e;">0</div>
-        </div>
-    </div>
-
-    <div class="crm-filter-bar">
-        <div class="search-wrapper">
-            <i data-lucide="search" class="search-icon"></i>
-            <input type="text" id="crm-search-input" placeholder="Buscar cliente, idea o tag..." oninput="executeGlobalCrmFilter()">
-        </div>
-        <div class="filter-pills-scroll">
-            <button class="pill-btn active" data-filter="all-contacts" onclick="setUiFilter('crmCategory', 'all')">👥 Todos Partners</button>
-            <button class="pill-btn" data-filter="clientes" onclick="setUiFilter('crmCategory', 'clientes')">💎 Clientes</button>
-            <button class="pill-btn" data-filter="sponsors" onclick="setUiFilter('crmCategory', 'sponsors')">👑 Sponsors</button>
-            <button class="pill-btn" data-filter="anunciantes" onclick="setUiFilter('crmCategory', 'anunciantes')">📢 Anunciantes</button>
-            <button class="pill-btn" data-filter="colaboracion" onclick="setUiFilter('crmCategory', 'colaboracion')">🤝 Alianzas</button>
-            <span class="filter-divider">|</span>
-            <button class="pill-btn" data-filter="ideas-all" onclick="setUiFilter('ideaStatus', 'all')">💡 Todas Ideas</button>
-            <button class="pill-btn" data-filter="ideas-proc" onclick="setUiFilter('ideaStatus', 'en-proceso')">🟡 En Proceso</button>
-            <button class="pill-btn" data-filter="ideas-crit" onclick="setUiFilter('ideaStatus', 'critica')">🔥 Críticas</button>
-        </div>
-    </div>
+</div>  
 
     <div class="crm-modal-backdrop" id="modal-add-contact">
         <div class="crm-modal-card">
