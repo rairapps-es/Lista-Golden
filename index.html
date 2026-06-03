@@ -5642,27 +5642,61 @@ function openTelegramPrivateChat(username) {
     }
 }
 
-function launchQuickPitch(contactId) {
-    const contact = state.crmContacts.find(c => c.id === contactId);
-    if (!contact) return;
+function launchQuickPitch(id) {
+    try {
+        console.log(`⚡ Iniciando Quick Pitch para el contacto: ${id}`);
 
-    let textBase = "";
-    if (contact.category === "anunciantes") {
-        textBase = `Hola ${contact.name}, espero que vayas genial. Te escribo de la administración de la MiniApp para ver cómo va el rendimiento de tus campañas vigentes y ofrecerte los nuevos cupos publicitarios de esta semana...`;
-    } else if (contact.category === "sponsors") {
-        textBase = `Buenas ${contact.name}, te adjunto el balance financiero de las métricas de impacto de nuestra MiniApp de Telegram para revisar los cierres de patrocinio mensuales...`;
-    } else {
-        textBase = `Hola ${contact.name}, un saludo. Te contacto para coordinar los siguientes hitos de nuestro acuerdo dentro de la MiniApp...`;
-    }
+        // 1. Buscamos al contacto real en la base de datos por su ID
+        if (!state.crmContacts) state.crmContacts = [];
+        const contact = state.crmContacts.find(c => c.id === id);
 
-    // Codificación segura URI para saltos y espacios limpios
-    const urlTelegramCompleta = `https://t.me/${contact.tgUsername}?text=${encodeURIComponent(textBase)}`;
+        if (!contact) {
+            alert("⚠️ No se pudo encontrar la información de este contacto.");
+            return;
+        }
 
-    if (window.Telegram?.WebApp) {
-        window.Telegram.WebApp.HapticFeedback.notificationOccurred("success");
-        window.Telegram.WebApp.openTelegramLink(urlTelegramCompleta);
-    } else {
-        window.open(urlTelegramCompleta, '_blank');
+        // 2. Definimos plantillas de mensajes automatizados según su Clasificación / Rol
+        let mensajePitch = "";
+        const nombreSocio = contact.name || "partner";
+
+        switch (contact.category) {
+            case "sponsors":
+                mensajePitch = `¡Hola ${nombreSocio}! 👋 Quería comentarte que estamos cerrando las métricas de esta semana y tenemos nuevos espacios VIP disponibles para patrocinadores. Avísame si te cuadra que te pase la propuesta de renovación para este mes. 🚀`;
+                break;
+            case "anunciantes":
+                mensajePitch = `¡Buenas ${nombreSocio}! 📢 Lanzamos una nueva campaña de difusión en nuestros canales comerciales con descuento especial para anunciantes recurrentes. ¿Te interesa que reservemos un slot para tu marca esta semana?`;
+                break;
+            case "clientes":
+                mensajePitch = `¡Hola ${nombreSocio}! 💎 Espero que todo vaya genial. Te escribo para hacer seguimiento de nuestro acuerdo y ver si necesitas algún ajuste en el volumen de puntos/trato económico actual. ¡Seguimos sumando!`;
+                break;
+            case "colaboracion":
+                mensajePitch = `¡Qué tal ${nombreSocio}! 🤝 Quería darte un toque rápido para revisar cómo llevamos las últimas tareas técnicas del equipo y coordinar el siguiente sprint. ¡Hablamos!`;
+                break;
+            default:
+                mensajePitch = `¡Hola ${nombreSocio}! 👋 Te escribo desde el panel de control para hacer un seguimiento rápido de nuestro último acuerdo. ¡Espero que todo vaya excelente!`;
+        }
+
+        // 3. LA ACCIÓN: Copiar el texto automáticamente al portapapeles del usuario
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(mensajePitch).then(() => {
+                // Alerta premium o feedback visual
+                alert(`📋 ¡Mensaje personalizado copiado al portapapeles!\n\nAhora ve al chat de @${contact.tgUsername} y pégalo.`);
+                
+                // Si estás en Telegram, abre el chat privado directamente después de copiarlo
+                if (typeof openTelegramPrivateChat === 'function' && contact.tgUsername) {
+                    openTelegramPrivateChat(contact.tgUsername);
+                }
+            }).catch(err => {
+                throw new Error("No se pudo copiar automáticamente: " + err.message);
+            });
+        } else {
+            // Alternativa de emergencia si el navegador de Telegram bloquea el portapapeles directo
+            alert(`💡 Propuesta generada para @${contact.tgUsername}:\n\n"${mensajePitch}"\n\n(Cópialo manualmente para enviarlo)`);
+        }
+
+    } catch (error) {
+        console.error("🚨 Error en launchQuickPitch:", error);
+        alert("El botón de Pitch falló: " + error.message);
     }
 }
 
