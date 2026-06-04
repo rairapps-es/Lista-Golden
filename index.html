@@ -4999,13 +4999,20 @@ window.navegarACanalOficial = function(telegramUserId, urlFallback, nombreCanal)
 // 🏁 EL ORQUESTRADOR UNIFICADO DE ARRANQUE (Limpiado y Sincronizado)
 // =========================================================================
 document.addEventListener("DOMContentLoaded", () => {
+    console.log("📥 [Ecosistema] Inicializando componentes principales de la interfaz...");
+
+    // 🛡️ PROTECCIÓN DE ENTORNO: Nos aseguramos de que el objeto state global exista siempre
+    if (typeof window.state === 'undefined') {
+        window.state = {};
+    }
+
+    // 1. Carga de datos de tu contexto y flujos diarios
     loadFromLocalStorage();
     initTelegramContext();
     executeDailyCheckIn();
     
-    // 🏛️ Esta función ahora arrastrará el Top 10 asegurando que los datos existan
+    // 🏛️ Renderizado de componentes visuales (Top 10, Carruseles y Sliders)
     renderAppUiComponents(); 
-    
     renderShopCarrousels();
     updateAdminToggleUI();
     renderCategorySliders();
@@ -5013,22 +5020,19 @@ document.addEventListener("DOMContentLoaded", () => {
     
     // 🔥 EL MOTOR SIMULADOR: Inyecta vida al contador en cuanto abre la WebApp
     initOnlineUsersSimulator('cont-usuarios-online'); 
+    initDynamicSliders(); 
     
-    initDynamicSliders(); // 👈 Llama a tus sliders originales
-    
-    // 💳 CONEXIÓN SEGURA CON EL MOTOR DE TARJETAS GPLUS
-    // Verificamos si la función ya existe globalmente. Si no, esperamos un instante a que el IIFE cargue.
+    // 💳 CONEXIÓN DIRECTA Y SIN RETRASOS CON EL MOTOR GPLUS
+    // Como la función ya es pública y global, la ejecutamos directamente de forma segura
     if (typeof checkVipInternalRegistration === 'function') {
         checkVipInternalRegistration();
-    } else {
-        setTimeout(() => {
-            if (typeof checkVipInternalRegistration === 'function') {
-                checkVipInternalRegistration();
-            }
-        }, 50); // Margen de seguridad de 50ms
     }
 
-    if (window.lucide) lucide.createIcons();
+    // Aseguramos los iconos decorativos del sistema
+    if (window.lucide) {
+        lucide.createIcons();
+    }
+    
     addLog("Ecosistema unificado bajo ID único de Telegram y tráfico simulado activo.");
 });
 
@@ -6087,7 +6091,7 @@ document.addEventListener("DOMContentLoaded", () => {
     console.log("📥 [CRM] Inicializando almacenamiento y base de datos local...");
     
     // 🛡️ CORRECCIÓN CRÍTICA: Si 'state' no existe en el entorno global, lo creamos de inmediato
-    if (typeof state === 'undefined') {
+    if (typeof window.state === 'undefined') {
         window.state = {};
     }
 
@@ -6096,15 +6100,22 @@ document.addEventListener("DOMContentLoaded", () => {
     const savedIdeas = localStorage.getItem('myMiniApp_IncubatorIdeas_v1');
 
     // 2. Sincronización estricta y segura dentro del objeto state
-    state.crmContacts = savedContacts ? JSON.parse(savedContacts) : [];
-    state.incubatorIdeas = savedIdeas ? JSON.parse(savedIdeas) : [];
+    window.state.crmContacts = savedContacts ? JSON.parse(savedContacts) : [];
+    window.state.incubatorIdeas = savedIdeas ? JSON.parse(savedIdeas) : [];
 
     // 3. Verificación de datos semilla de manera independiente
     if (typeof checkCrmSeedDataset === 'function') {
         checkCrmSeedDataset();
     }
 
-    console.log(`💾 [CRM] Base de datos sincronizada: ${state.crmContacts.length} contactos, ${state.incubatorIdeas.length} ideas.`);
+    console.log(`💾 [CRM] Base de datos sincronizada: ${window.state.crmContacts.length} contactos, ${window.state.incubatorIdeas.length} ideas.`);
+
+    // 🔥 ENLACE DE SEGURIDAD CRÍTICO CON GPLUS:
+    // Una vez que la base de datos local está lista, forzamos el renderizado de GPlus
+    if (typeof checkVipInternalRegistration === 'function') {
+        console.log("🔗 [CRM -> GPlus] Cooperación de scripts activa. Lanzando pasarela...");
+        checkVipInternalRegistration();
+    }
 });
 
 // 🔗 Forzamos el enlace global inequívoco con el HTML de la MiniApp de Telegram
