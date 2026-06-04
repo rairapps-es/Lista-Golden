@@ -1648,6 +1648,90 @@
 .btn-modal-cancel { flex: 1; border: none; background: #334155; color: #94a3b8; padding: 10px; border-radius: 8px; font-weight: 700; cursor: pointer; }
 .btn-modal-save { flex: 1; border: none; background: #3b82f6; color: #fff; padding: 10px; border-radius: 8px; font-weight: 700; cursor: pointer; }
 
+        /* =========================================================================
+   ESTILOS COMPONENTES INDEPENDIENTES (FILTRO AUTOMÁTICO COINCIDENTE)
+   ========================================================================= */
+.card-indep-gplus {
+    background: #17212b;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 20px;
+    color: #ffffff;
+    font-family: system-ui, -apple-system, sans-serif;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.header-indep-gplus {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    padding-bottom: 15px;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.info-indep-gplus h3 {
+    margin: 0 0 4px 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+.info-indep-gplus p {
+    margin: 0;
+    font-size: 0.8rem;
+    color: #6c7883;
+}
+
+.info-indep-gplus p span {
+    font-family: monospace;
+    color: #2481cc;
+}
+
+.badge-indep-gplus {
+    font-size: 0.7rem;
+    font-weight: 800;
+    padding: 6px 14px;
+    border-radius: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #ffffff;
+}
+
+.badge-indep-active { background: #22c55e; }
+.badge-indep-processing { background: #f97316; }
+.badge-indep-inactive { background: #6c7883; }
+
+.grid-indep-gplus {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+}
+
+.col-indep-gplus {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.label-indep-gplus {
+    font-size: 0.75rem;
+    color: #6c7883;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.value-indep-gplus {
+    font-size: 0.9rem;
+    color: #ffffff;
+    font-weight: 600;
+}
+
+.value-indep-gplus.highlight-indep-date {
+    color: #f97316;
+}
+
     </style>
 </head>
 <body>
@@ -5647,6 +5731,115 @@ setTimeout(checkVipInternalRegistration, 100);
 
 </script>
 
+    <script>
+        function verificarYMostrarSuscripcionAutomatica() {
+    // -------------------------------------------------------------------------
+    // 1. SIMULACIÓN DEL ID DEL USUARIO ACTUAL (Cambia este ID para hacer tus pruebas)
+    // -------------------------------------------------------------------------
+    const ID_USUARIO_ACTUAL_LOGUEADO = 1320417199; 
+
+    // -------------------------------------------------------------------------
+    // 2. TU TABLA DE CONFIGURACIÓN MANUAL DE 3 USUARIOS VIP
+    // -------------------------------------------------------------------------
+    const BASE_SUSCRIPCIONES_VIP = [
+        {
+            idTelegram: 1320417199,
+            tipoDuracion: "Anual",        // Texto exacto que quieres mostrar
+            fechaInicio: "2026-01-01",
+            fechaFin: "2027-01-01",
+            nombrePlan: "GPlus VIP Full",
+            estado: "active"
+        },
+        {
+            idTelegram: 87654321,
+            tipoDuracion: "Trimestral",
+            fechaInicio: "2026-05-15",
+            fechaFin: "2026-08-15",
+            nombrePlan: "GPlus PRO",
+            estado: "processing"
+        },
+        {
+            idTelegram: 55442211,
+            tipoDuracion: "1 Mes",
+            fechaInicio: "2026-06-01",
+            fechaFin: "2026-07-01",
+            nombrePlan: "GPlus Estándar",
+            estado: "inactive"
+        }
+    ];
+    // -------------------------------------------------------------------------
+
+    const contenedor = document.getElementById("gplus-user-status-block");
+    if (!contenedor) return;
+
+    // Buscar si el usuario actual coincide con alguno de los 3 registrados
+    const suscripcionValida = BASE_SUSCRIPCIONES_VIP.find(u => u.idTelegram === ID_USUARIO_ACTUAL_LOGUEADO);
+
+    // REGLA DE FILTRADO: Si el ID NO coincide con ninguno, ocultamos el panel por completo
+    if (!suscripcionValida) {
+        contenedor.style.display = "none";
+        contenedor.innerHTML = "";
+        console.log(`🔒 [GPlus] Usuario ${ID_USUARIO_ACTUAL_LOGUEADO} no coincide con la lista VIP. Panel ocultado.`);
+        return;
+    }
+
+    // Si coincide, forzamos que sea visible y procesamos el renderizado
+    contenedor.style.display = "block";
+
+    // Formateador interno de fechas (Ej: 1 de ene de 2026)
+    const formatearFecha = (fechaStr) => {
+        if (!fechaStr) return "N/A";
+        const partes = fechaStr.split("-");
+        if (partes.length !== 3) return fechaStr;
+        const fecha = new Date(partes[0], partes[1] - 1, partes[2]);
+        return fecha.toLocaleDateString("es-ES", { day: "numeric", month: "short", year: "numeric" });
+    };
+
+    // Control de colores del Badge de estado
+    let textoEstado = "Inactivo";
+    let claseBadge = "badge-indep-inactive";
+    if (suscripcionValida.estado === "active") {
+        textoEstado = "Activo";
+        claseBadge = "badge-indep-active";
+    } else if (suscripcionValida.estado === "processing") {
+        textoEstado = "En Revisión";
+        claseBadge = "badge-indep-processing";
+    }
+
+    // Inyectar la interfaz de su suscripción correspondiente
+    contenedor.innerHTML = `
+        <div class="card-indep-gplus">
+            <div class="header-indep-gplus">
+                <div class="info-indep-gplus">
+                    <h3>Estado de tu Suscripción GPlus</h3>
+                    <p>ID Sesión: <span>${suscripcionValida.idTelegram}</span> • Plan: <strong>${suscripcionValida.nombrePlan}</strong></p>
+                </div>
+                <span class="badge-indep-gplus ${claseBadge}">${textoEstado}</span>
+            </div>
+            
+            <div class="grid-indep-gplus">
+                <div class="col-indep-gplus">
+                    <span class="label-indep-gplus">Tipo de Duración</span>
+                    <strong class="value-indep-gplus">${suscripcionValida.tipoDuracion}</strong>
+                </div>
+                <div class="col-indep-gplus">
+                    <span class="label-indep-gplus">Fecha de Inicio</span>
+                    <strong class="value-indep-gplus">${formatearFecha(suscripcionValida.fechaInicio)}</strong>
+                </div>
+                <div class="col-indep-gplus">
+                    <span class="label-indep-gplus">Fecha de Vencimiento</span>
+                    <strong class="value-indep-gplus highlight-indep-date">${formatearFecha(suscripcionValida.fechaFin)}</strong>
+                </div>
+            </div>
+        </div>
+    `;
+    console.log(`🔓 [GPlus] Coincidencia exitosa para ID: ${ID_USUARIO_ACTUAL_LOGUEADO}. Mostrando datos.`);
+}
+
+// Disparador automático e independiente
+document.addEventListener("DOMContentLoaded", verificarYMostrarSuscripcionAutomatica);
+
+    </script>
     <script>
     // =========================================================================
 // 1. AMPLIACIÓN E INICIALIZACIÓN DEL ESTADO DE LA APP
