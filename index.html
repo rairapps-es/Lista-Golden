@@ -2567,15 +2567,17 @@
      CONTENEDOR MAIN: SISTEMA DE SUSCRIPCIÓN GPLUS INDEPENDIENTE
      ========================================================================= -->
 <main id="view-shop" class="app-view" style="font-family: system-ui, -apple-system, sans-serif; max-width: 1200px; margin: 0 auto; padding: 20px;">
-    
-    <div id="gplus-user-status-block" style="margin-bottom: 30px;">
+        
+        <!-- Bloque donde se inyectará dinámicamente la información del usuario coincidente -->
+        <div id="gplus-user-status-block" style="margin-bottom: 30px;"></div>
+
+        <h2 style="color: #fff; font-size: 1.5rem; font-weight: 800; margin-bottom: 20px; text-align: center;">Planes de Suscripción GPlus</h2>
+        
+        <div id="gplus-cards-row-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
+            <!-- Aquí van las tarjetas estáticas de tus planes de la tienda -->
         </div>
 
-    <h2 style="color: #fff; font-size: 1.5rem; font-weight: 800; margin-bottom: 20px; text-align: center;">Planes de Suscripción GPlus</h2>
-    <div id="gplus-cards-row-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
-        </div>
-
-</main>
+    </main>
     
 <button onclick="switchView('shop')">🛍️ Visitar Tienda</button>
 
