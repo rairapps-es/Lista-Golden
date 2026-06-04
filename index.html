@@ -4999,20 +4999,13 @@ window.navegarACanalOficial = function(telegramUserId, urlFallback, nombreCanal)
 // 🏁 EL ORQUESTRADOR UNIFICADO DE ARRANQUE (Limpiado y Sincronizado)
 // =========================================================================
 document.addEventListener("DOMContentLoaded", () => {
-    console.log("📥 [Ecosistema] Inicializando componentes principales de la interfaz...");
-
-    // 🛡️ PROTECCIÓN DE ENTORNO: Nos aseguramos de que el objeto state global exista siempre
-    if (typeof window.state === 'undefined') {
-        window.state = {};
-    }
-
-    // 1. Carga de datos de tu contexto y flujos diarios
     loadFromLocalStorage();
     initTelegramContext();
     executeDailyCheckIn();
     
-    // 🏛️ Renderizado de componentes visuales (Top 10, Carruseles y Sliders)
+    // 🏛️ Esta función ahora arrastrará el Top 10 asegurando que los datos existan
     renderAppUiComponents(); 
+    
     renderShopCarrousels();
     updateAdminToggleUI();
     renderCategorySliders();
@@ -5020,19 +5013,22 @@ document.addEventListener("DOMContentLoaded", () => {
     
     // 🔥 EL MOTOR SIMULADOR: Inyecta vida al contador en cuanto abre la WebApp
     initOnlineUsersSimulator('cont-usuarios-online'); 
-    initDynamicSliders(); 
     
-    // 💳 CONEXIÓN DIRECTA Y SIN RETRASOS CON EL MOTOR GPLUS
-    // Como la función ya es pública y global, la ejecutamos directamente de forma segura
+    initDynamicSliders(); // 👈 Llama a tus sliders originales
+    
+    // 💳 CONEXIÓN SEGURA CON EL MOTOR DE TARJETAS GPLUS
+    // Verificamos si la función ya existe globalmente. Si no, esperamos un instante a que el IIFE cargue.
     if (typeof checkVipInternalRegistration === 'function') {
         checkVipInternalRegistration();
+    } else {
+        setTimeout(() => {
+            if (typeof checkVipInternalRegistration === 'function') {
+                checkVipInternalRegistration();
+            }
+        }, 50); // Margen de seguridad de 50ms
     }
 
-    // Aseguramos los iconos decorativos del sistema
-    if (window.lucide) {
-        lucide.createIcons();
-    }
-    
+    if (window.lucide) lucide.createIcons();
     addLog("Ecosistema unificado bajo ID único de Telegram y tráfico simulado activo.");
 });
 
@@ -5888,11 +5884,6 @@ function saveNewContactAction() {
     try {
         console.log("🎯 Iniciando guardado y refresco de contacto...");
         
-        // 🛡️ CONTROL DE SEGURIDAD: Aseguramos que window.state y sus arrays existan antes de operar
-        if (typeof window.state === 'undefined') window.state = {};
-        if (!window.state.crmContacts) window.state.crmContacts = [];
-        if (!window.state.incubatorIdeas) window.state.incubatorIdeas = [];
-
         const nameEl = document.getElementById("form-cnt-name");
         const tgEl = document.getElementById("form-cnt-tg");
         const catEl = document.getElementById("form-cnt-category");
@@ -5925,12 +5916,13 @@ function saveNewContactAction() {
             date: new Date().toISOString().split('T')[0]
         };
 
-        // 1. Inyectar de manera segura en la memoria RAM global de la WebApp
-        window.state.crmContacts.push(newContact);
+        // 1. Garantizar estructura e inyectar en la memoria RAM
+        if (!state.crmContacts) state.crmContacts = [];
+        state.crmContacts.push(newContact);
         
-        // 2. 🔥 PERSISTENCIA DIRECTA SIMULTÁNEA: Escribimos los datos usando el objeto global unificado
-        localStorage.setItem('myMiniApp_CrmContacts_v1', JSON.stringify(window.state.crmContacts));
-        localStorage.setItem('myMiniApp_IncubatorIdeas_v1', JSON.stringify(window.state.incubatorIdeas)); 
+        // 2. 🔥 PERSISTENCIA DIRECTA SIMULTÁNEA: Aseguramos escribir ambos arrays limpios
+        localStorage.setItem('myMiniApp_CrmContacts_v1', JSON.stringify(state.crmContacts));
+        localStorage.setItem('myMiniApp_IncubatorIdeas_v1', JSON.stringify(state.incubatorIdeas || [])); 
         
         // 3. Cerramos el modal de la interfaz
         closeCrmModal('modal-add-contact');
@@ -5950,7 +5942,7 @@ function saveNewContactAction() {
             window.Telegram.WebApp.HapticFeedback.notificationOccurred("success");
         }
 
-        console.log("✅ Contacto renderizado y guardado en tiempo real en window.state.");
+        console.log("✅ Contacto renderizado y guardado en tiempo real.");
 
     } catch (error) {
         console.error("🚨 Error crítico en saveNewContactAction:", error);
@@ -5959,103 +5951,65 @@ function saveNewContactAction() {
 }
 
 function saveNewIdeaAction() {
-    try {
-        console.log("🎯 Iniciando guardado y refresco de idea en la incubadora...");
+    const title = document.getElementById("form-idea-title").value.trim();
+    const desc = document.getElementById("form-idea-desc").value.trim();
+    const priority = document.getElementById("form-idea-priority").value;
+    const imp = Number(document.getElementById("form-idea-impact").value) || 1;
+    const eff = Number(document.getElementById("form-idea-effort").value) || 1;
 
-        // 🛡️ CONTROL DE SEGURIDAD: Aseguramos que window.state y sus arrays existan en Window
-        if (typeof window.state === 'undefined') window.state = {};
-        if (!window.state.crmContacts) window.state.crmContacts = [];
-        if (!window.state.incubatorIdeas) window.state.incubatorIdeas = [];
-
-        const titleEl = document.getElementById("form-idea-title");
-        const descEl = document.getElementById("form-idea-desc");
-        const priorityEl = document.getElementById("form-idea-priority");
-        const impEl = document.getElementById("form-idea-impact");
-        const effEl = document.getElementById("form-idea-effort");
-
-        if (!titleEl || !descEl) {
-            alert("❌ Error: No se encuentran los inputs obligatorios de la idea en el HTML.");
-            return;
-        }
-
-        const title = titleEl.value.trim();
-        const desc = descEl.value.trim();
-        const priority = priorityEl ? priorityEl.value : "media";
-        const imp = impEl ? Number(impEl.value) : 1;
-        const eff = effEl ? Number(effEl.value) : 1;
-
-        if (!title || !desc) {
-            alert("Asigna un título y requerimientos para incubar la idea.");
-            return;
-        }
-
-        const calculatedScore = (imp / eff);
-
-        const newIdea = {
-            id: "idea_" + Date.now(),
-            title: title,
-            description: desc,
-            priority: priority,
-            impact: imp,
-            effort: eff,
-            score: calculatedScore,
-            status: "en-proceso",
-            date: new Date().toISOString().split('T')[0]
-        };
-
-        // 1. Añadir a la memoria interna global
-        window.state.incubatorIdeas.push(newIdea);
-        
-        // 2. 🔥 PERSISTENCIA DIRECTA SIMULTÁNEA: Guardar en el disco duro del navegador desde window.state
-        localStorage.setItem('myMiniApp_IncubatorIdeas_v1', JSON.stringify(window.state.incubatorIdeas));
-        localStorage.setItem('myMiniApp_CrmContacts_v1', JSON.stringify(window.state.crmContacts));
-        
-        // 3. Cerrar UI y renderizar
-        closeCrmModal('modal-add-idea');
-        renderCrmDashboard();
-
-        // 4. Limpiar los campos de forma segura
-        titleEl.value = "";
-        descEl.value = "";
-        if (priorityEl) priorityEl.value = "media";
-        if (impEl) impEl.value = "1";
-        if (effEl) effEl.value = "1";
-
-        // Feedback háptico de Telegram si aplica
-        if (window.Telegram?.WebApp) {
-            window.Telegram.WebApp.HapticFeedback.notificationOccurred("success");
-        }
-
-        console.log("✅ Idea registrada, calculada y guardada con éxito en window.state.");
-
-    } catch (error) {
-        console.error("🚨 Error crítico en saveNewIdeaAction:", error);
-        alert("Hubo un problema al procesar la idea visualmente: " + error.message);
+    if (!title || !desc) {
+        alert("Asigna un título y requerimientos para incubar la idea.");
+        return;
     }
+
+    const calculatedScore = (imp / eff);
+
+    const newIdea = {
+        id: "idea_" + Date.now(),
+        title: title,
+        description: desc,
+        priority: priority,
+        impact: imp,
+        effort: eff,
+        score: calculatedScore,
+        status: "en-proceso",
+        date: new Date().toISOString().split('T')[0]
+    };
+
+    // 1. Añadir a la memoria interna
+    if (!state.incubatorIdeas) state.incubatorIdeas = [];
+    state.incubatorIdeas.push(newIdea);
+    
+    // 2. 🔥 EL CAMBIO DE ORO: Guardar directamente en el disco duro del navegador
+    localStorage.setItem('myMiniApp_IncubatorIdeas_v1', JSON.stringify(state.incubatorIdeas));
+    localStorage.setItem('myMiniApp_CrmContacts_v1', JSON.stringify(state.crmContacts || []));
+    
+    // 3. Cerrar UI y renderizar
+    closeCrmModal('modal-add-idea');
+    renderCrmDashboard();
+
+    // 4. Limpiar
+    document.getElementById("form-idea-title").value = "";
+    document.getElementById("form-idea-desc").value = "";
 }
 
 function changeIdeaStatusAction(id, targetStatus) {
     try {
         console.log(`🔄 Cambiando estado de la idea ${id} a -> ${targetStatus}`);
         
-        // 🛡️ CONTROL DE SEGURIDAD: Aseguramos que window.state y sus arrays existan antes de buscar
-        if (typeof window.state === 'undefined') window.state = {};
-        if (!window.state.crmContacts) window.state.crmContacts = [];
-        if (!window.state.incubatorIdeas) window.state.incubatorIdeas = [];
-
-        // 1. Buscamos la idea en la memoria RAM global
-        const idea = window.state.incubatorIdeas.find(i => i.id === id);
+        // 1. Buscamos la idea en la memoria RAM
+        const idea = state.incubatorIdeas.find(i => i.id === id);
         if (!idea) {
             console.warn("⚠️ No se encontró la idea con ID:", id);
             return;
         }
 
-        // 2. Modificamos el estado de forma segura
+        // 2. Modificamos el estado
         idea.status = targetStatus;
         
-        // 3. Guardamos físicamente en las claves que lee tu app al arrancar usando window.state
-        localStorage.setItem('myMiniApp_IncubatorIdeas_v1', JSON.stringify(window.state.incubatorIdeas));
-        localStorage.setItem('myMiniApp_CrmContacts_v1', JSON.stringify(window.state.crmContacts));
+        // 3. Guardamos físicamente en las claves que lee tu app al arrancar
+        localStorage.setItem('myMiniApp_IncubatorIdeas_v1', JSON.stringify(state.incubatorIdeas));
+        localStorage.setItem('myMiniApp_CrmContacts_v1', JSON.stringify(state.crmContacts || []));
         
         // 4. 🔥 LA SOLUCIÓN EN TIEMPO REAL: Forzamos el redibujado de las tarjetas
         renderCrmDashboard();
@@ -6064,8 +6018,6 @@ function changeIdeaStatusAction(id, targetStatus) {
         if (window.Telegram?.WebApp) {
             window.Telegram.WebApp.HapticFeedback.notificationOccurred("success");
         }
-
-        console.log(`✅ Estado actualizado con éxito a "${targetStatus}" en window.state.`);
 
     } catch (error) {
         console.error("🚨 Error en changeIdeaStatusAction:", error);
@@ -6135,7 +6087,7 @@ document.addEventListener("DOMContentLoaded", () => {
     console.log("📥 [CRM] Inicializando almacenamiento y base de datos local...");
     
     // 🛡️ CORRECCIÓN CRÍTICA: Si 'state' no existe en el entorno global, lo creamos de inmediato
-    if (typeof window.state === 'undefined') {
+    if (typeof state === 'undefined') {
         window.state = {};
     }
 
@@ -6143,30 +6095,16 @@ document.addEventListener("DOMContentLoaded", () => {
     const savedContacts = localStorage.getItem('myMiniApp_CrmContacts_v1');
     const savedIdeas = localStorage.getItem('myMiniApp_IncubatorIdeas_v1');
 
-    // 2. Sincronización estricta y segura dentro del objeto state global
-    window.state.crmContacts = savedContacts ? JSON.parse(savedContacts) : [];
-    window.state.incubatorIdeas = savedIdeas ? JSON.parse(savedIdeas) : [];
-
-    // 🔗 EL PUENTE MAESTRO: Vinculamos la variable local 'state' que usan tus funciones con el 'window.state' global
-    if (typeof state !== 'undefined') {
-        state = window.state; 
-    } else {
-        window.state = window.state; // Asegura persistencia mutua
-    }
+    // 2. Sincronización estricta y segura dentro del objeto state
+    state.crmContacts = savedContacts ? JSON.parse(savedContacts) : [];
+    state.incubatorIdeas = savedIdeas ? JSON.parse(savedIdeas) : [];
 
     // 3. Verificación de datos semilla de manera independiente
     if (typeof checkCrmSeedDataset === 'function') {
         checkCrmSeedDataset();
     }
 
-    console.log(`💾 [CRM] Base de datos sincronizada: ${window.state.crmContacts.length} contactos, ${window.state.incubatorIdeas.length} ideas.`);
-
-    // 🔥 ENLACE DE SEGURIDAD CRÍTICO CON GPLUS:
-    // Una vez que la base de datos local está lista, forzamos el renderizado de GPlus
-    if (typeof checkVipInternalRegistration === 'function') {
-        console.log("🔗 [CRM -> GPlus] Cooperación de scripts activa. Lanzando pasarela...");
-        checkVipInternalRegistration();
-    }
+    console.log(`💾 [CRM] Base de datos sincronizada: ${state.crmContacts.length} contactos, ${state.incubatorIdeas.length} ideas.`);
 });
 
 // 🔗 Forzamos el enlace global inequívoco con el HTML de la MiniApp de Telegram
@@ -6176,6 +6114,7 @@ window.changeIdeaStatusAction = changeIdeaStatusAction;
 window.switchCrmTab = switchCrmTab;
 
 console.log("🚀 Módulo CRM completamente blindado, persistente y expuesto en Window.");
+
   </script>
     
     <div id="slider-detail-modal" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(7, 10, 19, 0.9); backdrop-filter: blur(12px); z-index: 9999999; display: none; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s ease; font-family: sans-serif;">
