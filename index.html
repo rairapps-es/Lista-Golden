@@ -1651,43 +1651,41 @@
         /* =========================================================================
    ESTILOS COMPONENTES INDEPENDIENTES (FILTRO AUTOMÁTICO COINCIDENTE)
    ========================================================================= */
+/* =========================================================================
+   CSS CORREGIDO: ALTO CONTRASTE PARA ENTORNO OSCURO
+   ========================================================================= */
+
+#view-shop {
+    font-family: system-ui, -apple-system, sans-serif;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* --- Panel Superior --- */
 .card-indep-gplus {
-    background: #17212b;
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: linear-gradient(145, #1c2a38, #111b24); /* Degradado para dar profundidad */
+    border: 1px solid rgba(36, 129, 204, 0.3); /* Borde azul sutil */
     border-radius: 16px;
     padding: 20px;
     color: #ffffff;
-    font-family: system-ui, -apple-system, sans-serif;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
 }
 
 .header-indep-gplus {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     padding-bottom: 15px;
     margin-bottom: 15px;
     flex-wrap: wrap;
     gap: 12px;
 }
 
-.info-indep-gplus h3 {
-    margin: 0 0 4px 0;
-    font-size: 1.1rem;
-    font-weight: 700;
-}
-
-.info-indep-gplus p {
-    margin: 0;
-    font-size: 0.8rem;
-    color: #6c7883;
-}
-
-.info-indep-gplus p span {
-    font-family: monospace;
-    color: #2481cc;
-}
+.info-indep-gplus h3 { margin: 0 0 4px 0; font-size: 1.1rem; font-weight: 700; color: #ffffff; }
+.info-indep-gplus p { margin: 0; font-size: 0.8rem; color: #a6b4c2; } /* Texto más claro para leer bien */
+.info-indep-gplus p span { font-family: monospace; color: #52a9ff; font-weight: bold; }
 
 .badge-indep-gplus {
     font-size: 0.7rem;
@@ -1695,129 +1693,121 @@
     padding: 6px 14px;
     border-radius: 20px;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
     color: #ffffff;
 }
-
-.badge-indep-active { background: #22c55e; }
-.badge-indep-processing { background: #f97316; }
+.badge-indep-active { background: #22c55e; box-shadow: 0 0 10px rgba(34, 197, 94, 0.3); }
+.badge-indep-processing { background: #f97316; box-shadow: 0 0 10px rgba(249, 115, 22, 0.3); }
 .badge-indep-inactive { background: #6c7883; }
 
-.grid-indep-gplus {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 15px;
-}
+.grid-indep-gplus { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; }
+.col-indep-gplus { display: flex; flex-direction: column; gap: 4px; }
+.label-indep-gplus { font-size: 0.75rem; color: #8897a6; text-transform: uppercase; }
+.value-indep-gplus { font-size: 0.9rem; color: #ffffff; font-weight: 600; }
+.value-indep-gplus.highlight-indep-date { color: #f97316; font-weight: 700; }
 
-.col-indep-gplus {
+
+/* --- 🛠️ CORRECCIÓN CRÍTICA: TARJETAS DE LA TIENDA --- */
+.gplus-plan-card {
+    background: linear-gradient(145, #182533, #101922); /* Más claras que el fondo base */
+    border: 1px solid rgba(255, 255, 255, 0.15); /* Borde visible e iluminado */
+    border-radius: 20px;
+    padding: 25px;
+    color: #ffffff;
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    justify-content: space-between;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35); /* Sombra pesada para separarla del fondo */
+    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-.label-indep-gplus {
-    font-size: 0.75rem;
-    color: #6c7883;
-    text-transform: uppercase;
-    letter-spacing: 0.3px;
+/* Efecto al pasar el mouse o tocar en el móvil */
+.gplus-plan-card:hover {
+    border-color: #2481cc; /* Ilumina el borde en azul */
+    transform: translateY(-4px); /* Se eleva un poco más */
+    box-shadow: 0 12px 30px rgba(36, 129, 204, 0.2); /* Destello azul en la base */
 }
 
-.value-indep-gplus {
-    font-size: 0.9rem;
+.gplus-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.gplus-plan-title { 
+    font-weight: 800; 
+    font-size: 1.2rem; 
     color: #ffffff;
-    font-weight: 600;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
 }
 
-.value-indep-gplus.highlight-indep-date {
-    color: #f97316;
+.gplus-duration-tag { 
+    font-size: 0.75rem; 
+    color: #c084fc; /* Color morado brillante */
+    text-transform: uppercase; 
+    font-weight: 700; 
+    margin-bottom: 12px; 
+    letter-spacing: 0.5px;
 }
 
-        /* Estilos base del contenedor principal */
-        #view-shop {
-            background-color: #0e1621; /* Fondo oscuro estilo Telegram */
-            min-height: 100vh;
-        }
+.gplus-plan-desc { 
+    font-size: 0.8rem; 
+    color: #b1c3d4; /* Gris claro de alta lectura */
+    margin: 0 0 15px 0; 
+    min-height: 38px; 
+    line-height: 1.5; 
+}
 
-        .card-indep-gplus {
-            background: #17212b;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 16px;
-            padding: 20px;
-            color: #ffffff;
-            font-family: system-ui, -apple-system, sans-serif;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        }
+.gplus-benefits-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 25px 0;
+    font-size: 0.8rem;
+    color: #e2e8f0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding-top: 15px;
+}
+.gplus-benefits-list li { display: flex; align-items: center; gap: 8px; }
+.gplus-benefits-list li span { 
+    color: #2da1fc; /* Checkmarks azules vibrantes */
+    font-weight: bold; 
+    font-size: 1rem;
+}
 
-        .header-indep-gplus {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-            padding-bottom: 15px;
-            margin-bottom: 15px;
-            flex-wrap: wrap;
-            gap: 12px;
-        }
+.gplus-price-row { 
+    font-size: 1.8rem; 
+    font-weight: 900; 
+    margin-bottom: 15px; 
+    color: #ffffff;
+}
+.gplus-price-row span { font-size: 0.8rem; color: #8897a6; font-weight: normal; }
 
-        .info-indep-gplus h3 {
-            margin: 0 0 4px 0;
-            font-size: 1.1rem;
-            font-weight: 700;
-        }
+/* Botón Premium con Resplandor */
+.gplus-btn-action {
+    width: 100%;
+    color: #ffffff;
+    font-weight: 800;
+    border: none;
+    padding: 14px;
+    border-radius: 14px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    background: linear-gradient(90, #2481cc, #2a9df2);
+    box-shadow: 0 4px 15px rgba(36, 129, 204, 0.4); /* Brillo de neón bajo el botón */
+    transition: background 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+}
 
-        .info-indep-gplus p {
-            margin: 0;
-            font-size: 0.8rem;
-            color: #6c7883;
-        }
+.gplus-btn-action:hover {
+    background: linear-gradient(90, #2072b5, #2481cc);
+    box-shadow: 0 6px 20px rgba(36, 129, 204, 0.6);
+}
 
-        .info-indep-gplus p span {
-            font-family: monospace;
-            color: #2481cc;
-        }
-
-        .badge-indep-gplus {
-            font-size: 0.7rem;
-            font-weight: 800;
-            padding: 6px 14px;
-            border-radius: 20px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: #ffffff;
-        }
-
-        .badge-indep-active { background: #22c55e; }
-        .badge-indep-processing { background: #f97316; }
-        .badge-indep-inactive { background: #6c7883; }
-
-        .grid-indep-gplus {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
-        }
-
-        .col-indep-gplus {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .label-indep-gplus {
-            font-size: 0.75rem;
-            color: #6c7883;
-            text-transform: uppercase;
-            letter-spacing: 0.3px;
-        }
-
-        .value-indep-gplus {
-            font-size: 0.9rem;
-            color: #ffffff;
-            font-weight: 600;
-        }
-
-        .value-indep-gplus.highlight-indep-date {
-            color: #f97316;
-        }
+.gplus-btn-action:active {
+    transform: scale(0.98); /* Efecto de hundimiento al clickear */
+}
         
     </style>
 </head>
@@ -5882,7 +5872,8 @@ setTimeout(checkVipInternalRegistration, 100);
     // -------------------------------------------------------------------------
     // 1. SIMULACIÓN DEL ID DEL USUARIO ACTUAL (Cambia este ID para hacer tus pruebas)
     // -------------------------------------------------------------------------
-    const ID_USUARIO_ACTUAL_LOGUEADO = 1320417199; 
+    //  LINEA REAL: Captura el ID del usuario de Telegram en tiempo real
+const ID_USUARIO_ACTUAL_LOGUEADO = window.Telegram?.WebApp?.initDataUnsafe?.user?.id || 0;
 
     // -------------------------------------------------------------------------
     // 2. TU TABLA DE CONFIGURACIÓN MANUAL DE 3 USUARIOS VIP
