@@ -5388,296 +5388,273 @@ function ocultarPantallaCargaApp() {
         <!-- =========================================================================
      SCRIPT DE CONTROL: TODO EN UNO Y BASADO EN TARJETAS
      ========================================================================= -->
-<script>
-(function() {
-    // -------------------------------------------------------------------------
-    // CONFIGURACIÓN DE INTEGRACIÓN (Modifica esto libremente)
-    // -------------------------------------------------------------------------
-    const VIP_TELEGRAM_IDS = [1320417199, 87654321, 55442211]; // Tus IDs con acceso Premium
-    const LINK_SOPORTE_TELEGRAM = "https://t.me/Airdayz"; // Tu bot o chat de atención
+// =========================================================================
+// CONFIGURACIÓN DE INTEGRACIÓN GPLUS (SISTEMA ABIERTO Y GLOBAL)
+// =========================================================================
+const VIP_TELEGRAM_IDS = [1320417199, 87654321, 55442211]; // Tus IDs con acceso Premium
+const LINK_SOPORTE_TELEGRAM = "https://t.me/Airdayz"; // Tu bot o chat de atención
+
+// IDs de tus etiquetas externas del HTML (Menú y Perfil) con guiones
+const ID_ETIQUETA_PERFIL = "id-de-tu-etiqueta-perfil";
+const ID_ETIQUETA_MENU = "id-de-tu-etiqueta-menu";
+
+// Definición maestra de los planes
+const DEF_PLANES = [
+    { id: "mes", title: "GPlus Estándar", desc: "Crecimiento regular.", duration: "1 Mes", price: 9.99, discount: 5, emoji: "🚀", benefits: ["Alcance x2 avanzado", "Soporte estándar"] },
+    { id: "semestral", title: "GPlus PRO", desc: "Automatización profesional.", duration: "6 Meses", price: 49.99, discount: 10, emoji: "🔥", benefits: ["Alcance x5 masivo", "Soporte prioritario"] },
+    { id: "anual", title: "GPlus Full", desc: "Acceso total ilimitado.", duration: "1 Año", price: 89.99, discount: 15, emoji: "👑", benefits: ["Alcance x10 máximo", "Herramientas IA"] }
+];
+
+// Jerarquía para bloquear/deshabilitar planes inferiores si ya se tiene uno superior
+const PLAN_HIERARCHY = { "gratis": 0, "mes": 1, "semestral": 2, "anual": 3 };
+
+// =========================================================================
+// MOTOR DE LÓGICA VINCULADO A LAS TARJETAS Y AL SWITCHVIEW
+// =========================================================================
+function checkVipInternalRegistration() {
+    console.log("🚀 [GPlus] Sincronizando tarjetas desde ID de Telegram...");
+
+    // 1. Extraemos de forma segura el usuario activo desde el objeto state de tu aplicación
+    let currentUserId = 1320417199; // ID de respaldo/Admin por si acaso
+    let currentUsername = "NexusAdmin";
+
+    if (window.state && window.state.user) {
+        if (window.state.user.idTelegram) currentUserId = Number(window.state.user.idTelegram);
+        if (window.state.user.username) currentUsername = window.state.user.username;
+    }
+
+    const currentIdStr = String(currentUserId);
+    const esVipPorCodigo = VIP_TELEGRAM_IDS.includes(currentUserId);
     
-    // Simulación del ID del usuario actual de la sesión (Reemplaza con tu variable real del CRM si cambia)
-    const CURRENT_USER_ID = 1320417199; 
-    const CURRENT_USERNAME = "NexusAdmin";
+    let localVipData = localStorage.getItem(`gplus_local_sub_${currentIdStr}`);
+    const planPendiente = localStorage.getItem(`gplus_pending_${currentIdStr}`);
 
-    // IDs de tus etiquetas externas del HTML (Menú y Perfil) con guiones
-    const ID_ETIQUETA_PERFIL = "id-de-tu-etiqueta-perfil";
-    const ID_ETIQUETA_MENU = "id-de-tu-etiqueta-menu";
+    let datosSuscripcion = {
+        isVip: false,
+        planKey: "gratis",
+        planName: "Suscripción Gratis",
+        startDate: new Date().toISOString(),
+        endDate: "Sin vencimiento",
+        status: planPendiente ? "processing" : "inactive"
+    };
 
-    // Definición maestra de los planes
-    const DEF_PLANES = [
-        { id: "mes", title: "GPlus Estándar", desc: "Crecimiento regular.", duration: "1 Mes", price: 9.99, discount: 5, emoji: "🚀", benefits: ["Alcance x2 avanzado", "Soporte estándar"] },
-        { id: "semestral", title: "GPlus PRO", desc: "Automatización profesional.", duration: "6 Meses", price: 49.99, discount: 10, emoji: "🔥", benefits: ["Alcance x5 masivo", "Soporte prioritario"] },
-        { id: "anual", title: "GPlus Full", desc: "Acceso total ilimitado.", duration: "1 Año", price: 89.99, discount: 15, emoji: "👑", benefits: ["Alcance x10 máximo", "Herramientas IA"] }
-    ];
+    // 2. REGLA DE ORO: Si tu ID está en el array, eres VIP total.
+    if (esVipPorCodigo) {
+        if (!localVipData) {
+            const inicio = new Date();
+            const fin = new Date();
+            fin.setFullYear(fin.getFullYear() + 1); // Forzamos 1 año de vigencia
 
-    // -------------------------------------------------------------------------
-    // MOTOR DE LOGICA INDEPENDIENTE GPLUS
-    // -------------------------------------------------------------------------
-    function inicializarSistemaGPlus() {
-        const currentIdStr = String(CURRENT_USER_ID);
-        const esVipPorCodigo = VIP_TELEGRAM_IDS.includes(CURRENT_USER_ID);
-        
-        let localVipData = localStorage.getItem(`gplus_local_sub_${currentIdStr}`);
-        const planPendiente = localStorage.getItem(`gplus_pending_${currentIdStr}`);
-
-        let datosSuscripcion = {
-            isVip: false,
-            planKey: "gratis",
-            planName: "Suscripción Gratis",
-            startDate: new Date().toISOString(),
-            endDate: "Sin vencimiento",
-            status: planPendiente ? "processing" : "inactive"
-        };
-
-        // Regla de Oro: Si está en el código, es VIP. Sincronizamos las tarjetas y fechas
-        if (esVipPorCodigo) {
-            // Si es VIP por código pero no tiene fechas guardadas localmente, le creamos un Plan Full (Anual) de protección
-            if (!localVipData) {
-                const inicio = new Date();
-                const fin = new Date();
-                fin.setFullYear(fin.getFullYear() + 1); // Le asignamos un año de vigencia inicial
-
-                localVipData = JSON.stringify({
-                    planKey: "anual",
-                    startDate: inicio.toISOString(),
-                    endDate: fin.toISOString()
-                });
-                localStorage.setItem(`gplus_local_sub_${currentIdStr}`, localVipData);
-                localStorage.removeItem(`gplus_pending_${currentIdStr}`);
-            }
-
-            const datosLocales = JSON.parse(localVipData);
-            const tiempoRestante = new Date(datosLocales.endDate).getTime() - new Date().getTime();
-
-            if (tiempoRestante > 0) {
-                // Suscripción VIP activa y en vigor
-                const planInfo = DEF_PLANES.find(p => p.id === datosLocales.planKey) || DEF_PLANES[2];
-                datosSuscripcion = {
-                    isVip: true,
-                    planKey: datosLocales.planKey,
-                    planName: planInfo.title,
-                    startDate: datosLocales.startDate,
-                    endDate: datosLocales.endDate,
-                    status: "active"
-                };
-            } else {
-                // Si la fecha local expiró pero sigue en tu lista de código, le renovamos un año extra de inmediato
-                const nuevaFechaInicio = new Date();
-                const nuevaFechaFin = new Date();
-                nuevaFechaFin.setFullYear(nuevaFechaFin.getFullYear() + 1);
-
-                localStorage.setItem(`gplus_local_sub_${currentIdStr}`, JSON.stringify({
-                    planKey: datosLocales.planKey,
-                    startDate: nuevaFechaInicio.toISOString(),
-                    endDate: nuevaFechaFin.toISOString()
-                }));
-
-                const planInfo = DEF_PLANES.find(p => p.id === datosLocales.planKey) || DEF_PLANES[2];
-                datosSuscripcion = {
-                    isVip: true,
-                    planKey: datosLocales.planKey,
-                    planName: planInfo.title,
-                    startDate: nuevaFechaInicio.toISOString(),
-                    endDate: nuevaFechaFin.toISOString(),
-                    status: "active"
-                };
-            }
-        } else {
-            // Si no está en el código, se limpia cualquier registro VIP viejo para evitar hackeos locales
-            localStorage.removeItem(`gplus_local_sub_${currentIdStr}`);
-        }
-
-        // Ejecutar renders visuales usando los datos recién procesados
-        renderizarPanelUsuario(datosSuscripcion);
-        renderizarTarjetasPlanes(datosSuscripcion, planPendiente);
-        sincronizarEtiquetasExternas(datosSuscripcion);
-    }
-
-    // -------------------------------------------------------------------------
-    // RENDERS VISUALES (HTML DINÁMICO)
-    // -------------------------------------------------------------------------
-    function renderizarPanelUsuario(sub) {
-        const container = document.getElementById("gplus-user-status-block");
-        if (!container) return;
-
-        const badgeColor = sub.isVip ? "#22c55e" : (sub.status === "processing" ? "#f97316" : "#6c7883");
-        const statusText = sub.isVip ? "Cuenta Premium Activa" : (sub.status === "processing" ? "Verificando Pago Manual" : "Cuenta Free");
-
-        const fInicio = sub.isVip ? new Date(sub.startDate).toLocaleDateString() : "N/A";
-        const fFin = sub.isVip ? new Date(sub.endDate).toLocaleDateString() : "Sin fecha de fin";
-
-        let html = `
-            <div style="background: #17212b; border: 1px solid rgba(255,255,255,0.05); padding: 20px; border-radius: 16px; color: #fff;">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; flex-wrap: wrap; gap:10px;">
-                    <div>
-                        <h4 style="margin:0; font-size:1rem; font-weight:800;">📋 Estado GPlus</h4>
-                        <small style="color: #6c7883;">ID asignado: ${CURRENT_USER_ID}</small>
-                    </div>
-                    <span style="background:${badgeColor}; color:#fff; font-size:0.65rem; font-weight:800; padding:5px 12px; border-radius:20px; text-transform:uppercase; letter-spacing:0.5px;">
-                        ${sub.planName} (${statusText})
-                    </span>
-                </div>
-                <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap:15px; font-size:0.75rem; color:#cbd5e1; border-top: 1px solid rgba(255,255,255,0.05); padding-top:12px;">
-                    <div>📅 Fecha Inicio:<br><strong style="color:#fff; font-size:0.85rem;">${fInicio}</strong></div>
-                    <div>⌛ Vencimiento de Acceso:<br><strong style="color:#fff; font-size:0.85rem;">${fFin}</strong></div>
-                </div>
-            </div>
-        `;
-        container.innerHTML = html;
-    }
-
-    function renderizarTarjetasPlanes(sub, planPendiente) {
-        const container = document.getElementById("gplus-cards-row-container");
-        if (!container) return;
-
-        let html = "";
-
-        DEF_PLANES.forEach(plan => {
-            let estadoTarjeta = "disponible"; 
-            let textoBoton = "Adquirir Plan GPlus";
-            let colorBoton = "#2481cc";
-            let deshabilitado = false;
-            let indicadorHtml = `<span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#4b5563; margin-right:6px;"></span> Inactivo`;
-
-            if (sub.isVip && sub.planKey === plan.id) {
-                estadoTarjeta = "activa";
-                textoBoton = "Plan Actual Activo";
-                colorBoton = "#22c55e";
-                deshabilitado = true;
-                indicadorHtml = `<span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#22c55e; box-shadow:0 0 8px #22c55e; margin-right:6px;"></span> Activo en tu ID`;
-            } else if (!sub.isVip && planPendiente === plan.id) {
-                estadoTarjeta = "pendiente";
-                textoBoton = "Revisando Transacción...";
-                colorBoton = "#f97316";
-                indicadorHtml = `<span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#f97316; box-shadow:0 0 8px #f97316; margin-right:6px;"></span> Esperando confirmación`;
-            } else if (sub.isVip) {
-                // Si el usuario ya es VIP de un plan superior, deshabilitamos opciones inferiores
-                deshabilitado = true;
-                textoBoton = "Incluido en tu suscripción";
-                colorBoton = "#374151";
-            }
-
-            html += `
-                <div style="background:#17212b; border: 1px solid rgba(255,255,255,0.06); border-radius:20px; padding:25px; color:#fff; display:flex; flex-direction:column; justify-content:space-between; position:relative; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);">
-                    <div>
-                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 12px;">
-                            <span style="font-weight: 700; font-size: 1.1rem;">${plan.emoji} ${plan.title}</span>
-                            <span style="background:rgba(168,85,247,0.15); color:#c084fc; font-size:0.65rem; padding:4px 8px; border-radius:12px; font-weight:bold;">-${plan.discount}% OFF</span>
-                        </div>
-                        <div style="font-size: 0.7rem; color: #a855f7; text-transform: uppercase; font-weight: 700; margin-bottom: 8px;">Duración: ${plan.duration}</div>
-                        <p style="font-size:0.75rem; color:#6c7883; margin:0 0 15px 0; min-height: 32px;">${plan.desc}</p>
-                        <ul style="list-style:none; padding:0; margin:0 0 20px 0; font-size:0.75rem; color:#cbd5e1; display:flex; flex-direction:column; gap:8px; border-top: 1px solid rgba(255,255,255,0.03); padding-top:12px;">
-                            ${plan.benefits.map(b => `<li style="display:flex; align-items:center; gap:6px;"><span>✓</span> ${b}</li>`).join('')}
-                        </ul>
-                    </div>
-                    <div>
-                        <div style="font-size:1.6rem; font-weight:900; margin-bottom:6px;">$${plan.price} <span style="font-size: 0.75rem; color:#6c7883; font-weight: normal;">USDT</span></div>
-                        <div style="font-size:0.7rem; margin-bottom:15px; color:#cbd5e1; display:flex; align-items:center;">${indicadorHtml}</div>
-                        <button class="gplus-action-btn" data-plan-id="${plan.id}" ${deshabilitado ? 'disabled' : ''} style="width:100%; background:${colorBoton}; color:#fff; font-weight:800; border:none; padding:12px; border-radius:12px; cursor:${deshabilitado ? 'not-allowed' : 'pointer'}; transition: transform 0.2s;">
-                            ${textoBoton}
-                        </button>
-                    </div>
-                </div>
-            `;
-        });
-
-        container.innerHTML = html;
-
-        // Asignar los eventos de click a los botones generados
-        container.querySelectorAll(".gplus-action-btn").forEach(btn => {
-            btn.addEventListener("click", function() {
-                const pId = this.getAttribute("data-plan-id");
-                abrirModalPasarelaPago(pId);
+            localVipData = JSON.stringify({
+                planKey: "anual", // Te asigna el plan Full directo
+                startDate: inicio.toISOString(),
+                endDate: fin.toISOString()
             });
-        });
-    }
-
-    function abrirModalPasarelaPago(planId) {
-        const plan = DEF_PLANES.find(p => p.id === planId);
-        if (!plan) return;
-
-        let modal = document.getElementById("gplus-payment-flow-modal");
-        if (!modal) {
-            modal = document.createElement("div");
-            modal.id = "gplus-payment-flow-modal";
-            modal.style = "position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(6,9,15,0.85); backdrop-filter:blur(6px); display:flex; align-items:center; justify-content:center; z-index:100000;";
-            document.body.appendChild(modal);
+            localStorage.setItem(`gplus_local_sub_${currentIdStr}`, localVipData);
+            localStorage.removeItem(`gplus_pending_${currentIdStr}`);
         }
 
-        modal.innerHTML = `
-            <div style="background:#17212b; width:90%; max-width:380px; border-radius:24px; padding:25px; color:#fff; position:relative; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 20px 25px -5px rgba(0,0,0,0.5);">
-                <button id="close-gplus-modal-btn" style="position:absolute; top:18px; right:18px; background:none; border:none; color:#6c7883; cursor:pointer; font-size:1.1rem;">✕</button>
-                <h3 style="margin-top:0; font-size:1.2rem; font-weight:800; color:#fff;">Adquirir ${plan.title}</h3>
-                <p style="font-size:0.8rem; color:#cbd5e1; margin-bottom:15px;">Envía exactamente <strong>$${plan.price} USDT (Red TRC20)</strong> a la siguiente billetera:</p>
-                <div style="background:#0e1621; padding:12px; border-radius:10px; font-family:monospace; font-size:0.75rem; word-break:break-all; margin-bottom:20px; border:1px solid rgba(255,255,255,0.05); color:#2481cc; text-align:center; font-weight:bold;">
-                    TU_DIRECCION_USDT_AQUI
+        const datosLocales = JSON.parse(localVipData);
+        const tiempoRestante = new Date(datosLocales.endDate).getTime() - new Date().getTime();
+
+        if (tiempoRestante > 0) {
+            const planInfo = DEF_PLANES.find(p => p.id === datosLocales.planKey) || DEF_PLANES[2];
+            datosSuscripcion = {
+                isVip: true,
+                planKey: datosLocales.planKey,
+                planName: planInfo.title,
+                startDate: datosLocales.startDate,
+                endDate: datosLocales.endDate,
+                status: "active"
+            };
+        } else {
+            // Auto-renovación si caducó en almacenamiento local pero sigue en la lista del código
+            const nuevaFechaInicio = new Date();
+            const nuevaFechaFin = new Date();
+            nuevaFechaFin.setFullYear(nuevaFechaFin.getFullYear() + 1);
+
+            localStorage.setItem(`gplus_local_sub_${currentIdStr}`, JSON.stringify({
+                planKey: datosLocales.planKey,
+                startDate: nuevaFechaInicio.toISOString(),
+                endDate: nuevaFechaFin.toISOString()
+            }));
+
+            const planInfo = DEF_PLANES.find(p => p.id === datosLocales.planKey) || DEF_PLANES[2];
+            datosSuscripcion = {
+                isVip: true,
+                planKey: datosLocales.planKey,
+                planName: planInfo.title,
+                startDate: nuevaFechaInicio.toISOString(),
+                endDate: nuevaFechaFin.toISOString(),
+                status: "active"
+            };
+        }
+    } else {
+        // Limpieza de seguridad si se saca de la lista VIP del código
+        localStorage.removeItem(`gplus_local_sub_${currentIdStr}`);
+    }
+
+    // Inyectamos el resultado en el estado global para sincronizar con tu perfil del CRM
+    if (!window.state) window.state = {};
+    if (!window.state.user) window.state.user = {};
+    window.state.user.isVipMember = datosSuscripcion.isVip;
+
+    // 3. MANDAMOS A PINTAR LAS TARJETAS Y LOS COMPONENTES
+    renderizarPanelUsuarioGPlus(datosSuscripcion, currentUserId);
+    renderizarTarjetasPlanesGPlus(datosSuscripcion, planPendiente, currentUserId, currentUsername);
+    sincronizarEtiquetasExternasGPlus(datosSuscripcion);
+}
+
+// =========================================================================
+// FUNCIONES AUXILIARES DE RENDERIZADO (Reemplazan los innerHTML vacíos)
+// =========================================================================
+function renderizarPanelUsuarioGPlus(sub, currentUserId) {
+    const container = document.getElementById("gplus-user-status-block");
+    if (!container) return;
+
+    const badgeColor = sub.isVip ? "#22c55e" : (sub.status === "processing" ? "#f97316" : "#6c7883");
+    const statusText = sub.isVip ? "Cuenta Premium Activa" : (sub.status === "processing" ? "Verificando Pago Manual" : "Cuenta Free");
+    const fInicio = sub.isVip ? new Date(sub.startDate).toLocaleDateString() : "N/A";
+    const fFin = sub.isVip ? new Date(sub.endDate).toLocaleDateString() : "Sin fecha de fin";
+
+    container.innerHTML = `
+        <div style="background: #17212b; border: 1px solid rgba(255,255,255,0.05); padding: 20px; border-radius: 16px; color: #fff;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; flex-wrap: wrap; gap:10px;">
+                <div>
+                    <h4 style="margin:0; font-size:1rem; font-weight:800;">📋 Estado GPlus</h4>
+                    <small style="color: #6c7883;">ID asignado: ${currentUserId}</small>
                 </div>
-                <button id="verify-gplus-payment-btn" style="width:100%; background:#22c55e; color:#fff; border:none; padding:14px; border-radius:12px; font-weight:800; cursor:pointer; font-size:0.85rem;">
-                    Ya pagué, verificar mi suscripción
-                </button>
+                <span style="background:${badgeColor}; color:#fff; font-size:0.65rem; font-weight:800; padding:5px 12px; border-radius:20px; text-transform:uppercase; letter-spacing:0.5px;">
+                    ${sub.planName} (${statusText})
+                </span>
+            </div>
+            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap:15px; font-size:0.75rem; color:#cbd5e1; border-top: 1px solid rgba(255,255,255,0.05); padding-top:12px;">
+                <div>📅 Fecha Inicio:<br><strong style="color:#fff; font-size:0.85rem;">${fInicio}</strong></div>
+                <div>⌛ Vencimiento de Acceso:<br><strong style="color:#fff; font-size:0.85rem;">${fFin}</strong></div>
+            </div>
+        </div>
+    `;
+}
+
+function renderizarTarjetasPlanesGPlus(sub, planPendiente, currentUserId, currentUsername) {
+    const container = document.getElementById("gplus-cards-row-container");
+    if (!container) return;
+
+    let html = "";
+    const userHierarchy = PLAN_HIERARCHY[sub.planKey] || 0;
+
+    DEF_PLANES.forEach(plan => {
+        const planHierarchy = PLAN_HIERARCHY[plan.id];
+        let textoBoton = "Adquirir Plan GPlus";
+        let colorBoton = "#2481cc";
+        let deshabilitado = false;
+        let indicatorHtml = `<span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#4b5563; margin-right:6px;"></span> Inactivo`;
+
+        if (sub.isVip && sub.planKey === plan.id) {
+            textoBoton = "Plan Actual Activo";
+            colorBoton = "#22c55e";
+            deshabilitado = true;
+            indicatorHtml = `<span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#22c55e; box-shadow:0 0 8px #22c55e; margin-right:6px;"></span> Activo en tu ID`;
+        } else if (!sub.isVip && planPendiente === plan.id) {
+            textoBoton = "Revisando Transacción...";
+            colorBoton = "#f97316";
+            indicatorHtml = `<span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#f97316; box-shadow:0 0 8px #f97316; margin-right:6px;"></span> Esperando confirmación`;
+        } else if (sub.isVip && planHierarchy < userHierarchy) {
+            deshabilitado = true;
+            textoBoton = "Incluido en tu suscripción";
+            colorBoton = "#374151";
+        }
+
+        html += `
+            <div style="background:#17212b; border: 1px solid rgba(255,255,255,0.06); border-radius:20px; padding:25px; color:#fff; display:flex; flex-direction:column; justify-content:space-between; position:relative;">
+                <div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 12px;">
+                        <span style="font-weight: 700; font-size: 1.1rem;">${plan.emoji} ${plan.title}</span>
+                        <span style="background:rgba(168,85,247,0.15); color:#c084fc; font-size:0.65rem; padding:4px 8px; border-radius:12px; font-weight:bold;">-${plan.discount}% OFF</span>
+                    </div>
+                    <div style="font-size: 0.7rem; color: #a855f7; text-transform: uppercase; font-weight: 700; margin-bottom: 8px;">Duración: ${plan.duration}</div>
+                    <p style="font-size:0.75rem; color:#6c7883; margin:0 0 15px 0; min-height: 32px;">${plan.desc}</p>
+                    <ul style="list-style:none; padding:0; margin:0 0 20px 0; font-size:0.75rem; color:#cbd5e1; display:flex; flex-direction:column; gap:8px; border-top: 1px solid rgba(255,255,255,0.03); padding-top:12px;">
+                        ${plan.benefits.map(b => `<li style="display:flex; align-items:center; gap:6px;"><span>✓</span> ${b}</li>`).join('')}
+                    </ul>
+                </div>
+                <div>
+                    <div style="font-size:1.6rem; font-weight:900; margin-bottom:6px;">$${plan.price} <span style="font-size: 0.75rem; color:#6c7883; font-weight: normal;">USDT</span></div>
+                    <div style="font-size:0.7rem; margin-bottom:15px; color:#cbd5e1; display:flex; align-items:center;">${indicatorHtml}</div>
+                    <button onclick="abrirModalPasarelaPagoGPlus('${plan.id}', ${currentUserId}, '${currentUsername}')" ${deshabilitado ? 'disabled' : ''} style="width:100%; background:${colorBoton}; color:#fff; font-weight:800; border:none; padding:12px; border-radius:12px; cursor:${deshabilitado ? 'not-allowed' : 'pointer'};">
+                        ${textoBoton}
+                    </button>
+                </div>
             </div>
         `;
+    });
 
-        modal.style.display = "flex";
+    container.innerHTML = html;
+}
 
-        // Lógica de cierre del modal
-        document.getElementById("close-gplus-modal-btn").onclick = () => modal.style.display = "none";
+function abrirModalPasarelaPagoGPlus(planId, currentUserId, currentUsername) {
+    const plan = DEF_PLANES.find(p => p.id === planId);
+    if (!plan) return;
 
-        // Lógica de envío y guardado pendiente
-        document.getElementById("verify-gplus-payment-btn").onclick = () => {
-            const currentIdStr = String(CURRENT_USER_ID);
-            localStorage.setItem(`gplus_pending_${currentIdStr}`, plan.id);
-            modal.style.display = "none";
-            
-            // Recargamos el estado interno de las tarjetas inmediatamente
-            inicializarSistemaGPlus();
-
-            // Mensaje preparado para tu bot/chat administrador
-            const mensajeTelegram = `🔔 ¡NUEVA SOLICITUD GPLUS PREMIUM! 🔔\n\n` +
-                                    `👤 Usuario: @${CURRENT_USERNAME}\n` +
-                                    `🆔 Telegram ID: ${CURRENT_USER_ID}\n` +
-                                    `📦 Plan Solicitado: ${plan.title}\n` +
-                                    `💰 Costo: $${plan.price} USDT\n\n` +
-                                    `Acción requerida: Agrega este ID de Telegram a la lista VIP_TELEGRAM_IDS del código para autorizar el acceso permanente de forma automática.`;
-
-            window.open(`${LINK_SOPORTE_TELEGRAM}?text=${encodeURIComponent(mensajeTelegram)}`, '_blank');
-        };
+    let modal = document.getElementById("gplus-payment-flow-modal");
+    if (!modal) {
+        modal = document.createElement("div");
+        modal.id = "gplus-payment-flow-modal";
+        modal.style = "position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(6,9,15,0.85); backdrop-filter:blur(6px); display:flex; align-items:center; justify-content:center; z-index:100000;";
+        document.body.appendChild(modal);
     }
 
-    function sincronizarEtiquetasExternas(sub) {
-        // Localizamos tus contenedores externos usando los IDs con guiones
-        const bPerfil = document.getElementById(ID_ETIQUETA_PERFIL);
-        const bMenu = document.getElementById(ID_ETIQUETA_MENU);
+    modal.innerHTML = `
+        <div style="background:#17212b; width:90%; max-width:380px; border-radius:24px; padding:25px; color:#fff; position:relative; border: 1px solid rgba(255,255,255,0.1);">
+            <button onclick="document.getElementById('gplus-payment-flow-modal').style.display='none'" style="position:absolute; top:18px; right:18px; background:none; border:none; color:#6c7883; cursor:pointer; font-size:1.1rem;">✕</button>
+            <h3 style="margin-top:0; font-size:1.2rem; font-weight:800;">Adquirir ${plan.title}</h3>
+            <p style="font-size:0.8rem; color:#cbd5e1; margin-bottom:15px;">Envía exactamente <strong>$${plan.price} USDT (TRC20)</strong> a la billetera:</p>
+            <div style="background:#0e1621; padding:12px; border-radius:10px; font-family:monospace; font-size:0.75rem; word-break:break-all; margin-bottom:20px; color:#2481cc; text-align:center; font-weight:bold;">
+                TU_DIRECCION_USDT_AQUI
+            </div>
+            <button id="verify-gplus-btn-action" style="width:100%; background:#22c55e; color:#fff; border:none; padding:14px; border-radius:12px; font-weight:800; cursor:pointer;">
+                Ya pagué, verificar mi suscripción
+            </button>
+        </div>
+    `;
+    modal.style.display = "flex";
 
-        if (bPerfil) {
-            bPerfil.innerHTML = sub.isVip ? `✨ ${sub.planName}` : "Gratis";
-            bPerfil.style.background = sub.isVip ? "#22c55e" : "#6c7883";
-            bPerfil.style.color = "#ffffff";
-            bPerfil.style.padding = "4px 8px";
-            bPerfil.style.borderRadius = "6px";
-            bPerfil.style.fontSize = "0.75rem";
-            bPerfil.style.fontWeight = "bold";
-        }
+    document.getElementById("verify-gplus-btn-action").onclick = () => {
+        const idStr = String(currentUserId);
+        localStorage.setItem(`gplus_pending_${idStr}`, plan.id);
+        modal.style.display = "none";
+        
+        checkVipInternalRegistration();
 
-        if (bMenu) {
-            bMenu.innerHTML = sub.isVip ? "GPlus Premium" : "Gratis";
-            bMenu.style.color = sub.isVip ? "#f97316" : "#cbd5e1";
-            bMenu.style.fontWeight = "bold";
-        }
+        const mensajeTelegram = `🔔 ¡NUEVA SOLICITUD GPLUS PREMIUM! 🔔\n\n👤 Usuario: @${currentUsername}\n🆔 Telegram ID: ${currentUserId}\n📦 Plan Solicitado: ${plan.title}\n💰 Costo: $${plan.price} USDT\n\nPor favor, autoriza mi pago metiendo mi ID en la lista VIP_TELEGRAM_IDS.`;
+        window.open(`${LINK_SOPORTE_TELEGRAM}?text=${encodeURIComponent(mensajeTelegram)}`, '_blank');
+    };
+}
+
+function sincronizarEtiquetasExternasGPlus(sub) {
+    const bPerfil = document.getElementById(ID_ETIQUETA_PERFIL);
+    const bMenu = document.getElementById(ID_ETIQUETA_MENU);
+
+    if (bPerfil) {
+        bPerfil.innerHTML = sub.isVip ? `✨ ${sub.planName}` : "Gratis";
+        bPerfil.style.background = sub.isVip ? "#22c55e" : "#6c7883";
+        bPerfil.style.color = "#ffffff";
+        bPerfil.style.padding = "4px 8px";
+        bPerfil.style.borderRadius = "6px";
+        bPerfil.style.fontSize = "0.75rem";
+        bPerfil.style.fontWeight = "bold";
     }
 
-    // -------------------------------------------------------------------------
-    // DISPARADOR DE ARRANQUE PROTEGIDO
-    // -------------------------------------------------------------------------
-    // Usamos una pequeña pausa controlada para asegurarnos de que el HTML externo existatodo en el DOM
-    if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", () => setTimeout(inicializarSistemaGPlus, 80));
-    } else {
-        setTimeout(inicializarSistemaGPlus, 80);
+    if (bMenu) {
+        bMenu.innerHTML = sub.isVip ? "GPlus Premium" : "Gratis";
+        bMenu.style.color = sub.isVip ? "#f97316" : "#cbd5e1";
+        bMenu.style.fontWeight = "bold";
     }
+}
 
-})();
+// Inicialización de seguridad al cargar la página
+setTimeout(checkVipInternalRegistration, 100);
+
 </script>
 
     <script>
