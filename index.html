@@ -5412,15 +5412,20 @@ const PLAN_HIERARCHY = { "gratis": 0, "mes": 1, "semestral": 2, "anual": 3 };
 // MOTOR DE LÓGICA VINCULADO A LAS TARJETAS Y AL SWITCHVIEW
 // =========================================================================
 function checkVipInternalRegistration() {
-    console.log("🚀 [GPlus] Sincronizando tarjetas desde ID de Telegram...");
+    console.log("🚀 [GPlus] Ejecutando sincronización forzada de tarjetas...");
 
-    // 1. Extraemos de forma segura el usuario activo desde el objeto state de tu aplicación
-    let currentUserId = 1320417199; // ID de respaldo/Admin por si acaso
+    // 1. VARIABLES DE RESPALDO SEGURO
+    let currentUserId = 1320417199; 
     let currentUsername = "NexusAdmin";
 
-    if (window.state && window.state.user) {
-        if (window.state.user.idTelegram) currentUserId = Number(window.state.user.idTelegram);
-        if (window.state.user.username) currentUsername = window.state.user.username;
+    // 2. INTENTO SEGURO DE LECTURA DEL CRM
+    try {
+        if (typeof window.state !== 'undefined' && window.state.user) {
+            if (window.state.user.idTelegram) currentUserId = Number(window.state.user.idTelegram);
+            if (window.state.user.username) currentUsername = window.state.user.username;
+        }
+    } catch (e) {
+        console.warn("⚠️ [GPlus] Estado del CRM no listo aún, usando datos locales seguros.");
     }
 
     const currentIdStr = String(currentUserId);
@@ -5438,15 +5443,15 @@ function checkVipInternalRegistration() {
         status: planPendiente ? "processing" : "inactive"
     };
 
-    // 2. REGLA DE ORO: Si tu ID está en el array, eres VIP total.
+    // 3. REGLA DE ORO AUTOMÁTICA (PROTEGIDA)
     if (esVipPorCodigo) {
         if (!localVipData) {
             const inicio = new Date();
             const fin = new Date();
-            fin.setFullYear(fin.getFullYear() + 1); // Forzamos 1 año de vigencia
+            fin.setFullYear(fin.getFullYear() + 1);
 
             localVipData = JSON.stringify({
-                planKey: "anual", // Te asigna el plan Full directo
+                planKey: "anual",
                 startDate: inicio.toISOString(),
                 endDate: fin.toISOString()
             });
@@ -5454,52 +5459,37 @@ function checkVipInternalRegistration() {
             localStorage.removeItem(`gplus_pending_${currentIdStr}`);
         }
 
-        const datosLocales = JSON.parse(localVipData);
-        const tiempoRestante = new Date(datosLocales.endDate).getTime() - new Date().getTime();
-
-        if (tiempoRestante > 0) {
-            const planInfo = DEF_PLANES.find(p => p.id === datosLocales.planKey) || DEF_PLANES[2];
-            datosSuscripcion = {
-                isVip: true,
-                planKey: datosLocales.planKey,
-                planName: planInfo.title,
-                startDate: datosLocales.startDate,
-                endDate: datosLocales.endDate,
-                status: "active"
-            };
-        } else {
-            // Auto-renovación si caducó en almacenamiento local pero sigue en la lista del código
-            const nuevaFechaInicio = new Date();
-            const nuevaFechaFin = new Date();
-            nuevaFechaFin.setFullYear(nuevaFechaFin.getFullYear() + 1);
-
-            localStorage.setItem(`gplus_local_sub_${currentIdStr}`, JSON.stringify({
-                planKey: datosLocales.planKey,
-                startDate: nuevaFechaInicio.toISOString(),
-                endDate: nuevaFechaFin.toISOString()
-            }));
-
-            const planInfo = DEF_PLANES.find(p => p.id === datosLocales.planKey) || DEF_PLANES[2];
-            datosSuscripcion = {
-                isVip: true,
-                planKey: datosLocales.planKey,
-                planName: planInfo.title,
-                startDate: nuevaFechaInicio.toISOString(),
-                endDate: nuevaFechaFin.toISOString(),
-                status: "active"
-            };
+        // EVITAMOS EL CRASH: Leemos de forma segura asegurándonos de que localVipData exista
+        try {
+            const datosLocales = JSON.parse(localVipData);
+            if (datosLocales && datosLocales.planKey) {
+                const planInfo = DEF_PLANES.find(p => p.id === datosLocales.planKey) || DEF_PLANES[2];
+                datosSuscripcion = {
+                    isVip: true,
+                    planKey: datosLocales.planKey,
+                    planName: planInfo.title,
+                    startDate: datosLocales.startDate,
+                    endDate: datosLocales.endDate,
+                    status: "active"
+                };
+            }
+        } catch(err) {
+            console.error("Error leyendo JSON local:", err);
         }
     } else {
-        // Limpieza de seguridad si se saca de la lista VIP del código
         localStorage.removeItem(`gplus_local_sub_${currentIdStr}`);
     }
 
-    // Inyectamos el resultado en el estado global para sincronizar con tu perfil del CRM
-    if (!window.state) window.state = {};
-    if (!window.state.user) window.state.user = {};
-    window.state.user.isVipMember = datosSuscripcion.isVip;
+    // 4. INYECTAR DE REGRESO AL CRM DE FORMA SEGURA
+    try {
+        if (typeof window.state !== 'undefined') {
+            if (!window.state.user) window.state.user = {};
+            window.state.user.isVipMember = datosSuscripcion.isVip;
+        }
+    } catch(e) {}
 
-    // 3. MANDAMOS A PINTAR LAS TARJETAS Y LOS COMPONENTES
+    // 5. MANDAR A PINTAR EL HTML
+    console.log("🛠️ [GPlus] Renderizando elementos en el DOM...");
     renderizarPanelUsuarioGPlus(datosSuscripcion, currentUserId);
     renderizarTarjetasPlanesGPlus(datosSuscripcion, planPendiente, currentUserId, currentUsername);
     sincronizarEtiquetasExternasGPlus(datosSuscripcion);
