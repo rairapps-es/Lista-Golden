@@ -3002,31 +3002,39 @@ function checkVipInternalRegistration() {
 }
 
 function updateAvatarRenderers() {
-    // 👤 1. Gestión del Avatar (Foto de Telegram o Silueta)
-    const siluetaPorDefecto = "https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/1f464.svg";
-    const finalUrl = state.user.telegramPhotoUrl || siluetaPorDefecto;
-    
     // Buscamos los elementos del DOM
     const headerImg = document.getElementById("header-avatar");
     const shopImg = document.getElementById("shop-ia-avatar-preview");
     const drawerImg = document.getElementById("drawer-avatar-render");
+
+    // 👤 1. Gestión del Avatar Inteligente (Evita imágenes rotas)
+    const siluetaPorDefecto = "https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/1f464.svg";
+    
+    // 🎯 TRUCO DE SEGURIDAD: Si state no tiene la foto, intentamos rescatar la URL de la barra superior que SÍ funciona
+    let finalUrl = state.user.telegramPhotoUrl;
+    
+    if (!finalUrl && headerImg && headerImg.src && !headerImg.src.includes('1f464.svg')) {
+        finalUrl = headerImg.src; // Le clonamos la foto que ya está viva arriba
+    }
+    
+    // Si de verdad no hay ninguna foto en ningún lado, ponemos la silueta
+    if (!finalUrl) {
+        finalUrl = siluetaPorDefecto;
+    }
 
     // Asignamos las imágenes de forma segura solo si existen en la página actual
     if (headerImg) headerImg.src = finalUrl;
     if (shopImg) shopImg.src = finalUrl;
     if (drawerImg) drawerImg.src = finalUrl;
     
-    // 💰 2. Sincronización del Saldo Acumulado (¡Añadido aquí!)
-    // Controlamos que state.user.balance exista, si no ponemos 0
+    // 💰 2. Sincronización del Saldo Acumulado
     const saldoActual = (state.user && state.user.balance !== undefined) ? state.user.balance : 0;
     
-    // Inyectamos el saldo en el nuevo contenedor que pusiste en tu Header
     const balanceHeader = document.getElementById("header-balance");
     if (balanceHeader) {
         balanceHeader.innerText = saldoActual;
     }
 
-    // Inyectamos también en el perfil por si acaso usas profile-balance o drawer-balance
     const balanceProfile = document.getElementById("profile-balance") || document.getElementById("drawer-balance");
     if (balanceProfile) {
         balanceProfile.innerText = saldoActual;
@@ -3037,7 +3045,7 @@ function updateAvatarRenderers() {
         renderEquippedChipsList();
     }
 }
-
+        
         function renderShopCarrousels() {
     const trackExplorers = document.getElementById("track-explorers");
     const trackOwners = document.getElementById("track-owners");
