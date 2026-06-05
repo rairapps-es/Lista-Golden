@@ -365,16 +365,29 @@
     border: 3px solid var(--telegram-blue, #24a1de);
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
 }
-
 /* 👤 La imagen interna del perfil (Sincronizada por JS) */
+
+        /* 1. Limpiamos por completo la imagen para que rellene su marco de forma perfecta */
 #drawer-avatar-render {
-    width: 100%;       /* Ocupa el 100% de los 120px del contenedor */
-    height: 100%;      /* Ocupa el 100% de los 120px del contenedor */
-    object-fit: cover; /* Evita que la foto se estire o se deforme si no es perfectamente cuadrada */
+    width: 100%;       
+    height: 100%;      
+    object-fit: cover; 
     display: block;
 }
 
-        .ia-avatar-frame img { width: 100%; height: 100%; object-fit: cover; }
+/* 2. Corregimos el frame quitando el padding-top interno de la imagen */
+.ia-avatar-frame img { 
+    width: 100%; 
+    height: 100%; 
+    object-fit: cover; 
+    /* ❌ Eliminamos el padding-top de aquí adentro */
+}
+
+/* 3. 🛠️ AGREGAMOS ESTO: Empujamos el marco entero (con la foto dentro) hacia abajo */
+.ia-avatar-frame {
+    margin-top: 130px; /* Esto baja el bloque completo separándolo de la barra superior */
+    display: block;    /* Asegura que respete los márgenes correctamente */
+}
 
         .equipped-badges-container {
             display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-top: 10px;
