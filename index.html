@@ -118,19 +118,23 @@
         }
 
         /* Adaptación del perfil para que actúe como página completa individual */
+/* 👤 Adaptación del perfil como página completa individual - CORREGIDO */
 #view-profile.app-view {
     display: none; /* Empieza oculto por defecto */
     width: 100%;
     min-height: 100vh;
-    background: var(--bg-principal, #0f172a); /* El fondo oscuro de tu app */
-    padding: 16px;
+    background: var(--bg-principal, #0f172a); 
+    
+    /* 🛠️ CORRECCIÓN CRÍTICA: Cambiamos 16px arriba por 85px para empujar el contenido debajo de la barra */
+    padding: 85px 16px 16px 16px; 
+    
     box-sizing: border-box;
     position: relative;
     top: 0;
     left: 0;
-    transform: none; /* Eliminamos el desplazamiento lateral del viejo drawer */
+    transform: none; 
     box-shadow: none;
-    overflow-y: auto; /* Permite scroll hacia abajo si añades misiones/FAQs */
+    overflow-y: auto; 
 }
 
 /* 🌟 IMPORTANTE: Cuando tu script le ponga la clase activa, se mostrará en pantalla */
@@ -362,23 +366,19 @@
 
 /* 1. EL MARCO (El contenedor redondo que se posiciona y brilla) */
 .ia-avatar-frame {
-    width: 110px !important;   /* Tamaño grande e imponente */
-    height: 110px !important;
-    border-radius: 50% !important;
-    overflow: hidden;          /* Corta de forma implacable lo que se salga del círculo */
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    overflow: hidden;
     display: flex;
     align-items: center;
     justify-content: center;
-    
-    /* Margen perfecto: 15px arriba (ya que el drawer tiene 85px de padding), 
-       centrado horizontal (auto), y 12px abajo para el nombre */
-    margin: 15px auto 12px auto !important; 
-    
-    /* Borde azul premium de Telegram y sombra */
-    border: 3px solid var(--telegram-blue, #24a1de) !important;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4) !important;
-    position: relative;
+    /* Un margen superior suave, ya que el contenedor padre ahora hace el trabajo pesado */
+    margin: 15px auto 12px auto; 
+    border: 3px solid var(--telegram-blue, #24a1de);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
 }
+
 /* 2. LA IMAGEN INTERNA (Se adapta al marco como un guante sin importar el ID) */
 #drawer-avatar-render, 
 #shop-ia-avatar-preview,
