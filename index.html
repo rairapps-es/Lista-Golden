@@ -2711,6 +2711,11 @@
 
         </div>
 
+     <!-- 2. AQUÍ SE MOSTRARÁN LAS TARJETAS AUTOMÁTICAMENTE -->
+    <div id="gplus-cards-row-container">
+        <!-- Deja este bloque vacío. Al cargar la página, el JavaScript 
+             lo rellenará solo con tus 3 planes de DEF_PLANES -->
+    </div>
     </main>
     
 <button onclick="switchView('shop')">🛍️ Visitar Tienda</button>
@@ -5878,50 +5883,45 @@ const ID_USUARIO_ACTUAL_LOGUEADO = window.Telegram?.WebApp?.initDataUnsafe?.user
     // -------------------------------------------------------------------------
     // 2. TU TABLA DE CONFIGURACIÓN MANUAL DE 3 USUARIOS VIP
     // -------------------------------------------------------------------------
+// 📦 TU REFERENCIA REAL DE PLANES
+const DEF_PLANES = [
+    { id: "mes", title: "GPlus Estándar", desc: "Crecimiento regular.", duration: "1 Mes", price: 9.99, discount: 5, emoji: "🚀", benefits: ["Alcance x2 avanzado", "Soporte estándar"] },
+    { id: "semestral", title: "GPlus PRO", desc: "Automatización profesional.", duration: "6 Meses", price: 49.99, discount: 10, emoji: "🔥", benefits: ["Alcance x5 masivo", "Soporte prioritario"] },
+    { id: "anual", title: "GPlus Full", desc: "Acceso total ilimitado.", duration: "1 Año", price: 89.99, discount: 15, emoji: "👑", benefits: ["Alcance x10 máximo", "Herramientas IA"] }
+];
+    // Tu lista manual de 3 usuarios VIP (He cambiado 'nombrePlan' por 'planKey' para asociarlo directamente con DEF_PLANES)
     const BASE_SUSCRIPCIONES_VIP = [
         {
             idTelegram: 1320417199,
-            tipoDuracion: "Anual",        // Texto exacto que quieres mostrar
+            planKey: "anual",        // Coincide con id: "anual"
+            tipoDuracion: "Anual",
             fechaInicio: "2026-01-01",
             fechaFin: "2027-01-01",
-            nombrePlan: "GPlus VIP Full",
             estado: "active"
         },
         {
             idTelegram: 87654321,
+            planKey: "semestral",    // Coincide con id: "semestral"
             tipoDuracion: "Trimestral",
             fechaInicio: "2026-05-15",
             fechaFin: "2026-08-15",
-            nombrePlan: "GPlus PRO",
             estado: "processing"
         },
         {
             idTelegram: 55442211,
+            planKey: "mes",          // Coincide con id: "mes"
             tipoDuracion: "1 Mes",
             fechaInicio: "2026-06-01",
             fechaFin: "2026-07-01",
-            nombrePlan: "GPlus Estándar",
             estado: "inactive"
         }
     ];
-    // -------------------------------------------------------------------------
 
-    const contenedor = document.getElementById("gplus-user-status-block");
-    if (!contenedor) return;
+    const contenedorStatus = document.getElementById("gplus-user-status-block");
+    const contenedorTienda = document.getElementById("gplus-cards-row-container");
 
-    // Buscar si el usuario actual coincide con alguno de los 3 registrados
+    // Buscar si el usuario actual coincide con la lista VIP
     const suscripcionValida = BASE_SUSCRIPCIONES_VIP.find(u => u.idTelegram === ID_USUARIO_ACTUAL_LOGUEADO);
-
-    // REGLA DE FILTRADO: Si el ID NO coincide con ninguno, ocultamos el panel por completo
-    if (!suscripcionValida) {
-        contenedor.style.display = "none";
-        contenedor.innerHTML = "";
-        console.log(`🔒 [GPlus] Usuario ${ID_USUARIO_ACTUAL_LOGUEADO} no coincide con la lista VIP. Panel ocultado.`);
-        return;
-    }
-
-    // Si coincide, forzamos que sea visible y procesamos el renderizado
-    contenedor.style.display = "block";
 
     // Formateador interno de fechas (Ej: 1 de ene de 2026)
     const formatearFecha = (fechaStr) => {
@@ -5932,48 +5932,97 @@ const ID_USUARIO_ACTUAL_LOGUEADO = window.Telegram?.WebApp?.initDataUnsafe?.user
         return fecha.toLocaleDateString("es-ES", { day: "numeric", month: "short", year: "numeric" });
     };
 
-    // Control de colores del Badge de estado
-    let textoEstado = "Inactivo";
-    let claseBadge = "badge-indep-inactive";
-    if (suscripcionValida.estado === "active") {
-        textoEstado = "Activo";
-        claseBadge = "badge-indep-active";
-    } else if (suscripcionValida.estado === "processing") {
-        textoEstado = "En Revisión";
-        claseBadge = "badge-indep-processing";
+    // =========================================================================
+    // 1. RENDERIZAR EL PANEL DE ESTADO SUPERIOR
+    // =========================================================================
+    if (!suscripcionValida) {
+        if (contenedorStatus) {
+            contenedorStatus.style.display = "none";
+            contenedorStatus.innerHTML = "";
+        }
+    } else if (contenedorStatus) {
+        contenedorStatus.style.display = "block";
+
+        let textoEstado = "Inactivo";
+        let claseBadge = "badge-indep-inactive";
+        if (suscripcionValida.estado === "active") {
+            textoEstado = "Activo";
+            claseBadge = "badge-indep-active";
+        } else if (suscripcionValida.estado === "processing") {
+            textoEstado = "En Revisión";
+            claseBadge = "badge-indep-processing";
+        }
+
+        // Buscamos el nombre comercial del plan para el bloque superior usando el planKey
+        const planRef = DEF_PLANES.find(p => p.id === suscripcionValida.planKey);
+        const nombrePlanSuperior = planRef ? planRef.title : "GPlus Premium";
+
+        contenedorStatus.innerHTML = `
+            <div class="card-indep-gplus">
+                <div class="header-indep-gplus">
+                    <div class="info-indep-gplus">
+                        <h3>Estado de tu Suscripción GPlus</h3>
+                        <p>ID Sesión: <span>${suscripcionValida.idTelegram}</span> • Plan: <strong>${nombrePlanSuperior}</strong></p>
+                    </div>
+                    <span class="badge-indep-gplus ${claseBadge}">${textoEstado}</span>
+                </div>
+                <div class="grid-indep-gplus">
+                    <div class="col-indep-gplus">
+                        <span class="label-indep-gplus">Tipo de Duración</span>
+                        <strong class="value-indep-gplus">${suscripcionValida.tipoDuracion}</strong>
+                    </div>
+                    <div class="col-indep-gplus">
+                        <span class="label-indep-gplus">Fecha de Inicio</span>
+                        <strong class="value-indep-gplus">${formatearFecha(suscripcionValida.fechaInicio)}</strong>
+                    </div>
+                    <div class="col-indep-gplus">
+                        <span class="label-indep-gplus">Fecha de Vencimiento</span>
+                        <strong class="value-indep-gplus highlight-indep-date">${formatearFecha(suscripcionValida.fechaFin)}</strong>
+                    </div>
+                </div>
+            </div>
+        `;
     }
 
-    // Inyectar la interfaz de su suscripción correspondiente
-    contenedor.innerHTML = `
-        <div class="card-indep-gplus">
-            <div class="header-indep-gplus">
-                <div class="info-indep-gplus">
-                    <h3>Estado de tu Suscripción GPlus</h3>
-                    <p>ID Sesión: <span>${suscripcionValida.idTelegram}</span> • Plan: <strong>${suscripcionValida.nombrePlan}</strong></p>
-                </div>
-                <span class="badge-indep-gplus ${claseBadge}">${textoEstado}</span>
-            </div>
+    // =========================================================================
+    // 2. RENDERIZAR LAS TARJETAS DE LA TIENDA CON BLOQUEO EN VIVO
+    // =========================================================================
+    if (contenedorTienda) {
+        contenedorTienda.innerHTML = DEF_PLANES.map(plan => {
             
-            <div class="grid-indep-gplus">
-                <div class="col-indep-gplus">
-                    <span class="label-indep-gplus">Tipo de Duración</span>
-                    <strong class="value-indep-gplus">${suscripcionValida.tipoDuracion}</strong>
+            // 🎯 PREGUNTA DIRECTA: ¿Este plan de la tienda es el que tiene activo el usuario actual?
+            const esElPlanActivo = (suscripcionValida && plan.id === suscripcionValida.planKey && suscripcionValida.estado === "active");
+
+            // Si es el activo, preparamos las variables de bloqueo. Si no, vacías (normales)
+            const estiloTarjeta = esElPlanActivo ? 'style="opacity: 0.55; pointer-events: none; border: 1px dashed rgba(34, 197, 94, 0.5);"' : '';
+            const textoBoton   = esElPlanActivo ? "✓ Plan ya Activo" : "Adquirir Plan";
+            const estiloBoton  = esElPlanActivo ? 'style="background: #1e293b; color: #22c55e; box-shadow: none;" disabled' : '';
+
+            const listaBeneficios = plan.benefits.map(b => `<li><span>✓</span> ${b}</li>`).join("");
+
+            return `
+                <div class="gplus-plan-card" ${estiloTarjeta}>
+                    <div>
+                        <div class="gplus-card-header">
+                            <span class="gplus-plan-title">${plan.emoji} ${plan.title}</span>
+                        </div>
+                        <div class="gplus-duration-tag">Pase ${plan.duration}</div>
+                        <p class="gplus-plan-desc">${plan.desc}</p>
+                        <ul class="gplus-benefits-list">
+                            ${listaBeneficios}
+                        </ul>
+                    </div>
+                    <div>
+                        <div class="gplus-price-row">${plan.price}$ <span>/ ${plan.duration.toLowerCase()}</span></div>
+                        <button class="gplus-btn-action" ${estiloBoton} onclick="alert('Abriendo pasarela para ${plan.title}...')">${textoBoton}</button>
+                    </div>
                 </div>
-                <div class="col-indep-gplus">
-                    <span class="label-indep-gplus">Fecha de Inicio</span>
-                    <strong class="value-indep-gplus">${formatearFecha(suscripcionValida.fechaInicio)}</strong>
-                </div>
-                <div class="col-indep-gplus">
-                    <span class="label-indep-gplus">Fecha de Vencimiento</span>
-                    <strong class="value-indep-gplus highlight-indep-date">${formatearFecha(suscripcionValida.fechaFin)}</strong>
-                </div>
-            </div>
-        </div>
-    `;
-    console.log(`🔓 [GPlus] Coincidencia exitosa para ID: ${ID_USUARIO_ACTUAL_LOGUEADO}. Mostrando datos.`);
+            `;
+        }).join("");
+    }
 }
 
-// Disparador automático e independiente
+// Disparador automático e independiente al cargar la web
 document.addEventListener("DOMContentLoaded", verificarYMostrarSuscripcionAutomatica);
 
     </script>
