@@ -3656,11 +3656,19 @@ window.navegarACanalOficial = function(url, nombreCanal) {
     const container = document.getElementById("vip-slider");
     if (!container) return;
     
-    // Filtramos solo los canales marcados como VIP
+    // 👑 REGLA DE SINCRONIZACIÓN INMEDIATA:
+    // Si el usuario global ya es VIP, buscamos su canal en el dataset y lo actualizamos en vivo
+    if (state && state.user && state.user.isVipMember && state.user.idTelegram) {
+        const myChannel = INITIAL_CHANNELS_DATASET.find(c => c.telegramUserId === state.user.idTelegram);
+        if (myChannel) {
+            myChannel.isVip = true; // Forzamos a que el dataset sepa que ya eres VIP
+        }
+    }
+    
+    // Ahora filtramos solo los canales marcados como VIP (¡el tuyo ahora ya estará incluido!)
     const vips = INITIAL_CHANNELS_DATASET.filter(c => c.isVip);
     
-    // 🔥 MEJORA: Usamos la función reutilizable con el contexto 'vip-'
-    // Esto genera IDs únicos como id="accordion-vip-123" para que no choquen con nadie
+    // Genera las tarjetas con IDs únicos para que no choquen
     container.innerHTML = vips.map(c => buildChannelCardHtml(c, 'vip-')).join('');
     
     // Forzamos el refresco de los iconos de Lucide cargados dinámicamente
