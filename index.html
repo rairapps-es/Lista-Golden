@@ -1867,111 +1867,111 @@
 
     </header>
 <div id="view-profile" class="app-view">
+    
     <div class="drawer-identity">
         
         <div class="ia-avatar-frame">
             <img src="" id="drawer-avatar-render" alt="Avatar Perfil Grande">
         </div>
 
-        </div>
+        <div class="drawer-username-tag">
+            <span id="drawer-username">@Anónimo</span>
+            
+            <div id="user-premium-tag" class="user-badge-status badge-free" onclick="toggleBenefitsSection()">
+                <i data-lucide="award" style="width:14px; height:14px;"></i> 
+                <span id="tag-label-text">GRATIS</span>
+            </div>
+            
+            <div id="hidden-benefits-box" class="premium-modal-overlay" style="display: none;">
+                <div class="premium-modal-card">
+                    <button class="close-premium-btn" onclick="toggleBenefitsSection()">&times;</button>
+                    
+                    <div class="premium-modal-header">
+                        <span class="premium-badge-icon">👑</span>
+                        <h5 id="benefits-box-title">Beneficios VIP</h5>
+                    </div>
 
-            <div class="drawer-username-tag">
-                <span id="drawer-username">@Anónimo</span>
-                <div id="user-premium-tag" class="user-badge-status badge-free" onclick="toggleBenefitsSection()">
-                    <i data-lucide="award" style="width:14px; height:14px;"></i> <span id="tag-label-text">GRATIS</span>
+                    <div class="premium-modal-body">
+                        <div class="benefit-item">✨ <span>4,99€ / mes</span></div>
+                        <div class="benefit-item">🚀 <span>Publica hasta 3 canales</span></div>
+                        <div class="benefit-item">🗂️ <span>Tus canales en 3 categorías</span></div>
+                        <div class="benefit-item">⭐ <span>Destacado en el directorio</span></div>
+                    </div>
+                    
+                    <div id="premium-order-form" class="premium-modal-footer">
+                        <div class="form-group-premium">
+                            <label>Método de Pago</label>
+                            <select id="pay-method" class="form-control-premium">
+                                <option value="PayPal">PayPal</option>
+                                <option value="USDT">USDT (Crypto)</option>
+                            </select>
+                        </div>
+                        <button id="btn-submit-order" class="btn-subscribe-trigger-premium" onclick="sendOrderToTelegram()">
+                            <span id="btn-text-content">Hacer Pedido 🛒</span>
+                        </button>
+                    </div>
                 </div>
-                
-                <div id="hidden-benefits-box" class="premium-modal-overlay" style="display: none;">
-    <div class="premium-modal-card">
-        <button class="close-premium-btn" onclick="toggleBenefitsSection()">&times;</button>
-        
-        <div class="premium-modal-header">
-            <span class="premium-badge-icon">👑</span>
-            <h5 id="benefits-box-title">Beneficios VIP</h5>
-        </div>
-
-        <div class="premium-modal-body">
-            <div class="benefit-item">✨ <span>4,99€ / mes</span></div>
-            <div class="benefit-item">🚀 <span>Publica hasta 3 canales</span></div>
-            <div class="benefit-item">🗂️ <span>Tus canales en 3 categorías</span></div>
-            <div class="benefit-item">⭐ <span>Destacado en el directorio</span></div>
-        </div>
-        
-        <div id="premium-order-form" class="premium-modal-footer">
-            <div class="form-group-premium">
-                <label>Método de Pago</label>
-                <select id="pay-method" class="form-control-premium">
-                    <option value="PayPal">PayPal</option>
-                    <option value="USDT">USDT (Crypto)</option>
-                </select>
             </div>
-            <button id="btn-submit-order" class="btn-subscribe-trigger-premium" onclick="sendOrderToTelegram()">
-                <span id="btn-text-content">Hacer Pedido 🛒</span>
-            </button>
+
+            <span id="drawer-range" style="color: var(--vip-gold); font-size: 0.85rem; font-weight: 800; margin-top: 6px; display: block;">[ Rango ]</span>
+        </div>
+    </div> <div class="rpg-progress-container" style="margin-top: 15px; margin-bottom: 20px;">
+        <div class="rpg-labels">
+            <span>Progreso: <strong id="rpg-current-pts">0</strong>/ 4950 Pts</span>
+            <span id="rpg-status-badge">Nivel Inicial</span>
+        </div>
+        <div style="width:100%; height:6px; background:var(--border-color); border-radius:10px; overflow:hidden;">
+            <div id="rpg-bar-fill" style="width: 20%; height:100%; background:linear-gradient(90deg, var(--telegram-blue), var(--mystic-purple)); transition: var(--transition-smooth);"></div>
         </div>
     </div>
+
+    <div class="premium-balance-box" style="margin-bottom: 16px;">
+        <div class="balance-title">Saldo Acumulado</div>
+        <div class="balance-amount"><span id="profile-balance">0</span> <span style="color: var(--vip-gold)">✨ Pts</span></div>
+    </div>
+
+    <div class="role-switch-container" style="margin-bottom: 20px;">
+        <div class="switch-label">Modo Administrador</div>
+        <div id="role-toggle" class="toggle-btn" onclick="toggleAdminRole()"></div>
+    </div>
+
+    <div class="status-counters" style="margin-bottom: 20px;">
+        <div class="counter-card" onclick="toggleProfileDrawer(); switchView('directory')">
+            <span id="cnt-channels">0</span>
+            <span>Directorio</span>
+        </div>
+        <div class="counter-card" onclick="toggleProfileDrawer(); switchView('favorites')">
+            <span id="cnt-favs">0</span>
+            <span>Favoritos ⭐</span>
+        </div>
+        <div class="counter-card" onclick="toggleProfileDrawer(); switchView('history')">
+            <span id="cnt-purchases">0</span>
+            <span>Mis Compras</span>
+        </div>
+    </div>
+
+    <div class="admin-only" style="margin-bottom: 25px;">
+        <button class="drawer-btn" style="border-color: var(--telegram-blue); background: rgba(36,161,222,0.05); width: 100%;" onclick="toggleProfileDrawer(); switchView('my-channels');">
+            <span>🗂️ Mis Canales (<strong id="cnt-my-owned-channels">0</strong>)</span> <i data-lucide="arrow-right"></i>
+        </button>
+    </div>
+
+    <div class="drawer-links" style="width: 100%; margin-top: 10px;">
+        <button class="drawer-btn" style="width: 100%;" onclick="toggleProfileDrawer(); switchView('shop')">
+            <span>🛍️ Tienda de Recompensas</span> <i data-lucide="chevron-right"></i>
+        </button>
+        <button class="drawer-btn" style="width: 100%;" onclick="toggleProfileDrawer(); switchView('energy')">
+            <span>⚡ Cómo Ganar Puntos</span> <i data-lucide="chevron-right"></i>
+        </button>
+        <button id="epic-avatar-link" class="drawer-btn locked" style="width: 100%;" onclick="handlePremiumDrawerAccess()">
+            <span id="drawer-locked-text">🔒 Avatar Premium (Requiere Rango 5)</span> <i data-lucide="lock" id="drawer-locked-icon"></i>
+        </button>
+        <button class="drawer-btn" style="width: 100%;" onclick="toggleProfileDrawer(); openLogsModal()">
+            <span>📊 Historial de Logs</span> <i data-lucide="file-text"></i>
+        </button>
+    </div>
+
 </div>
-
-                <span id="drawer-range" style="color: var(--vip-gold); font-size: 0.85rem; font-weight: 800; margin-top: 6px;">[ Rango ]</span>
-            </div>
-        </div>
-
-        <div class="rpg-progress-container">
-            <div class="rpg-labels">
-                <span>Progreso: <strong id="rpg-current-pts">0</strong>/ 4950 Pts</span>
-                <span id="rpg-status-badge">Nivel Inicial</span>
-            </div>
-            <div style="width:100%; height:6px; background:var(--border-color); border-radius:10px; overflow:hidden;">
-                <div id="rpg-bar-fill" style="width: 20%; height:100%; background:linear-gradient(90deg, var(--telegram-blue), var(--mystic-purple)); transition: var(--transition-smooth);"></div>
-            </div>
-        </div>
-
-        <div class="premium-balance-box">
-            <div class="balance-title">Saldo Acumulado</div>
-            <div class="balance-amount"><span id="profile-balance">0</span> <span style="color: var(--vip-gold)">✨ Pts</span></div>
-        </div>
-
-        <div class="role-switch-container">
-            <div class="switch-label">Modo Administrador</div>
-            <div id="role-toggle" class="toggle-btn" onclick="toggleAdminRole()"></div>
-        </div>
-
-        <div class="status-counters">
-            <div class="counter-card" onclick="toggleProfileDrawer(); switchView('directory')">
-                <span id="cnt-channels">0</span>
-                <span>Directorio</span>
-            </div>
-            <div class="counter-card" onclick="toggleProfileDrawer(); switchView('favorites')">
-                <span id="cnt-favs">0</span>
-                <span>Favoritos ⭐</span>
-            </div>
-            <div class="counter-card" onclick="toggleProfileDrawer(); switchView('history')">
-                <span id="cnt-purchases">0</span>
-                <span>Mis Compras</span>
-            </div>
-        </div>
-
-        <div class="admin-only" style="margin-bottom: 12px;">
-            <button class="drawer-btn" style="border-color: var(--telegram-blue); background: rgba(36,161,222,0.05);" onclick="toggleProfileDrawer(); switchView('my-channels');">
-                <span>🗂️ Mis Canales (<strong id="cnt-my-owned-channels">0</strong>)</span> <i data-lucide="arrow-right"></i>
-            </button>
-        </div>
-
-        <div class="drawer-links">
-            <button class="drawer-btn" onclick="toggleProfileDrawer(); switchView('shop')">
-                <span>🛍️ Tienda de Recompensas</span> <i data-lucide="chevron-right"></i>
-            </button>
-            <button class="drawer-btn" onclick="toggleProfileDrawer(); switchView('energy')">
-                <span>⚡ Cómo Ganar Puntos</span> <i data-lucide="chevron-right"></i>
-            </button>
-            <button id="epic-avatar-link" class="drawer-btn locked" onclick="handlePremiumDrawerAccess()">
-                <span id="drawer-locked-text">🔒 Avatar Premium (Requiere Rango 5)</span> <i data-lucide="lock" id="drawer-locked-icon"></i>
-            </button>
-            <button class="drawer-btn" onclick="toggleProfileDrawer(); openLogsModal()">
-                <span>📊 Historial de Logs</span> <i data-lucide="file-text"></i>
-            </button>
-        </div>
-    </div>
 
     <main id="view-home" class="app-view active-view">
         <div class="stats-grid">
