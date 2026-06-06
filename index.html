@@ -2143,14 +2143,17 @@
         </table>
 
         <div id="my-owned-channels-list" class="directory-grid" style="margin-top: 20px;"></div>
-        <div class="gplus-banner" style="position:relative; z-index: 1;">
-    <div style="position:relative; z-index:2;">
-        <span style="background:#a855f7; color:#fff; font-size:0.65rem; font-weight:900; padding:3px 8px; border-radius:20px; text-transform:uppercase; letter-spacing:1px;">Suscripción GPlus</span>
-        <h3 style="font-size:1.3rem; font-weight:800; margin: 8px 0 4px 0; color:#fff;">⚡ El Plan Todo en Uno para Propietarios</h3>
-        <p style="font-size:0.8rem; color:#cbd5e1; margin-bottom:14px;">Multiplica por x10 el alcance de tus canales, sin límites y con privilegios exclusivos de la Golden List.</p>
-        <button onclick="openGPlusPanel()" style="background:#fff; color:#000; font-weight:800; border:none; padding:10px 16px; border-radius:8px; font-size:0.8rem; cursor:pointer; display:flex; align-items:center; gap:6px;">
-            <i data-lucide="sparkles" style="width:14px; height:14px;"></i> Ver Beneficios GPlus
-        </button>
+
+<div id="gplus-dynamic-banner-container">
+    <div class="gplus-banner" style="position:relative; z-index: 1;">
+        <div style="position:relative; z-index:2;">
+            <span style="background:#a855f7; color:#fff; font-size:0.65rem; font-weight:900; padding:3px 8px; border-radius:20px; text-transform:uppercase; letter-spacing:1px;">Suscripción GPlus</span>
+            <h3 style="font-size:1.3rem; font-weight:800; margin: 8px 0 4px 0; color:#fff;">⚡ El Plan Todo en Uno para Propietarios</h3>
+            <p style="font-size:0.8rem; color:#cbd5e1; margin-bottom:14px;">Multiplica por x10 el alcance de tus canales, sin límites y con privilegios exclusivos de la Golden List.</p>
+            <button onclick="openGPlusPanel()" style="background:#fff; color:#000; font-weight:800; border:none; padding:10px 16px; border-radius:8px; font-size:0.8rem; cursor:pointer; display:flex; align-items:center; gap:6px;">
+                <i data-lucide="sparkles" style="width:14px; height:14px;"></i> Ver Beneficios GPlus
+            </button>
+        </div>
     </div>
 </div>
 
@@ -4877,19 +4880,22 @@ document.addEventListener("DOMContentLoaded", () => {
     checkFirstSessionFeaturedCeleb();
 });
 
-        // =========================================================================
-// NUEVA FUNCIÓN DINÁMICA PARA EL ANUNCIO GPLUS (Pégala aquí al final)
-// =========================================================================
+        /**
+ * 👑 RENDERIZADO DINÁMICO DEL BANNER GPLUS
+ * Evalúa el estado del usuario en tiempo real. Si ya es VIP, limpia la pantalla;
+ * si no lo es, inyecta la oferta comercial con sus respectivos disparadores.
+ */
 function renderDynamicGPlusBanner() {
     const container = document.getElementById("gplus-dynamic-banner-container");
     if (!container) return;
 
-    // Evaluamos exactamente igual que en tu función toggleBenefitsSection
+    // Evaluamos con total seguridad si el usuario cuenta con la suscripción activa
     const isVip = state.user && (state.user.isVipMember === true || state.user.isVipMember === "true");
 
     if (isVip) {
         // 🔥 SI ES VIP: Vaciamos el contenedor para que el anuncio DESAPAREZCA por completo de la pantalla
         container.innerHTML = '';
+        console.log("🧼 [GPlus] Banner publicitario eliminado porque el usuario ya es VIP.");
     } else {
         // SI NO ES VIP: Mostramos el banner completo con el botón para contratar
         container.innerHTML = `
@@ -4905,10 +4911,13 @@ function renderDynamicGPlusBanner() {
             </div>
         `;
         
-        // Refrescamos los iconos de Lucide solo si el banner se va a mostrar
-        if (typeof lucide !== 'undefined') lucide.createIcons();
+        // Refrescamos los iconos vectoriales de Lucide solo si el banner se dibuja
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
     }
 }
+
         // =========================================================================
 // DATASET CONFIGURABLE DE LOS DOS SLIDERS
 // =========================================================================
