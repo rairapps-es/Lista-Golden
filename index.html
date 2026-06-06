@@ -3120,20 +3120,20 @@
 
             <!-- Barra Visual de Progreso Semanal -->
             <div class="streak-timeline">
-                <div class="timeline-track">
-                    <div id="streak-timeline-fill" class="timeline-fill" style="width: 0%;"></div>
-                </div>
-                <div class="timeline-days-labels">
-                    <span>Lun</span><span>Mar</span><span>Mié</span><span>Jue</span><span>Vie</span><span>Sáb</span><span>Dom</span>
-                </div>
-            </div>
+    <div class="timeline-track">
+        <div id="streak-timeline-fill" class="timeline-fill" style="width: 0%;"></div>
+    </div>
+    <div class="timeline-days-labels" id="streak-days-row">
+        <span id="streak-day-1">Lun</span>
+        <span id="streak-day-2">Mar</span>
+        <span id="streak-day-3">Mié</span>
+        <span id="streak-day-4">Jue</span>
+        <span id="streak-day-5">Vie</span>
+        <span id="streak-day-6">Sáb</span>
+        <span id="streak-day-0">Dom</span>
+    </div>
+</div>
 
-            <!-- Footer Informativo Dinámico -->
-            <div class="streak-reward-footer">
-                <span class="reward-sparkle">✨</span>
-                <p id="streak-reward-message">¡Entra mañana para mantener el fuego y ganar +1 Pts!</p>
-            </div>
-            
         </div>
     </div>
 
@@ -6317,7 +6317,167 @@ function sincronizarEtiquetasExternasGPlus(sub) {
 setTimeout(checkVipInternalRegistration, 100);
 
 </script>
+<script>
+    /**
+ * ==========================================================================
+ * 🔥 CONTROLADOR AUTOMÁTICO DE RACHAS DIARIAS CYBER-FLAME
+ * ==========================================================================
+ * Gestión de marcas de tiempo precisas a medianoche, inyección de economía RPG
+ * y renderizado de componentes visuales en tiempo real.
+ */
 
+function checkAndProcessUserStreak() {
+    const uiCard = document.querySelector(".streak-card-neon");
+    const uiNumber = document.getElementById("streak-number-count");
+    const uiTimeline = document.getElementById("streak-timeline-fill");
+    
+    // Verificación de seguridad de existencia de componentes en el DOM
+    if (!uiCard || !uiNumber || !uiTimeline) return;
+
+    // 1. OBTENER LAS FECHAS CLAVE (Aplanadas a medianoche para evitar desajustes por horas)
+    const ahora = new Date();
+    const hoyMidnight = new Date(ahora.getFullYear(), ahora.getMonth(), ahora.getDate()).getTime();
+    
+    const ultimaFechaGuardada = localStorage.getItem("gplus_streak_last_date");
+    let rachaActual = parseInt(localStorage.getItem("gplus_streak_count")) || 0;
+
+    // Caso Inicial: El usuario ingresa por primera vez en la historia de la App
+    if (!ultimaFechaGuardada) {
+        localStorage.setItem("gplus_streak_count", "1");
+        localStorage.setItem("gplus_streak_last_date", hoyMidnight.toString());
+        actualizarInterfazRacha(1, false);
+        return;
+    }
+
+    const ultimaFechaMidnight = parseInt(ultimaFechaGuardada);
+    
+    // Calcular la diferencia neta de tiempo convertida a días de 24 horas exactas
+    const diferenciaTiempo = hoyMidnight - ultimaFechaMidnight;
+    const unDiaEnMililisegundos = 24 * 60 * 60 * 1000;
+    const diasTranscurridos = Math.floor(diferenciaTiempo / unDiaEnMililisegundos);
+
+    // 2. MÁQUINA DE ESTADOS CRÍTICA DE LA RACHA
+    if (diasTranscurridos === 0) {
+        // Caso A: El usuario ya ingresó hoy. Mantenemos el fuego encendido sin regalar puntos extra
+        actualizarInterfazRacha(rachaActual, false);
+        
+    } else if (diasTranscurridos === 1) {
+        // Caso B: ¡ENTRÓ AL DÍA SIGUIENTE EN CADENA! Aumentamos racha y sumamos 1 punto de saldo
+        rachaActual += 1;
+        
+        localStorage.setItem("gplus_streak_count", rachaActual.toString());
+        localStorage.setItem("gplus_streak_last_date", hoyMidnight.toString());
+        
+        // Ejecutamos la inyección en tu economía global de juego
+        if (typeof rewardPoints === "function") {
+            rewardPoints(1, "Bono por Racha Diaria Activa");
+            
+            if (typeof registerActionToHistory === "function") {
+                registerActionToHistory("Racha de Fuego", `Entraste un día más. Racha de x${rachaActual} días. +1 Pts.`, "success");
+            }
+        }
+        
+        // Forzamos el renderizado de la interfaz con la gran animación expansiva de pantalla
+        actualizarInterfazRacha(rachaActual, true);
+        
+    } else {
+        // Caso C: Pasaron 2 días o más desde el último ingreso. El fuego se apaga por inactividad
+        rachaActual = 1; // Resetea el contador al primer peldaño (hoy)
+        localStorage.setItem("gplus_streak_count", "1");
+        localStorage.setItem("gplus_streak_last_date", hoyMidnight.toString());
+        
+        if (typeof registerActionToHistory === "function") {
+            registerActionToHistory("Fuego Apagado", "Perdiste tu racha por inactividad acumulada.", "inactive");
+        }
+        
+        // Renderizamos con indicador de reinicio silencioso
+        actualizarInterfazRacha(rachaActual, false, true);
+    }
+}
+
+/**
+ * 🎨 RENDERIZADOR INTEGRADO DE LA INTERFAZ DE USUARIO
+ * Modifica las barras, números, textos informativos y resalta el día de la semana actual.
+ */
+function actualizarInterfazRacha(contador, debeCelebrar = false, fueReseteado = false) {
+    const uiCard = document.querySelector(".streak-card-neon");
+    const uiNumber = document.getElementById("streak-number-count");
+    const uiTimeline = document.getElementById("streak-timeline-fill");
+    const uiMessage = document.getElementById("streak-reward-message");
+
+    if (!uiCard || !uiNumber || !uiTimeline || !uiMessage) return;
+
+    // Asignamos el valor numérico al marcador principal
+    uiNumber.innerText = contador;
+
+    // Calcular llenado modular de la barra de progreso semanal (Ciclos de 7 casillas)
+    const diasModulo = contador % 7 === 0 ? 7 : contador % 7;
+    const porcentajeProgreso = Math.min(100, diasModulo * 14.28);
+    uiTimeline.style.width = `${porcentajeProgreso}%`;
+
+    // Evaluamos el estado visual de la tarjeta contenedora
+    if (contador > 0) {
+        uiCard.classList.add("streak-active");
+        uiMessage.innerHTML = `¡Fuego encendido! Mantén la racha mañana para seguir ganando puntos.`;
+    } else {
+        uiCard.classList.remove("streak-active");
+        uiMessage.innerHTML = `El fuego se apagó. Entra mañana para iniciar una nueva racha de puntos.`;
+    }
+
+    // 📅 DETECTOR Y ACTUALIZADOR DEL DÍA REAL EN CURSO
+    const diaSemanaHoy = new Date().getDay(); // Filtro nativo: 0 para Dom, 1 para Lun, ..., 6 para Sáb
+    
+    // Limpiamos rastros obsoletos de luces en la fila de etiquetas
+    document.querySelectorAll("#streak-days-row span").forEach(el => el.classList.remove("day-today"));
+    
+    // Encendemos en neón el nodo del día exacto del calendario de hoy
+    const elHoy = document.getElementById(`streak-day-${diaSemanaHoy}`);
+    if (elHoy) {
+        elHoy.classList.add("day-today");
+    }
+
+    // 🎉 ANIMACIONES SENSORIALES Y DE PANTALLA COMPLETA
+    if (debeCelebrar) {
+        // Disparador de confeti nativo de tu MiniApp
+        if (typeof triggerConfettiExplosion === "function") {
+            triggerConfettiExplosion();
+        }
+        
+        // Alerta flotante estilizada
+        if (typeof showToast === "function") {
+            showToast(`¡Racha aumentada a ${contador} días! +1 ✨ Pts asignado.`, "success");
+        }
+
+        // Creación del destello flash nebulosa en el viewport absoluto
+        const flash = document.createElement("div");
+        flash.style.position = "fixed";
+        flash.style.top = "0";
+        flash.style.left = "0";
+        flash.style.width = "100vw";
+        flash.style.height = "100vh";
+        flash.style.background = "radial-gradient(circle, rgba(249,115,22,0.4) 0%, rgba(239,68,68,0.1) 60%, transparent 100%)";
+        flash.style.zIndex = "99999";
+        flash.style.pointerEvents = "none";
+        flash.style.transition = "opacity 0.6s ease-out";
+        document.body.appendChild(flash);
+        
+        // Ciclo de desvanecimiento controlado por software
+        setTimeout(() => {
+            flash.style.opacity = "0";
+            setTimeout(() => flash.remove(), 600);
+        }, 50);
+    }
+}
+
+/**
+ * DISPARADOR DE ARRANQUE SEGURO
+ * Escucha la carga inicial de la estructura para calcular la racha tras el despliegue del SDK.
+ */
+window.addEventListener("DOMContentLoaded", () => {
+    // Retardo estratégico de 400ms para permitir que las variables de Telegram y 'state' estén pobladas
+    setTimeout(checkAndProcessUserStreak, 400);
+});
+</script>
     <script>
         function verificarYMostrarSuscripcionAutomatica() {
     // -------------------------------------------------------------------------
