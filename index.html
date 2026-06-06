@@ -6320,10 +6320,8 @@ setTimeout(checkVipInternalRegistration, 100);
 <script>
     /**
  * ==========================================================================
- * 🔥 CONTROLADOR AUTOMÁTICO DE RACHAS DIARIAS CYBER-FLAME
+ * 🔥 CONTROLADOR INMUNE A FALLOS - RACHAS CYBER-FLAME
  * ==========================================================================
- * Gestión de marcas de tiempo precisas a medianoche, inyección de economía RPG
- * y renderizado de componentes visuales en tiempo real.
  */
 
 function checkAndProcessUserStreak() {
@@ -6331,17 +6329,23 @@ function checkAndProcessUserStreak() {
     const uiNumber = document.getElementById("streak-number-count");
     const uiTimeline = document.getElementById("streak-timeline-fill");
     
-    // Verificación de seguridad de existencia de componentes en el DOM
-    if (!uiCard || !uiNumber || !uiTimeline) return;
+    // 🔍 SI NO ENCUENTRA LOS ELEMENTOS, REINTENTA EN 300MS (Evita fallos de carga diferida)
+    if (!uiCard || !uiNumber || !uiTimeline) {
+        console.warn("⏳ [Racha] Esperando a que el HTML aparezca en el DOM...");
+        setTimeout(checkAndProcessUserStreak, 300);
+        return;
+    }
 
-    // 1. OBTENER LAS FECHAS CLAVE (Aplanadas a medianoche para evitar desajustes por horas)
+    console.log("🔥 [Racha] HTML detectado con éxito. Procesando cálculos...");
+
+    // 1. OBTENER LAS FECHAS CLAVE
     const ahora = new Date();
     const hoyMidnight = new Date(ahora.getFullYear(), ahora.getMonth(), ahora.getDate()).getTime();
     
     const ultimaFechaGuardada = localStorage.getItem("gplus_streak_last_date");
     let rachaActual = parseInt(localStorage.getItem("gplus_streak_count")) || 0;
 
-    // Caso Inicial: El usuario ingresa por primera vez en la historia de la App
+    // Caso Inicial: Primer acceso histórico
     if (!ultimaFechaGuardada) {
         localStorage.setItem("gplus_streak_count", "1");
         localStorage.setItem("gplus_streak_last_date", hoyMidnight.toString());
@@ -6350,54 +6354,43 @@ function checkAndProcessUserStreak() {
     }
 
     const ultimaFechaMidnight = parseInt(ultimaFechaGuardada);
-    
-    // Calcular la diferencia neta de tiempo convertida a días de 24 horas exactas
     const diferenciaTiempo = hoyMidnight - ultimaFechaMidnight;
     const unDiaEnMililisegundos = 24 * 60 * 60 * 1000;
     const diasTranscurridos = Math.floor(diferenciaTiempo / unDiaEnMililisegundos);
 
-    // 2. MÁQUINA DE ESTADOS CRÍTICA DE LA RACHA
+    // 2. MÁQUINA DE ESTADOS CRÍTICA
     if (diasTranscurridos === 0) {
-        // Caso A: El usuario ya ingresó hoy. Mantenemos el fuego encendido sin regalar puntos extra
+        // Ya entró hoy
+        if (rachaActual === 0) rachaActual = 1; // Corrección por si estaba corrupto
         actualizarInterfazRacha(rachaActual, false);
         
     } else if (diasTranscurridos === 1) {
-        // Caso B: ¡ENTRÓ AL DÍA SIGUIENTE EN CADENA! Aumentamos racha y sumamos 1 punto de saldo
+        // ¡Racha continuada al día siguiente!
         rachaActual += 1;
-        
         localStorage.setItem("gplus_streak_count", rachaActual.toString());
         localStorage.setItem("gplus_streak_last_date", hoyMidnight.toString());
         
-        // Ejecutamos la inyección en tu economía global de juego
         if (typeof rewardPoints === "function") {
             rewardPoints(1, "Bono por Racha Diaria Activa");
-            
             if (typeof registerActionToHistory === "function") {
                 registerActionToHistory("Racha de Fuego", `Entraste un día más. Racha de x${rachaActual} días. +1 Pts.`, "success");
             }
         }
-        
-        // Forzamos el renderizado de la interfaz con la gran animación expansiva de pantalla
         actualizarInterfazRacha(rachaActual, true);
         
     } else {
-        // Caso C: Pasaron 2 días o más desde el último ingreso. El fuego se apaga por inactividad
-        rachaActual = 1; // Resetea el contador al primer peldaño (hoy)
+        // Pasaron 2 días o más (Fuego apagado)
         localStorage.setItem("gplus_streak_count", "1");
         localStorage.setItem("gplus_streak_last_date", hoyMidnight.toString());
-        
         if (typeof registerActionToHistory === "function") {
-            registerActionToHistory("Fuego Apagado", "Perdiste tu racha por inactividad acumulada.", "inactive");
+            registerActionToHistory("Fuego Apagado", "Perdiste tu racha por inactividad.", "inactive");
         }
-        
-        // Renderizamos con indicador de reinicio silencioso
-        actualizarInterfazRacha(rachaActual, false, true);
+        actualizarInterfazRacha(1, false, true);
     }
 }
 
 /**
- * 🎨 RENDERIZADOR INTEGRADO DE LA INTERFAZ DE USUARIO
- * Modifica las barras, números, textos informativos y resalta el día de la semana actual.
+ * 🎨 RENDERIZADOR FORZADO DE LA INTERFAZ
  */
 function actualizarInterfazRacha(contador, debeCelebrar = false, fueReseteado = false) {
     const uiCard = document.querySelector(".streak-card-neon");
@@ -6407,61 +6400,52 @@ function actualizarInterfazRacha(contador, debeCelebrar = false, fueReseteado = 
 
     if (!uiCard || !uiNumber || !uiTimeline || !uiMessage) return;
 
-    // Asignamos el valor numérico al marcador principal
+    // Inyectar número seguro
     uiNumber.innerText = contador;
 
-    // Calcular llenado modular de la barra de progreso semanal (Ciclos de 7 casillas)
+    // Calcular barra (mínimo 14.28% para que no se vea vacía)
     const diasModulo = contador % 7 === 0 ? 7 : contador % 7;
     const porcentajeProgreso = Math.min(100, diasModulo * 14.28);
     uiTimeline.style.width = `${porcentajeProgreso}%`;
 
-    // Evaluamos el estado visual de la tarjeta contenedora
+    // Activar estados CSS
     if (contador > 0) {
         uiCard.classList.add("streak-active");
         uiMessage.innerHTML = `¡Fuego encendido! Mantén la racha mañana para seguir ganando puntos.`;
     } else {
         uiCard.classList.remove("streak-active");
-        uiMessage.innerHTML = `El fuego se apagó. Entra mañana para iniciar una nueva racha de puntos.`;
+        uiMessage.innerHTML = `El fuego se apagó. Entra mañana para iniciar una nueva racha.`;
     }
 
-    // 📅 DETECTOR Y ACTUALIZADOR DEL DÍA REAL EN CURSO
-    const diaSemanaHoy = new Date().getDay(); // Filtro nativo: 0 para Dom, 1 para Lun, ..., 6 para Sáb
+    // 📅 FORZADO INMEDIATO DEL DÍA DE LA SEMANA REAL (Sábado)
+    const diaSemanaHoy = new Date().getDay(); // 6 = Sábado
     
-    // Limpiamos rastros obsoletos de luces en la fila de etiquetas
+    // Limpieza radical de clases viejas
     document.querySelectorAll("#streak-days-row span").forEach(el => el.classList.remove("day-today"));
     
-    // Encendemos en neón el nodo del día exacto del calendario de hoy
+    // Iluminar el día real
     const elHoy = document.getElementById(`streak-day-${diaSemanaHoy}`);
     if (elHoy) {
         elHoy.classList.add("day-today");
     }
 
-    // 🎉 ANIMACIONES SENSORIALES Y DE PANTALLA COMPLETA
-    if (debeCelebrar) {
-        // Disparador de confeti nativo de tu MiniApp
-        if (typeof triggerConfettiExplosion === "function") {
-            triggerConfettiExplosion();
-        }
-        
-        // Alerta flotante estilizada
-        if (typeof showToast === "function") {
-            showToast(`¡Racha aumentada a ${contador} días! +1 ✨ Pts asignado.`, "success");
-        }
+    // Lucide Icons Render Forzado
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
 
-        // Creación del destello flash nebulosa en el viewport absoluto
+    // 🎉 ANIMACIÓN EXPANSIVA DE PANTALLA COMPLETA
+    if (debeCelebrar) {
+        if (typeof triggerConfettiExplosion === "function") triggerConfettiExplosion();
+        if (typeof showToast === "function") showToast(`¡Racha aumentada a ${contador} días! +1 ✨ Pts asignado.`, "success");
+
         const flash = document.createElement("div");
         flash.style.position = "fixed";
-        flash.style.top = "0";
-        flash.style.left = "0";
-        flash.style.width = "100vw";
-        flash.style.height = "100vh";
+        flash.style.top = "0"; flash.style.left = "0"; flash.style.width = "100vw"; flash.style.height = "100vh";
         flash.style.background = "radial-gradient(circle, rgba(249,115,22,0.4) 0%, rgba(239,68,68,0.1) 60%, transparent 100%)";
-        flash.style.zIndex = "99999";
-        flash.style.pointerEvents = "none";
-        flash.style.transition = "opacity 0.6s ease-out";
+        flash.style.zIndex = "99999"; flash.style.pointerEvents = "none"; flash.style.transition = "opacity 0.6s ease-out";
         document.body.appendChild(flash);
         
-        // Ciclo de desvanecimiento controlado por software
         setTimeout(() => {
             flash.style.opacity = "0";
             setTimeout(() => flash.remove(), 600);
@@ -6469,14 +6453,13 @@ function actualizarInterfazRacha(contador, debeCelebrar = false, fueReseteado = 
     }
 }
 
-/**
- * DISPARADOR DE ARRANQUE SEGURO
- * Escucha la carga inicial de la estructura para calcular la racha tras el despliegue del SDK.
- */
-window.addEventListener("DOMContentLoaded", () => {
-    // Retardo estratégico de 400ms para permitir que las variables de Telegram y 'state' estén pobladas
-    setTimeout(checkAndProcessUserStreak, 400);
-});
+// 🚀 EJECUCIÓN INMEDIATA Y DOBLE CONTROL DE ARRANQUE
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", () => setTimeout(checkAndProcessUserStreak, 100));
+} else {
+    setTimeout(checkAndProcessUserStreak, 100);
+}
+
 </script>
     <script>
         function verificarYMostrarSuscripcionAutomatica() {
