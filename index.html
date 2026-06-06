@@ -3653,7 +3653,7 @@ function checkDailyGachaStatus() {
     }
 }
 
-        function switchView(viewId) {
+      function switchView(viewId) {
     state.adminFilterOnly = false; 
     document.querySelectorAll('.app-view').forEach(v => v.classList.remove('active-view'));
     document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active-tab'));
@@ -3680,7 +3680,20 @@ function checkDailyGachaStatus() {
                 backButton.hide();
             });
         }
-    } else {
+    } 
+    // 🔥 NUEVO: Activar botón atrás nativo también al visitar la pantalla individual de la Racha
+    else if (viewId === 'streak') {
+        if (window.Telegram && window.Telegram.WebApp) {
+            const backButton = window.Telegram.WebApp.BackButton;
+            backButton.show();
+            backButton.offClick();
+            backButton.onClick(() => {
+                switchView('home'); // Regresa a la home al pulsar atrás desde la racha
+                backButton.hide();
+            });
+        }
+    } 
+    else {
         // 🔄 Si entra a cualquier OTRA pestaña (home, shop...), ocultamos el botón atrás de Telegram
         if (window.Telegram && window.Telegram.WebApp) {
             window.Telegram.WebApp.BackButton.hide();
@@ -3707,11 +3720,19 @@ function checkDailyGachaStatus() {
     
     // 🔥 NUEVO: Renderiza el panel de contactos e ideas al pulsar el botón 'crm-dashboard'
     if (viewId === 'crm-dashboard') renderCrmDashboard();
+
+    // 🔥 NUEVO: Repintado agresivo en caliente de la racha para evitar que nazca en 0 o rota
+    if (viewId === 'streak') {
+        if (typeof actualizarInterfazRacha === 'function') {
+            const rachaGuardada = parseInt(localStorage.getItem("gplus_streak_count")) || 1;
+            actualizarInterfazRacha(rachaGuardada, false);
+        }
+    }
     
     // Aseguramos que los iconos se dibujen bien
     if (window.lucide) lucide.createIcons();
 }
-
+  
         function toggleProfileDrawer() {
     // 🌟 Ahora solo actúa como un puente directo al sistema centralizado de navegación
     if (typeof switchView === 'function') {
