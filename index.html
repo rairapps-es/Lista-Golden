@@ -1957,6 +1957,230 @@
     100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(249, 115, 22, 0); }
 }
 
+        /* ==========================================================================
+   🔥 SISTEMA DE RACHAS CYBER-FLAME - PÁGINA INDIVIDUAL (<main>)
+   ========================================================================== */
+
+/* --- 1. Contenedor de la Vista Principal --- */
+#view-streak {
+    width: 100%;
+    min-height: 85vh; /* Ocupa el alto de la pantalla restando el header/footer de Telegram */
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Centrado vertical premium estilo videojuego */
+    align-items: center;    /* Centrado horizontal */
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+/* --- 2. Tarjeta Base GPlus --- */
+.streak-main-container {
+    width: 100%;
+    max-width: 420px; /* Evita que se deforme en pantallas de tablets */
+    box-sizing: border-box;
+}
+
+.streak-card-neon {
+    background: #0f172a; /* Slate oscuro profundo que rompe y resalta sobre tu fondo gris pastel */
+    border: 2px solid rgba(249, 115, 22, 0.15);
+    border-radius: 28px;
+    padding: 30px 26px;
+    color: #ffffff;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.35);
+    transition: border-color 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), 
+                box-shadow 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* Aura de fuego parpadeante trasera */
+.fire-glow-overlay {
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(249, 115, 22, 0.08) 0%, transparent 60%);
+    pointer-events: none;
+    animation: flame-breathing 4s ease-in-out infinite;
+}
+
+/* --- 3. Encabezado del Módulo --- */
+.streak-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    position: relative;
+    z-index: 2;
+}
+
+.streak-badge-title {
+    background: rgba(249, 115, 22, 0.12);
+    color: #fdba74;
+    border: 1px solid rgba(249, 115, 22, 0.25);
+    font-size: 0.7rem;
+    font-weight: 900;
+    padding: 6px 14px;
+    border-radius: 99px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Contenedor circular del Icono de Fuego */
+.streak-fire-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: all 0.4s ease;
+}
+
+/* El Icono Lucide base (Apagado / Gris por defecto) */
+.streak-flame-icon {
+    width: 24px;
+    height: 24px;
+    color: #475569; 
+    transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* --- 4. 🚀 ESTADO ACTIVO (Cuando el usuario tiene días seguidos acumulados) --- */
+.streak-card-neon.streak-active {
+    border-color: rgba(249, 115, 22, 0.6);
+    box-shadow: 0 25px 50px rgba(249, 115, 22, 0.18), 0 0 40px rgba(239, 68, 68, 0.08);
+}
+
+/* El fuego se enciende en neón */
+.streak-card-neon.streak-active .streak-flame-icon {
+    color: #f97316;
+    filter: drop-shadow(0 0 12px #f97316) drop-shadow(0 0 25px #ef4444);
+    transform: scale(1.15);
+}
+
+/* Animación de oscilación constante del fuego */
+@keyframes flame-burn {
+    0%, 100% { transform: scale(1.1) rotate(-3deg); }
+    50% { transform: scale(1.18) rotate(3deg); }
+}
+.animated-burn {
+    animation: flame-burn 1.2s ease-in-out infinite alternate;
+}
+
+/* --- 5. Contador de Números Gigante --- */
+.streak-counter-display {
+    text-align: center;
+    margin-bottom: 30px;
+    position: relative;
+    z-index: 2;
+}
+
+.streak-counter-display h2 {
+    font-size: 5rem;
+    font-weight: 950;
+    margin: 0;
+    line-height: 1;
+    background: linear-gradient(135deg, #ffffff 40%, #475569);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -3px;
+    transition: all 0.4s ease;
+}
+
+/* El número cambia a degradado de fuego si la racha está activa */
+.streak-card-neon.streak-active .streak-counter-display h2 {
+    background: linear-gradient(135deg, #ffffff 20%, #f97316 70%, #ef4444);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 4px 15px rgba(249, 115, 22, 0.25));
+}
+
+.streak-status-text {
+    margin: 8px 0 0 0;
+    font-size: 0.85rem;
+    color: #64748b;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+.streak-card-neon.streak-active .streak-status-text {
+    color: #94a3b8;
+}
+
+/* --- 6. Línea de Tiempo / Barra Semanal --- */
+.streak-timeline {
+    margin-bottom: 25px;
+    position: relative;
+    z-index: 2;
+}
+.timeline-track {
+    width: 100%;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    overflow: hidden;
+}
+.timeline-fill {
+    height: 100%;
+    width: 0%; /* Controlado dinámicamente por JS */
+    background: linear-gradient(90deg, #ef4444, #f97316);
+    box-shadow: 0 0 12px rgba(249, 115, 22, 0.5);
+    transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.timeline-days-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+    font-size: 0.65rem;
+    color: #334155;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.streak-card-neon.streak-active .timeline-days-labels {
+    color: #64748b;
+}
+
+/* --- 7. Módulo Footer Informativo --- */
+.streak-reward-footer {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(255, 255, 255, 0.02);
+    padding: 14px 18px;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    position: relative;
+    z-index: 2;
+}
+.reward-sparkle {
+    font-size: 1.1rem;
+    animation: flash-sparkle 1.5s infinite alternate;
+}
+.streak-reward-footer p {
+    margin: 0;
+    font-size: 0.8rem;
+    color: #64748b;
+    line-height: 1.4;
+    font-weight: 600;
+}
+.streak-card-neon.streak-active .streak-reward-footer p {
+    color: #94a3b8;
+}
+
+/* --- 8. Animaciones de Ambiente --- */
+@keyframes flame-breathing {
+    0%, 100% { transform: scale(1); opacity: 0.4; }
+    50% { transform: scale(1.15); opacity: 0.9; }
+}
+@keyframes flash-sparkle {
+    0% { opacity: 0.4; transform: scale(0.9); }
+    100% { opacity: 1; transform: scale(1.15); filter: drop-shadow(0 0 6px #f97316); }
+}
+
     </style>
 </head>
 <body>
@@ -2870,7 +3094,51 @@
              lo rellenará solo con tus 3 planes de DEF_PLANES -->
     </div>
     </main>
+    <!-- 🔥 PÁGINA INDIVIDUAL: CONTENEDOR PRINCIPAL DE RACHAS DE FUEGO -->
+<main id="view-streak" class="app-view" style="display: none; display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 80vh; padding: 20px; box-sizing: border-box;">
     
+    <!-- Contenedor Espectacular de la Tarjeta -->
+    <div class="streak-main-container" style="width: 100%; max-width: 420px;">
+        <div class="streak-card-neon">
+            
+            <!-- Aura de fuego parpadeante trasera -->
+            <div class="fire-glow-overlay"></div>
+            
+            <!-- Encabezado del Módulo -->
+            <div class="streak-header">
+                <span class="streak-badge-title">Multiplicador Diario</span>
+                <div class="streak-fire-wrapper" id="streak-fire-icon-container">
+                    <i data-lucide="flame" class="streak-flame-icon animated-burn"></i>
+                </div>
+            </div>
+
+            <!-- Contador Central Gigante -->
+            <div class="streak-counter-display">
+                <h2 id="streak-number-count">0</h2>
+                <p id="streak-status-text">Días Seguidos</p>
+            </div>
+
+            <!-- Barra Visual de Progreso Semanal -->
+            <div class="streak-timeline">
+                <div class="timeline-track">
+                    <div id="streak-timeline-fill" class="timeline-fill" style="width: 0%;"></div>
+                </div>
+                <div class="timeline-days-labels">
+                    <span>Lun</span><span>Mar</span><span>Mié</span><span>Jue</span><span>Vie</span><span>Sáb</span><span>Dom</span>
+                </div>
+            </div>
+
+            <!-- Footer Informativo Dinámico -->
+            <div class="streak-reward-footer">
+                <span class="reward-sparkle">✨</span>
+                <p id="streak-reward-message">¡Entra mañana para mantener el fuego y ganar +1 Pts!</p>
+            </div>
+            
+        </div>
+    </div>
+
+</main>
+
 <button onclick="switchView('shop')">🛍️ Visitar Tienda</button>
 
 <button onclick="switchView('home')">🏠 Volver al Inicio</button>
@@ -2881,6 +3149,9 @@
         style="background: var(--vip-gold); color: black; width: auto; margin: 0 auto; padding: 8px 16px; font-weight: bold; border: none; border-radius: 8px; cursor: pointer;" 
         onclick="if(typeof switchView === 'function') { switchView('view-profile-page'); } else { openProfileAsPage(); }">
    👤 Ver mi Perfil
+</button>
+<button class="drawer-btn" onclick="toggleProfileDrawer(); switchView('view-streak')">
+    <span>🔥 Mi Racha Diaria</span> <i data-lucide="chevron-right"></i>
 </button>
 
     <button onclick="switchView('crm-dashboard')">📊 Panel & CRM</button>
