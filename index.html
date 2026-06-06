@@ -2181,6 +2181,73 @@
     100% { opacity: 1; transform: scale(1.15); filter: drop-shadow(0 0 6px #f97316); }
 }
 
+        /* --- Lista de Misiones Estilo Fila --- */
+.mission-row-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #0f172a; /* Fondo a juego con la racha */
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 18px;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Efecto de presión al hacer clic */
+.mission-row-card:active {
+    transform: scale(0.98);
+    border-color: rgba(249, 115, 22, 0.3);
+    background: rgba(249, 115, 22, 0.02);
+}
+
+.mission-left-info {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.mission-icon-box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 12px;
+    color: #94a3b8;
+}
+.mission-icon-box i {
+    width: 18px;
+    height: 18px;
+}
+
+.mission-text-meta h4 {
+    margin: 0;
+    font-size: 0.85rem;
+    color: #ffffff;
+    font-weight: 700;
+}
+
+.mission-text-meta p {
+    margin: 2px 0 0 0;
+    font-size: 0.7rem;
+    color: #64748b;
+    font-weight: 500;
+}
+
+/* Insignia de los +5 Puntos de Recompensa */
+.mission-reward-badge {
+    background: rgba(249, 115, 22, 0.1);
+    color: #fdba74;
+    border: 1px solid rgba(249, 115, 22, 0.2);
+    font-size: 0.7rem;
+    font-weight: 800;
+    padding: 4px 10px;
+    border-radius: 99px;
+}
+
     </style>
 </head>
 <body>
@@ -3137,28 +3204,69 @@
         </div>
     </div>
 
+    <div class="missions-section-container" style="width: 100%; max-width: 420px; margin-top: 25px; box-sizing: border-box;">
+    
+    <h3 style="color: #94a3b8; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; font-weight: 800;">
+        🗺️ Tour de Exploración
+    </h3>
+
+    <div class="mission-row-card" data-mision="explorar_directorio" onclick="switchView('directory')">
+        <div class="mission-left-info">
+            <div class="mission-icon-box"><i data-lucide="compass"></i></div>
+            <div class="mission-text-meta">
+                <h4>Explorar Directorio</h4>
+                <p>Mira la lista completa de canales verificados</p>
+            </div>
+        </div>
+        <div class="mission-reward-badge">+5 Pts</div>
+    </div>
+
+    <div class="mission-row-card" data-mision="visitar_tienda_gplus" onclick="switchView('shop')">
+        <div class="mission-left-info">
+            <div class="mission-icon-box"><i data-lucide="shopping-bag"></i></div>
+            <div class="mission-text-meta">
+                <h4>Visitar Tienda GPlus</h4>
+                <p>Conoce los canales VIP y las ventajas</p>
+            </div>
+        </div>
+        <div class="mission-reward-badge">+5 Pts</div>
+    </div>
+
+    <div class="mission-row-card" data-mision="revisar_historial_puntos" onclick="switchView('history')">
+        <div class="mission-left-info">
+            <div class="mission-icon-box"><i data-lucide="history"></i></div>
+            <div class="mission-text-meta">
+                <h4>Auditar Historial</h4>
+                <p>Verifica tu libro contable de puntos ingresados</p>
+            </div>
+        </div>
+        <div class="mission-reward-badge">+5 Pts</div>
+    </div>
+
+</div>
+
 </main>
 
-<button onclick="switchView('shop')">🛍️ Visitar Tienda</button>
+<button onclick="switchView('shop')" data-mision="explorar_tienda>🛍️ Visitar Tienda</button>
 
 <button onclick="switchView('home')">🏠 Volver al Inicio</button>
 
-<button onclick="switchView('directory')">📂 Ver Directorio</button>
+<button onclick="switchView('directory')" data-mision="explorar_directorio"> 📂 Ver Directorio</button>
     
 <button class="btn-subscribe-trigger" 
         style="background: var(--vip-gold); color: black; width: auto; margin: 0 auto; padding: 8px 16px; font-weight: bold; border: none; border-radius: 8px; cursor: pointer;" 
-        onclick="if(typeof switchView === 'function') { switchView('view-profile-page'); } else { openProfileAsPage(); }">
+        onclick="if(typeof switchView === 'function') { switchView('view-profile-page'); } else { openProfileAsPage(); }" data-mision="explorar_mi_perfil">
    👤 Ver mi Perfil
 </button>
 <button class="drawer-btn" onclick="switchView('view-streak')">
     <span>🔥 Mi Racha Diaria</span> <i data-lucide="chevron-right"></i>
 </button>
 
-    <button onclick="switchView('crm-dashboard')">📊 Panel & CRM</button>
+    <button onclick="switchView('crm-dashboard')" data-mision="explorar_crm">📊 Panel & CRM</button>
     
     
     
-<a href="#" onclick="switchView('favorites'); return false;">⭐ Mis Favoritos</a>
+<a href="#" onclick="switchView('favorites'); return false;" data-mision="explorar_favoritos">⭐ Mis Favoritos</a>
     <nav class="tab-bar">
         <div class="tab-item active-tab" id="tab-home" onclick="switchView('home')">
             <i data-lucide="home"></i><span>Inicio</span>
@@ -3169,13 +3277,13 @@
         <div class="tab-item" id="tab-favorites" onclick="switchView('favorites')">
             <i data-lucide="star"></i><span>Favoritos</span>
         </div>
-        <div class="tab-item" id="tab-history" onclick="switchView('history')">
+        <div class="tab-item" id="tab-history" onclick="switchView('history')" data-mision="explorar_historial">
             <i data-lucide="history"></i><span>Historial</span>
         </div>
-        <div class="tab-item" id="tab-energy" onclick="switchView('energy')">
+        <div class="tab-item" id="tab-energy" onclick="switchView('energy')" data-mision="explorar_pts">
             <i data-lucide="zap"></i><span>Puntos</span>
         </div>
-        <div id="tab-profile" class="tab-item" onclick="switchView('profile')">
+        <div id="tab-profile" class="tab-item" onclick="switchView('profile')" data-mision="explorar_perfil">
     <i data-lucide="user" style="width: 20px; height: 20px;"></i>
     <span style="font-size: 0.7rem; margin-top: 4px;">Perfil</span>
 </div>
@@ -6436,6 +6544,68 @@ if (document.readyState === "loading") {
 }
     
 </script>
+    <script>
+       /**
+ * ==========================================================================
+ * 📡 DETECTOR INVISIBLE DE TOURS CON REGISTRO DE HISTORIAL DINÁMICO
+ * ==========================================================================
+ */
+document.addEventListener("click", function (event) {
+    // Buscamos si el elemento clickeado (o su contenedor) tiene el atributo 'data-mision'
+    const target = event.target.closest("[data-mision]");
+    
+    if (!target) return; // Si no es un enlace de misión, ignoramos el clic
+
+    const missionId = target.getAttribute("data-mision");
+    if (!missionId) return;
+
+    const cleanMissionId = missionId.trim().toLowerCase();
+    const storageKey = `gplus_tour_done_${cleanMissionId}`;
+
+    // 🛡️ CONTROL ANTI-TRAMPAS: Verificar si ya cobró
+    if (localStorage.getItem(storageKey) === "true") {
+        console.log(`ℹ️ [Tour] Misión ya completada anteriormente: ${cleanMissionId}`);
+        return; 
+    }
+
+    // Guardar registro inmediato para bloquear exploits de doble clic
+    localStorage.setItem(storageKey, "true");
+    console.log(`🎯 [Tour] Ejecutando misión: ${cleanMissionId}`);
+
+    // 🗺️ DICCIONARIO TRADUCTOR: Convierte el ID técnico en nombres limpios para tu Historial
+    const nombresMisiones = {
+        "explorar_directorio": { titulo: "Exploración", desc: "Visitaste el directorio de canales verificados." },
+        "visitar_tienda_gplus": { titulo: "Visita Comercial", desc: "Exploraste los productos VIP de la Tienda GPlus." },
+        "revisar_historial_puntos": { titulo: "Auditoría", desc: "Revisaste el libro contable de tus puntos acumulados." }
+    };
+
+    // Obtenemos los textos limpios; si usas un ID nuevo que no esté en la lista, usa un genérico
+    const infoMision = nombresMisiones[cleanMissionId] || { 
+        titulo: "Misión Tour", 
+        desc: `Completaste la acción promocional [${cleanMissionId}].` 
+    };
+
+    // 1. 💰 INYECCIÓN DIRECTA DE PUNTOS
+    if (typeof rewardPoints === "function") {
+        rewardPoints(5, `Bono Tour: ${infoMision.titulo}`);
+    }
+
+    // 2. 📝 REGISTRO EN TU HISTORIAL EXISTENTE
+    if (typeof registerActionToHistory === "function") {
+        registerActionToHistory(infoMision.titulo, `${infoMision.desc} +5 Pts.`, "success");
+    }
+
+    // 3. 🎉 ALERTA TOAST Y CONFETI SENSORIAL
+    if (typeof showToast === "function") {
+        showToast(`¡Misión Cumplida! 🗺️ +5 Pts asignados a tu saldo.`, "success");
+    }
+
+    if (typeof triggerConfettiExplosion === "function") {
+        setTimeout(triggerConfettiExplosion, 150);
+    }
+});
+ 
+    </script>
     <script>
         function verificarYMostrarSuscripcionAutomatica() {
     // -------------------------------------------------------------------------
