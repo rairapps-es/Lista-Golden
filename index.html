@@ -3210,38 +3210,37 @@
         🗺️ Tour de Exploración
     </h3>
 
-    <div class="mission-row-card" data-mision="explorar_directorio" onclick="switchView('directory')">
-        <div class="mission-left-info">
-            <div class="mission-icon-box"><i data-lucide="compass"></i></div>
-            <div class="mission-text-meta">
-                <h4>Explorar Directorio</h4>
-                <p>Mira la lista completa de canales verificados</p>
-            </div>
-        </div>
-        <div class="mission-reward-badge">+5 Pts</div>
+    <div class="mission-row-card" data-mision="explorar_directorio" data-tipo="diaria" onclick="switchView('directory')">
+    <div class="mission-text-meta">
+        <h4>Exploración Diaria</h4>
+        <p>Visita los canales disponibles hoy</p>
     </div>
+    <div class="mission-reward-badge">+5 Pts</div>
+</div>
 
-    <div class="mission-row-card" data-mision="visitar_tienda_gplus" onclick="switchView('shop')">
-        <div class="mission-left-info">
-            <div class="mission-icon-box"><i data-lucide="shopping-bag"></i></div>
-            <div class="mission-text-meta">
-                <h4>Visitar Tienda GPlus</h4>
-                <p>Conoce los canales VIP y las ventajas</p>
-            </div>
-        </div>
-        <div class="mission-reward-badge">+5 Pts</div>
+<div class="mission-row-card" data-mision="visitar_tienda_gplus" data-tipo="diaria" onclick="switchView('shop')">
+    <div class="mission-text-meta">
+        <h4>Revisar Ofertas VIP</h4>
+        <p>Entra a la tienda a ver las novedades</p>
     </div>
+    <div class="mission-reward-badge">+5 Pts</div>
+</div>
 
-    <div class="mission-row-card" data-mision="revisar_historial_puntos" onclick="switchView('history')">
-        <div class="mission-left-info">
-            <div class="mission-icon-box"><i data-lucide="history"></i></div>
-            <div class="mission-text-meta">
-                <h4>Auditar Historial</h4>
-                <p>Verifica tu libro contable de puntos ingresados</p>
-            </div>
-        </div>
-        <div class="mission-reward-badge">+5 Pts</div>
+    <div class="mission-row-card" data-mision="unirse_canal_oficial" data-tipo="unica" onclick="window.open('https://t.me/ListaGolden', '_blank')">
+    <div class="mission-text-meta">
+        <h4>📢 Canal Oficial GPlus</h4>
+        <p>Únete para no perderte actualizaciones (Solo una vez)</p>
     </div>
+    <div class="mission-reward-badge">+5 Pts</div>
+</div>
+
+<div class="mission-row-card" data-mision="completar_perfil" data-tipo="unica" onclick="switchView('profile')">
+    <div class="mission-text-meta">
+        <h4>👤 Ajustes de Cuenta</h4>
+        <p>Sincroniza tus datos de creador por primera vez</p>
+    </div>
+    <div class="mission-reward-badge">+5 Pts</div>
+</div>
 
 </div>
 
@@ -3283,7 +3282,7 @@
         <div class="tab-item" id="tab-energy" onclick="switchView('energy')" data-mision="explorar_pts">
             <i data-lucide="zap"></i><span>Puntos</span>
         </div>
-        <div id="tab-profile" class="tab-item" onclick="switchView('profile')" data-mision="explorar_perfil">
+        <div id="tab-profile" class="tab-item" onclick="switchView('profile')" data-mision="explorar_perfil" data-tipo="diaria">
     <i data-lucide="user" style="width: 20px; height: 20px;"></i>
     <span style="font-size: 0.7rem; margin-top: 4px;">Perfil</span>
 </div>
@@ -6545,66 +6544,115 @@ if (document.readyState === "loading") {
     
 </script>
     <script>
-       /**
+/**
  * ==========================================================================
- * 📡 DETECTOR INVISIBLE DE TOURS CON REGISTRO DE HISTORIAL DINÁMICO
+ * 📡 MOTOR DE TOURS HÍBRIDO (MISIONES ÚNICAS Y DIARIAS CON CARGA)
  * ==========================================================================
  */
 document.addEventListener("click", function (event) {
-    // Buscamos si el elemento clickeado (o su contenedor) tiene el atributo 'data-mision'
     const target = event.target.closest("[data-mision]");
-    
-    if (!target) return; // Si no es un enlace de misión, ignoramos el clic
+    if (!target) return;
 
     const missionId = target.getAttribute("data-mision");
+    // 🏷️ LEER EL TIPO DE MISIÓN: Si no pones nada, por defecto será 'unica'
+    const tipoMision = target.getAttribute("data-tipo") || "unica"; 
+    
     if (!missionId) return;
 
     const cleanMissionId = missionId.trim().toLowerCase();
-    const storageKey = `gplus_tour_done_${cleanMissionId}`;
+    const hoyString = new Date().toDateString();
+    
+    // Definimos llaves diferentes en LocalStorage según el tipo
+    const storageKeyUnica = `gplus_tour_done_${cleanMissionId}`;
+    const storageKeyDiaria = `gplus_tour_date_${cleanMissionId}`;
 
-    // 🛡️ CONTROL ANTI-TRAMPAS: Verificar si ya cobró
-    if (localStorage.getItem(storageKey) === "true") {
-        console.log(`ℹ️ [Tour] Misión ya completada anteriormente: ${cleanMissionId}`);
-        return; 
+    // 🛡️ CONTROL DE BLOQUEO SEGÚN EL TIPO
+    if (tipoMision === "diaria") {
+        if (localStorage.getItem(storageKeyDiaria) === hoyString) {
+            console.log(`ℹ️ [Tour] Misión diaria ya cobrada hoy: ${cleanMissionId}`);
+            return;
+        }
+    } else {
+        // Misión Única (Hito para siempre)
+        if (localStorage.getItem(storageKeyUnica) === "true") {
+            console.log(`ℹ️ [Tour] Misión única ya completada históricamente: ${cleanMissionId}`);
+            return;
+        }
     }
 
-    // Guardar registro inmediato para bloquear exploits de doble clic
-    localStorage.setItem(storageKey, "true");
-    console.log(`🎯 [Tour] Ejecutando misión: ${cleanMissionId}`);
+    console.log(`⏳ [Tour] Iniciando carga para misión [${tipoMision}]: ${cleanMissionId}`);
 
-    // 🗺️ DICCIONARIO TRADUCTOR: Convierte el ID técnico en nombres limpios para tu Historial
+    // --- DICCIONARIO PARA HISTORIAL ---
     const nombresMisiones = {
-        "explorar_directorio": { titulo: "Exploración", desc: "Visitaste el directorio de canales verificados." },
-        "visitar_tienda_gplus": { titulo: "Visita Comercial", desc: "Exploraste los productos VIP de la Tienda GPlus." },
-        "revisar_historial_puntos": { titulo: "Auditoría", desc: "Revisaste el libro contable de tus puntos acumulados." }
+        "explorar_directorio": { titulo: "Exploración Diaria", desc: "Visitaste el directorio de canales." },
+        "visitar_tienda_gplus": { titulo: "Visita Comercial Diaria", desc: "Exploraste los productos VIP." },
+        "revisar_historial_puntos": { titulo: "Auditoría Diaria", desc: "Revisaste tu libro contable." },
+        "unirse_canal_oficial": { titulo: "Hito Comunidad", desc: "Te uniste al canal oficial de soporte GPlus." },
+        "completar_perfil": { titulo: "Hito Registro", desc: "Configuraste tu perfil de usuario por primera vez." }
     };
 
-    // Obtenemos los textos limpios; si usas un ID nuevo que no esté en la lista, usa un genérico
     const infoMision = nombresMisiones[cleanMissionId] || { 
-        titulo: "Misión Tour", 
-        desc: `Completaste la acción promocional [${cleanMissionId}].` 
+        titulo: tipoMision === "diaria" ? "Misión Diaria" : "Logro Único", 
+        desc: `Completaste la acción [${cleanMissionId}].` 
     };
 
-    // 1. 💰 INYECCIÓN DIRECTA DE PUNTOS
-    if (typeof rewardPoints === "function") {
-        rewardPoints(5, `Bono Tour: ${infoMision.titulo}`);
-    }
+    // --- 🛠️ MODAL DE BARRA DE CARGA INYECTADO ---
+    const modalCarga = document.createElement("div");
+    modalCarga.style.cssText = `
+        position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+        background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(8px);
+        display: flex; flex-direction: column; justify-content: center; align-items: center;
+        z-index: 100000; font-family: system-ui, sans-serif; padding: 20px; box-sizing: border-box;
+    `;
 
-    // 2. 📝 REGISTRO EN TU HISTORIAL EXISTENTE
-    if (typeof registerActionToHistory === "function") {
-        registerActionToHistory(infoMision.titulo, `${infoMision.desc} +5 Pts.`, "success");
-    }
+    modalCarga.innerHTML = `
+        <div style="background: #1e293b; border: 1px solid rgba(255,255,255,0.08); padding: 24px; border-radius: 24px; width: 100%; max-width: 320px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.5);">
+            <div style="font-size: 1.5rem; margin-bottom: 10px;">⚡</div>
+            <h4 style="margin: 0; color: #fff; font-size: 1rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">Verificando</h4>
+            <p style="margin: 6px 0 16px 0; color: #64748b; font-size: 0.75rem; font-weight: 500;">Procesando recompensa del sistema...</p>
+            <div style="width: 100%; height: 6px; background: rgba(255,255,255,0.05); border-radius: 99px; overflow: hidden;">
+                <div id="gplus-loader-fill" style="width: 0%; height: 100%; background: linear-gradient(90deg, #f97316, #ef4444); box-shadow: 0 0 10px #f97316; transition: width 1.5s linear;"></div>
+            </div>
+        </div>
+    `;
 
-    // 3. 🎉 ALERTA TOAST Y CONFETI SENSORIAL
-    if (typeof showToast === "function") {
-        showToast(`¡Misión Cumplida! 🗺️ +5 Pts asignados a tu saldo.`, "success");
-    }
+    document.body.appendChild(modalCarga);
+    const barFill = document.getElementById("gplus-loader-fill");
+    setTimeout(() => { if (barFill) barFill.style.width = "100%"; }, 50);
 
-    if (typeof triggerConfettiExplosion === "function") {
-        setTimeout(triggerConfettiExplosion, 150);
-    }
+    // --- 🎯 ADJUDICACIÓN DE RECOMPENSAS (TRAS 1.5 SEGUNDOS) ---
+    setTimeout(() => {
+        modalCarga.remove();
+
+        // Guardar bloqueo según corresponda
+        if (tipoMision === "diaria") {
+            localStorage.setItem(storageKeyDiaria, hoyString);
+        } else {
+            localStorage.setItem(storageKeyUnica, "true");
+        }
+
+        // 1. Puntos
+        if (typeof rewardPoints === "function") {
+            rewardPoints(5, `Bono: ${infoMision.titulo}`);
+        }
+
+        // 2. Historial
+        if (typeof registerActionToHistory === "function") {
+            registerActionToHistory(infoMision.titulo, `${infoMision.desc} +5 Pts.`, "success");
+        }
+
+        // 3. Toast & Confeti
+        if (typeof showToast === "function") {
+            showToast(`¡Misión Completa! +5 Pts asignados.`, "success");
+        }
+
+        if (typeof triggerConfettiExplosion === "function") {
+            setTimeout(triggerConfettiExplosion, 150);
+        }
+
+    }, 1500);
 });
- 
+
     </script>
     <script>
         function verificarYMostrarSuscripcionAutomatica() {
