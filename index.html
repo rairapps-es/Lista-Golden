@@ -4245,7 +4245,7 @@ function renderMyOwnedChannelsList() {
     document.getElementById("panel-cnt-review").innerText = review;
     document.getElementById("panel-cnt-published").innerText = published;
     // Si tienes un elemento visual para "Sin Publicar" puedes actualizarlo aquí, ej:
-    // document.getElementById("panel-cnt-unpublished").innerText = unpublished;
+    document.getElementById("panel-cnt-unpublished").innerText = unpublished;
 
     if (myOwned.length === 0) {
         tableBody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:var(--text-muted);">No posees canales registrados.</td></tr>`;
@@ -6339,148 +6339,102 @@ setTimeout(checkVipInternalRegistration, 100);
 
 </script>
 <script>
-    /**
- * ==========================================================================
- * 🔥 CONTROLADOR INMUNE A FALLOS - RACHAS CYBER-FLAME
- * ==========================================================================
- */
 
 function checkAndProcessUserStreak() {
-    const uiCard = document.querySelector(".streak-card-neon");
-    const uiNumber = document.getElementById("streak-number-count");
-    const uiTimeline = document.getElementById("streak-timeline-fill");
-    
-    // 🔍 SI NO ENCUENTRA LOS ELEMENTOS, REINTENTA EN 300MS (Evita fallos de carga diferida)
-    if (!uiCard || !uiNumber || !uiTimeline) {
-        console.warn("⏳ [Racha] Esperando a que el HTML aparezca en el DOM...");
-        setTimeout(checkAndProcessUserStreak, 300);
-        return;
-    }
+    console.log("🔥 [Racha] Iniciando comprobación de datos en LocalStorage...");
 
-    console.log("🔥 [Racha] HTML detectado con éxito. Procesando cálculos...");
-
-    // 1. OBTENER LAS FECHAS CLAVE
+    // 1. OBTENER LAS FECHAS CLAVE (Lógica pura, no depende del HTML)
     const ahora = new Date();
     const hoyMidnight = new Date(ahora.getFullYear(), ahora.getMonth(), ahora.getDate()).getTime();
     
     const ultimaFechaGuardada = localStorage.getItem("gplus_streak_last_date");
     let rachaActual = parseInt(localStorage.getItem("gplus_streak_count")) || 0;
 
-    // Caso Inicial: Primer acceso histórico
+    let rachaParaVisualizar = rachaActual;
+    let animarRacha = false;
+    let rachaReiniciada = false;
+
+    // 2. MÁQUINA DE ESTADOS (Se procesa al instante)
     if (!ultimaFechaGuardada) {
+        rachaParaVisualizar = 1;
         localStorage.setItem("gplus_streak_count", "1");
         localStorage.setItem("gplus_streak_last_date", hoyMidnight.toString());
-        actualizarInterfazRacha(1, false);
-        return;
-    }
+    } else {
+        const ultimaFechaMidnight = parseInt(ultimaFechaGuardada);
+        const diferenciaTiempo = hoyMidnight - ultimaFechaMidnight;
+        const unDiaEnMililisegundos = 24 * 60 * 60 * 1000;
+        const diasTranscurridos = Math.floor(diferenciaTiempo / unDiaEnMililisegundos);
 
-    const ultimaFechaMidnight = parseInt(ultimaFechaGuardada);
-    const diferenciaTiempo = hoyMidnight - ultimaFechaMidnight;
-    const unDiaEnMililisegundos = 24 * 60 * 60 * 1000;
-    const diasTranscurridos = Math.floor(diferenciaTiempo / unDiaEnMililisegundos);
-
-    // 2. MÁQUINA DE ESTADOS CRÍTICA
-    if (diasTranscurridos === 0) {
-        // Ya entró hoy
-        if (rachaActual === 0) rachaActual = 1; // Corrección por si estaba corrupto
-        actualizarInterfazRacha(rachaActual, false);
-        
-    } else if (diasTranscurridos === 1) {
-        // ¡Racha continuada al día siguiente!
-        rachaActual += 1;
-        localStorage.setItem("gplus_streak_count", rachaActual.toString());
-        localStorage.setItem("gplus_streak_last_date", hoyMidnight.toString());
-        
-        if (typeof rewardPoints === "function") {
-            rewardPoints(1, "Bono por Racha Diaria Activa");
+        if (diasTranscurridos === 0) {
+            if (rachaActual === 0) rachaActual = 1;
+            rachaParaVisualizar = rachaActual;
+        } else if (diasTranscurridos === 1) {
+            rachaActual += 1;
+            rachaParaVisualizar = rachaActual;
+            animarRacha = true;
+            localStorage.setItem("gplus_streak_count", rachaActual.toString());
+            localStorage.setItem("gplus_streak_last_date", hoyMidnight.toString());
+            
+            if (typeof rewardPoints === "function") {
+                rewardPoints(1, "Bono por Racha Diaria Activa");
+            }
             if (typeof registerActionToHistory === "function") {
                 registerActionToHistory("Racha de Fuego", `Entraste un día más. Racha de x${rachaActual} días. +1 Pts.`, "success");
             }
+        } else {
+            rachaParaVisualizar = 1;
+            rachaReiniciada = true;
+            localStorage.setItem("gplus_streak_count", "1");
+            localStorage.setItem("gplus_streak_last_date", hoyMidnight.toString());
+            if (typeof registerActionToHistory === "function") {
+                registerActionToHistory("Fuego Apagado", "Perdiste tu racha por inactividad.", "inactive");
+            }
         }
-        actualizarInterfazRacha(rachaActual, true);
-        
-    } else {
-        // Pasaron 2 días o más (Fuego apagado)
-        localStorage.setItem("gplus_streak_count", "1");
-        localStorage.setItem("gplus_streak_last_date", hoyMidnight.toString());
-        if (typeof registerActionToHistory === "function") {
-            registerActionToHistory("Fuego Apagado", "Perdiste tu racha por inactividad.", "inactive");
-        }
-        actualizarInterfazRacha(1, false, true);
     }
+
+    console.log(`✅ [Racha] Datos procesados. Racha actual: x${rachaParaVisualizar}`);
+
+    // 3. INTENTO DE RENDERIZADO VISUAL CONTROLADO
+    let intentos = 0;
+    const maxIntentos = 10; // Evita que se quede ejecutando en segundo plano para siempre
+
+    function procesarRenderizadoUI() {
+        const uiCard = document.querySelector(".streak-card-neon");
+        const uiNumber = document.getElementById("streak-number-count");
+        const uiTimeline = document.getElementById("streak-timeline-fill");
+
+        // Si falta algún elemento, reintentamos de forma limitada
+        if (!uiCard || !uiNumber || !uiTimeline) {
+            intentos++;
+            if (intentos < maxIntentos) {
+                console.warn(`⏳ [Racha] HTML no detectado (Intento ${intentos}/${maxIntentos}). Reintentando en 200ms...`);
+                setTimeout(procesarRenderizadoUI, 200);
+            } else {
+                console.error("❌ [Racha] El HTML de la racha no existe en el DOM actual o los IDs están mal escritos. La lógica se guardó pero la interfaz no se actualizará hasta abrir la pestaña.");
+            }
+            return;
+        }
+
+        // Si encuentra los elementos, ejecuta tu función visual
+        if (typeof actualizarInterfazRacha === "function") {
+            console.log("🎨 [Racha] Dibujando interfaz visual...");
+            actualizarInterfazRacha(rachaParaVisualizar, animarRacha, rachaReiniciada);
+        } else {
+            console.error("❌ [Racha] La función 'actualizarInterfazRacha' no está definida.");
+        }
+    }
+
+    // Arrancamos el intento de renderizado
+    procesarRenderizadoUI();
 }
 
-/**
- * 🎨 RENDERIZADOR FORZADO DE LA INTERFAZ
- */
-function actualizarInterfazRacha(contador, debeCelebrar = false, fueReseteado = false) {
-    const uiCard = document.querySelector(".streak-card-neon");
-    const uiNumber = document.getElementById("streak-number-count");
-    const uiTimeline = document.getElementById("streak-timeline-fill");
-    const uiMessage = document.getElementById("streak-reward-message");
-
-    if (!uiCard || !uiNumber || !uiTimeline || !uiMessage) return;
-
-    // Inyectar número seguro
-    uiNumber.innerText = contador;
-
-    // Calcular barra (mínimo 14.28% para que no se vea vacía)
-    const diasModulo = contador % 7 === 0 ? 7 : contador % 7;
-    const porcentajeProgreso = Math.min(100, diasModulo * 14.28);
-    uiTimeline.style.width = `${porcentajeProgreso}%`;
-
-    // Activar estados CSS
-    if (contador > 0) {
-        uiCard.classList.add("streak-active");
-        uiMessage.innerHTML = `¡Fuego encendido! Mantén la racha mañana para seguir ganando puntos.`;
-    } else {
-        uiCard.classList.remove("streak-active");
-        uiMessage.innerHTML = `El fuego se apagó. Entra mañana para iniciar una nueva racha.`;
-    }
-
-    // 📅 FORZADO INMEDIATO DEL DÍA DE LA SEMANA REAL (Sábado)
-    const diaSemanaHoy = new Date().getDay(); // 6 = Sábado
-    
-    // Limpieza radical de clases viejas
-    document.querySelectorAll("#streak-days-row span").forEach(el => el.classList.remove("day-today"));
-    
-    // Iluminar el día real
-    const elHoy = document.getElementById(`streak-day-${diaSemanaHoy}`);
-    if (elHoy) {
-        elHoy.classList.add("day-today");
-    }
-
-    // Lucide Icons Render Forzado
-    if (typeof lucide !== 'undefined') {
-        lucide.createIcons();
-    }
-
-    // 🎉 ANIMACIÓN EXPANSIVA DE PANTALLA COMPLETA
-    if (debeCelebrar) {
-        if (typeof triggerConfettiExplosion === "function") triggerConfettiExplosion();
-        if (typeof showToast === "function") showToast(`¡Racha aumentada a ${contador} días! +1 ✨ Pts asignado.`, "success");
-
-        const flash = document.createElement("div");
-        flash.style.position = "fixed";
-        flash.style.top = "0"; flash.style.left = "0"; flash.style.width = "100vw"; flash.style.height = "100vh";
-        flash.style.background = "radial-gradient(circle, rgba(249,115,22,0.4) 0%, rgba(239,68,68,0.1) 60%, transparent 100%)";
-        flash.style.zIndex = "99999"; flash.style.pointerEvents = "none"; flash.style.transition = "opacity 0.6s ease-out";
-        document.body.appendChild(flash);
-        
-        setTimeout(() => {
-            flash.style.opacity = "0";
-            setTimeout(() => flash.remove(), 600);
-        }, 50);
-    }
-}
-
-// 🚀 EJECUCIÓN INMEDIATA Y DOBLE CONTROL DE ARRANQUE
+// 🚀 TU BLOQUE DE EJECUCIÓN SEGURO Y MEJORADO
 if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", () => setTimeout(checkAndProcessUserStreak, 100));
 } else {
     setTimeout(checkAndProcessUserStreak, 100);
 }
-
+    
 </script>
     <script>
         function verificarYMostrarSuscripcionAutomatica() {
