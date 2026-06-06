@@ -1667,152 +1667,296 @@
 }
 
 /* --- Panel Superior --- */
+  /* ==========================================================================
+   👑 REDISEÑO PREMIUM GPLUS - ESTILO NEÓN NEBULOSA 
+   ========================================================================== */
+
+/* --- 1. Panel Superior (Info de tu Suscripción) --- */
 .card-indep-gplus {
-    background: linear-gradient(145, #1c2a38, #111b24); /* Degradado para dar profundidad */
-    border: 1px solid rgba(36, 129, 204, 0.3); /* Borde azul sutil */
-    border-radius: 16px;
-    padding: 20px;
-    color: #333333;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+    background: #ffffff; /* Contraste brutal sobre tu fondo gris pastel */
+    border: 1px solid rgba(168, 85, 247, 0.15);
+    border-radius: 24px;
+    padding: 24px;
+    color: #1e293b;
+    box-shadow: 0 10px 30px rgba(168, 85, 247, 0.06), 0 1px 3px rgba(0, 0, 0, 0.02);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Decoración de fondo sutil para el panel */
+.card-indep-gplus::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -20%;
+    width: 200px;
+    height: 200px;
+    background: radial-gradient(circle, rgba(168, 85, 247, 0.1) 0%, transparent 70%);
+    pointer-events: none;
 }
 
 .header-indep-gplus {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    padding-bottom: 15px;
-    margin-bottom: 15px;
+    border-bottom: 1px solid #f1f5f9;
+    padding-bottom: 18px;
+    margin-bottom: 18px;
     flex-wrap: wrap;
     gap: 12px;
 }
 
-.info-indep-gplus h3 { margin: 0 0 4px 0; font-size: 1.1rem; font-weight: 700; color: #ffffff; }
-.info-indep-gplus p { margin: 0; font-size: 0.8rem; color: #555555; } /* Texto más claro para leer bien */
-.info-indep-gplus p span { font-family: monospace; color: #555555; font-weight: bold; }
+.info-indep-gplus h3 { 
+    margin: 0 0 6px 0; 
+    font-size: 1.25rem; 
+    font-weight: 800; 
+    color: #0f172a;
+    letter-spacing: -0.5px;
+}
+.info-indep-gplus p { margin: 0; font-size: 0.85rem; color: #64748b; }
+.info-indep-gplus p span { font-family: 'Courier New', monospace; color: #a855f7; font-weight: 700; }
 
+/* Badges de Estado con Efecto Glow */
 .badge-indep-gplus {
     font-size: 0.7rem;
-    font-weight: 800;
+    font-weight: 900;
     padding: 6px 14px;
-    border-radius: 20px;
+    border-radius: 99px;
     text-transform: uppercase;
-    color: #333333;
+    letter-spacing: 0.5px;
 }
-.badge-indep-active { background: #22c55e; box-shadow: 0 0 10px rgba(34, 197, 94, 0.3); }
-.badge-indep-processing { background: #f97316; box-shadow: 0 0 10px rgba(249, 115, 22, 0.3); }
-.badge-indep-inactive { background: #6c7883; }
+.badge-indep-active { 
+    background: rgba(34, 197, 94, 0.12); 
+    color: #166534; 
+    border: 1px solid rgba(34, 197, 94, 0.2);
+}
+.badge-indep-processing { 
+    background: rgba(249, 115, 22, 0.12); 
+    color: #9a3412;
+    border: 1px solid rgba(249, 115, 22, 0.2);
+    animation: pulse-glow 2s infinite;
+}
+.badge-indep-inactive { 
+    background: #f1f5f9; 
+    color: #64748b; 
+}
 
-.grid-indep-gplus { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; }
+.grid-indep-gplus { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 16px; }
 .col-indep-gplus { display: flex; flex-direction: column; gap: 4px; }
-.label-indep-gplus { font-size: 0.75rem; color: #333333; text-transform: uppercase; }
-.value-indep-gplus { font-size: 0.9rem; color: #333333; font-weight: 600; }
-.value-indep-gplus.highlight-indep-date { color: #333333; font-weight: 700; }
+.label-indep-gplus { font-size: 0.7rem; color: #94a3b8; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+.value-indep-gplus { font-size: 0.95rem; color: #1e293b; font-weight: 600; }
+.value-indep-gplus.highlight-indep-date { color: #a855f7; font-weight: 700; }
 
 
-/* --- 🛠️ CORRECCIÓN CRÍTICA: TARJETAS DE LA TIENDA --- */
+/* --- 2. 🛠️ LAS NUEVAS TARJETAS DE LA TIENDA VIP (Modo Oscuro Cyber-Cyber) --- */
 .gplus-plan-card {
-    background: linear-gradient(145, #fafafa, #ffffff); /* Más claras que el fondo base */
-    border: 1px solid rgba(255, 255, 255, 0.15); /* Borde visible e iluminado */
-    border-radius: 20px;
-    padding: 25px;
+    background: #0f172a; /* Slate ultra oscuro para romper el gris pastel de tu app */
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 28px;
+    padding: 28px;
     color: #ffffff;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35); /* Sombra pesada para separarla del fondo */
-    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 20px 40px rgba(15, 23, 42, 0.15);
+    
+    /* Animación de entrada suave */
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), 
+                border-color 0.3s ease, 
+                box-shadow 0.4s ease;
 }
 
-/* Efecto al pasar el mouse o tocar en el móvil */
+/* Destello de neón interno en la esquina superior */
+.gplus-plan-card::before {
+    content: '';
+    position: absolute;
+    top: -20%;
+    left: -20%;
+    width: 150px;
+    height: 150px;
+    background: radial-gradient(circle, rgba(168, 85, 247, 0.25) 0%, transparent 60%);
+    pointer-events: none;
+    transition: all 0.5s ease;
+}
+
+/* 🚀 EFECTO HOVER IMPACTANTE */
 .gplus-plan-card:hover {
-    border-color: #2481cc; /* Ilumina el borde en azul */
-    transform: translateY(-4px); /* Se eleva un poco más */
-    box-shadow: 0 12px 30px rgba(36, 129, 204, 0.2); /* Destello azul en la base */
+    transform: translateY(-8px) scale(1.02);
+    border-color: rgba(168, 85, 247, 0.4);
+    box-shadow: 0 24px 50px rgba(168, 85, 247, 0.15), 0 0 30px rgba(36, 161, 222, 0.1);
+}
+
+.gplus-plan-card:hover::before {
+    top: -10%;
+    left: -10%;
+    width: 200px;
+    height: 200px;
+    background: radial-gradient(circle, rgba(36, 161, 222, 0.35) 0%, transparent 70%);
 }
 
 .gplus-card-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 12px;
+    margin-bottom: 6px;
+    position: relative;
+    z-index: 2;
 }
 
 .gplus-plan-title { 
-    font-weight: 800; 
-    font-size: 1.2rem; 
+    font-weight: 900; 
+    font-size: 1.4rem; 
     color: #ffffff;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    background: linear-gradient(120deg, #ffffff, #cbd5e1);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Tarjeta Destacada/Recomendada */
+.gplus-plan-card.featured-plan {
+    border: 2px solid #a855f7;
+}
+.gplus-plan-card.featured-plan::after {
+    content: '★ POPULAR';
+    position: absolute;
+    top: 15px;
+    right: -30px;
+    background: linear-gradient(90deg, #a855f7, #6366f1);
+    color: #fff;
+    font-size: 0.6rem;
+    font-weight: 900;
+    padding: 4px 30px;
+    transform: rotate(45deg);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
 }
 
 .gplus-duration-tag { 
-    font-size: 0.75rem; 
-    color: #c084fc; /* Color morado brillante */
+    font-size: 0.7rem; 
+    color: #c084fc; 
     text-transform: uppercase; 
-    font-weight: 700; 
-    margin-bottom: 12px; 
-    letter-spacing: 0.5px;
+    font-weight: 800; 
+    margin-bottom: 14px; 
+    letter-spacing: 1px;
+    position: relative;
+    z-index: 2;
 }
 
 .gplus-plan-desc { 
-    font-size: 0.8rem; 
-    color: #555555; /* Gris claro de alta lectura */
-    margin: 0 0 15px 0; 
-    min-height: 38px; 
-    line-height: 1.5; 
+    font-size: 0.85rem; 
+    color: #94a3b8; 
+    margin: 0 0 20px 0; 
+    min-height: 40px; 
+    line-height: 1.6;
+    position: relative;
+    z-index: 2;
 }
 
+/* Lista de Beneficios limpia y tecnológica */
 .gplus-benefits-list {
     list-style: none;
-    padding: 0;
-    margin: 0 0 25px 0;
-    font-size: 0.8rem;
-    color: #333333;
+    padding: 18px 0 0 0;
+    margin: 0 0 28px 0;
+    font-size: 0.85rem;
+    color: #e2e8f0;
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
-    padding-top: 15px;
+    gap: 12px;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    position: relative;
+    z-index: 2;
 }
-.gplus-benefits-list li { display: flex; align-items: center; gap: 8px; }
-.gplus-benefits-list li span { 
-    color: #2da1fc; /* Checkmarks azules vibrantes */
-    font-weight: bold; 
-    font-size: 1rem;
+.gplus-benefits-list li { display: flex; align-items: center; gap: 10px; }
+
+/* El checkmark ahora es un círculo neón */
+.gplus-benefits-list li::before {
+    content: '✓';
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    background: rgba(36, 161, 222, 0.15);
+    color: #38bdf8;
+    border-radius: 50%;
+    font-size: 0.65rem;
+    font-weight: bold;
+    border: 1px solid rgba(36, 161, 222, 0.3);
+    flex-shrink: 0;
 }
 
+/* Fila del Precio */
 .gplus-price-row { 
-    font-size: 1.8rem; 
-    font-weight: 900; 
-    margin-bottom: 15px; 
-    color: #222222;
+    font-size: 2.20rem; 
+    font-weight: 950; 
+    margin-bottom: 20px; 
+    color: #ffffff;
+    letter-spacing: -1px;
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+    position: relative;
+    z-index: 2;
 }
-.gplus-price-row span { font-size: 0.8rem; color: #8897a6; font-weight: normal; }
+.gplus-price-row span { font-size: 0.85rem; color: #64748b; font-weight: 500; letter-spacing: 0px; }
 
-/* Botón Premium con Resplandor */
+/* --- ⚡ EL BOTÓN DE ACCIÓN CON ANIMACIÓN DE REFLEJO (SHINE) --- */
 .gplus-btn-action {
     width: 100%;
-    color: #333333;
+    color: #ffffff;
     font-weight: 800;
     border: none;
-    padding: 14px;
-    border-radius: 14px;
+    padding: 16px;
+    border-radius: 16px;
     cursor: pointer;
     font-size: 0.95rem;
-    background: linear-gradient(90, #2481cc, #2a9df2);
-    box-shadow: 0 4px 15px rgba(36, 129, 204, 0.4); /* Brillo de neón bajo el botón */
-    transition: background 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+    letter-spacing: 0.5px;
+    background: linear-gradient(90deg, #a855f7, #2481cc);
+    background-size: 200% auto;
+    box-shadow: 0 4px 20px rgba(168, 85, 247, 0.3);
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    z-index: 2;
+}
+
+/* Efecto de rayo de luz que cruza el botón */
+.gplus-btn-action::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -60%;
+    width: 30%;
+    height: 200%;
+    background: rgba(255, 255, 255, 0.25);
+    transform: rotate(25deg);
+    transition: none;
 }
 
 .gplus-btn-action:hover {
-    background: linear-gradient(90, #2072b5, #2481cc);
-    box-shadow: 0 6px 20px rgba(36, 129, 204, 0.6);
+    background-position: right center; /* Desplaza el degradado */
+    box-shadow: 0 6px 24px rgba(168, 85, 247, 0.5), 0 0 15px rgba(36, 161, 222, 0.3);
+    transform: scale(1.01);
+}
+
+/* Dispara el rayo de luz al pasar el cursor */
+.gplus-plan-card:hover .gplus-btn-action::after {
+    left: 140%;
+    transition: left 0.7s ease-in-out;
 }
 
 .gplus-btn-action:active {
-    transform: scale(0.98); /* Efecto de hundimiento al clickear */
+    transform: scale(0.97);
 }
-        
+
+/* --- Animaciones Auxiliares --- */
+@keyframes pulse-glow {
+    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.4); }
+    70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(249, 115, 22, 0); }
+    100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(249, 115, 22, 0); }
+}
+
     </style>
 </head>
 <body>
