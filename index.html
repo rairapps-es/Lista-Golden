@@ -7681,32 +7681,15 @@ console.log("🚀 Módulo CRM completamente blindado, persistente y expuesto en 
 </div>
 
 <script>
-    // 🎨 INYECCIÓN NATIVA DE ESTILOS PARA LAS TARJETAS (Pega esto al inicio de tu <script>)
+    
+// 🎨 INYECCIÓN NATIVA DE ESTILOS PARA LAS TARJETAS
 if (!document.getElementById("gplus-rewards-styles")) {
     const estiloPremios = document.createElement("style");
     estiloPremios.id = "gplus-rewards-styles";
     estiloPremios.innerHTML = `
-        /* Modo Grid Estándar (2 columnas en móvil) */
-        .gplus-view-grid {
-            display: grid !important;
-            grid-template-columns: repeat(2, 1fr) !important;
-            gap: 12px !important;
-            width: 100% !important;
-        }
-        /* Modo Compacto (3 columnas ultra-pequeñas) */
-        .gplus-view-compacta {
-            display: grid !important;
-            grid-template-columns: repeat(3, 1fr) !important;
-            gap: 8px !important;
-            width: 100% !important;
-        }
-        /* Modo 1:1 y Full Horizontal (1 columna grande) */
-        .gplus-view-1to1, .gplus-view-horizontal, .gplus-view-desplegable {
-            display: flex !important;
-            flex-direction: column !important;
-            gap: 14px !important;
-            width: 100% !important;
-        }
+        .gplus-view-grid { display: grid !important; grid-template-columns: repeat(2, 1fr) !important; gap: 12px !important; width: 100% !important; }
+        .gplus-view-compacta { display: grid !important; grid-template-columns: repeat(3, 1fr) !important; gap: 8px !important; width: 100% !important; }
+        .gplus-view-1to1, .gplus-view-horizontal, .gplus-view-desplegable { display: flex !important; flex-direction: column !important; gap: 14px !important; width: 100% !important; }
     `;
     document.head.appendChild(estiloPremios);
 }
@@ -7719,8 +7702,8 @@ const PREMIOS_DB = [
         descripcion: "Estrellas oficiales transferidas directamente a tu saldo de creador de contenido.",
         categoria: "explorador",
         precio: 300,
-        tipo: "REPETIBLE", // UNICO, DIARIO, REPETIBLE
-        limiteRepetible: 5, // Solo si es REPETIBLE
+        tipo: "REPETIBLE",
+        limiteRepetible: 5,
         valorReal: "1.99 USD",
         imagen: "https://placehold.co/400x300/1e293b/38bdf8?text=⭐+Stars+Telegram"
     },
@@ -7806,7 +7789,7 @@ let gplusFiltroOrden = "todos";
 let gplusModoVista = "grid";
 let gplusRelojPremiosInterval = null;
 
-// Inicialización de Saldo Simulada para pruebas (puedes enlazarla a tu variable state global)
+// Inicialización de Saldo Simulada para pruebas
 if(!localStorage.getItem("gplus_saldo_puntos")){
     localStorage.setItem("gplus_saldo_puntos", "1500");
 }
@@ -7814,15 +7797,16 @@ if(!localStorage.getItem("gplus_saldo_puntos")){
 // 2. FUNCIÓN DE RENDERIZACIÓN PRINCIPAL DEL CATÁLOGO
 function renderizarCatalogoPremios() {
     const gridContainer = document.getElementById("gplus-rewards-grid");
-    if(!gridContainer) return;
+    if(!gridContainer) return; // 🛡️ Evita que colapse el script si el contenedor no está montado
 
-    // Actualizar Saldo en la Interfaz
-    const saldoActual = parseInt(localStorage.getItem("gplus_saldo_puntos"));
-    document.getElementById("gplus-user-points").innerText = saldoActual;
+    // Actualizar Saldo en la Interfaz (Comprobación segura)
+    const saldoActual = parseInt(localStorage.getItem("gplus_saldo_puntos") || "0");
+    const pointsEl = document.getElementById("gplus-user-points");
+    if(pointsEl) {
+        pointsEl.innerText = saldoActual;
+    }
 
     const hoyString = new Date().toDateString();
-
-    // Clonar base de datos para no alterar la original al ordenar
     let premiosFiltrados = [...PREMIOS_DB];
 
     // Filtrar por Pestaña
@@ -7837,29 +7821,10 @@ function renderizarCatalogoPremios() {
 
     // Limpiar contenedor
     gridContainer.innerHTML = "";
-    
-    // Aplicar clase css de orden de vista dinámico
     gridContainer.className = `gplus-view-${gplusModoVista}`;
-
-    // Estilos CSS dinámicos inyectados para el control de vistas
-    let estilosEstructura = `
-        .gplus-view-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .gplus-view-compacta { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-        .gplus-view-1to1 { display: grid; grid-template-columns: 1fr; gap: 14px; }
-        .gplus-view-horizontal { display: flex; flex-direction: column; gap: 16px; }
-        .gplus-view-desplegable { display: flex; flex-direction: column; gap: 8px; }
-    `;
-    
-    if(!document.getElementById("gplus-styles-views")){
-        const sheet = document.createElement("style");
-        sheet.id = "gplus-styles-views";
-        sheet.innerText = estilosEstructura;
-        document.head.appendChild(sheet);
-    }
 
     // Bucle de renderizado de tarjetas
     premiosFiltrados.forEach(premio => {
-        // Leer contadores y bloqueos del localStorage
         const totalReclamado = parseInt(localStorage.getItem(`gplus_reward_cnt_${premio.id}`) || "0");
         const bloqueadoUnico = premio.tipo === "UNICO" && localStorage.getItem(`gplus_reward_done_${premio.id}`) === "true";
         const bloqueadoDiario = premio.tipo === "DIARIO" && localStorage.getItem(`gplus_reward_date_${premio.id}`) === hoyString;
@@ -7868,11 +7833,9 @@ function renderizarCatalogoPremios() {
         const faltaSaldo = saldoActual < premio.precio;
         const estaBloqueadoEstructuralmente = bloqueadoUnico || bloqueadoDiario || bloqueadoRepetible;
 
-        // Maquetación de tarjetas según la vista elegida
         let innerHTMLTarjeta = "";
 
         if (gplusModoVista === "desplegable") {
-            // DISEÑO 5: ACORDEÓN DESPLEGABLE
             innerHTMLTarjeta = `
                 <details style="background:#1e293b; border-radius:12px; border:1px solid rgba(255,255,255,0.05); padding:10px; cursor:pointer; width:100%; box-sizing:border-box;">
                     <summary style="display:flex; justify-content:space-between; align-items:center; font-weight:700; font-size:0.85rem; color:#fff;">
@@ -7887,7 +7850,6 @@ function renderizarCatalogoPremios() {
                 </details>
             `;
         } else if(gplusModoVista === "compacta") {
-            // DISEÑO 2: VISTA MINI COMPACTA
             innerHTMLTarjeta = `
                 <div style="background:#1e293b; border-radius:12px; padding:8px; border:1px solid rgba(255,255,255,0.05); display:flex; flex-direction:column; justify-content:space-between; text-align:center;">
                     <h5 style="margin:0 0 4px 0; color:#fff; font-size:0.75rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${premio.titulo}</h5>
@@ -7897,14 +7859,12 @@ function renderizarCatalogoPremios() {
                 </div>
             `;
         } else {
-            // DISEÑOS: GRID (📱), 1:1 (📐) O HORIZONTAL FULL (🧾)
             const esHorizontal = gplusModoVista === "horizontal";
             const esUnoUno = gplusModoVista === "1to1";
 
             innerHTMLTarjeta = `
                 <div style="background:#1e293b; border-radius:18px; border:1px solid rgba(255,255,255,0.05); overflow:hidden; display:flex; ${esHorizontal ? 'flex-direction:row; align-items:center; height:120px;' : 'flex-direction:column;'} position:relative; box-sizing:border-box; width:100%;">
                     <img src="${premio.imagen}" alt="${premio.titulo}" style="${esHorizontal ? 'width:100px; height:100px; margin-left:10px; border-radius:12px; object-fit:cover;' : 'width:100%; height:' + (esUnoUno ? '240px':'110px') + '; object-fit:cover;'} opacity:0.85;">
-                    
                     <div style="padding:12px; flex:1; display:flex; flex-direction:column; justify-content:space-between; gap:6px;">
                         <div>
                             <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -7914,7 +7874,6 @@ function renderizarCatalogoPremios() {
                             <h4 style="margin:6px 0 2px 0; color:#fff; font-size:0.85rem; font-weight:700; line-height:1.2;">${premio.titulo}</h4>
                             ${esUnoUno || esHorizontal ? `<p style="margin:4px 0 0 0; color:#64748b; font-size:0.72rem; line-height:1.3;">${premio.descripcion}</p>` : ''}
                         </div>
-                        
                         <div style="display:flex; flex-direction:column; gap:6px; margin-top:4px;">
                             <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.68rem; color:#64748b;">
                                 <span>Reclamados: <strong>${totalReclamado}${premio.tipo === 'REPETIBLE' ? '/' + premio.limiteRepetible : ''}</strong></span>
@@ -7927,46 +7886,39 @@ function renderizarCatalogoPremios() {
             `;
         }
 
-        // Crear Nodo Temporal para inyección limpia
         const divTemp = document.createElement("div");
         divTemp.innerHTML = innerHTMLTarjeta;
         gridContainer.appendChild(divTemp.firstElementChild);
 
-        // 3. INYECTAR BOTÓN O SEGURO DE BLOQUEO DINÁMICO
         const wrapperBoton = document.getElementById(`wrapper-btn-${premio.id}`);
         if(!wrapperBoton) return;
 
         if (faltaSaldo && !estaBloqueadoEstructuralmente) {
-            // Regla de Oro 1: Bloqueo por falta de fondos
             const ptsFaltantes = premio.precio - saldoActual;
             wrapperBoton.innerHTML = `
                 <button style="width:100%; padding:8px; border-radius:8px; border:1px dashed #ef4444; background:rgba(239,68,68,0.05); color:#f87171; font-size:0.7rem; font-weight:700; text-align:center; cursor:not-allowed;">
-                    🔒 Bloqueado: te faltan ${ptsFaltantes} Pts. Consigue más haciendo misiones.
+                    🔒 Bloqueado: te faltan ${ptsFaltantes} Pts.
                 </button>
             `;
         } else if (estaBloqueadoEstructuralmente) {
-            // Regla de Oro 2: Bloqueado por restricciones de tiempo o uso
             if (premio.tipo === "UNICO") {
-                wrapperBoton.innerHTML = `<button style="width:100%; padding:8px; border-radius:8px; border:none; background:#0f172a; color:#475569; font-size:0.72rem; font-weight:700; cursor:not-allowed;">🔒 Ya Adquirido (Límite Único)</button>`;
+                wrapperBoton.innerHTML = `<button style="width:100%; padding:8px; border-radius:8px; border:none; background:#0f172a; color:#475569; font-size:0.72rem; font-weight:700; cursor:not-allowed;">🔒 Ya Adquirido</button>`;
             } else {
-                // Lleva contador regresivo para Diarios o Repetibles agotados
                 wrapperBoton.innerHTML = `<button data-countdown-premio="${premio.id}" data-tipo-premio="${premio.tipo}" style="width:100%; padding:8px; border-radius:8px; border:none; background:#0f172a; color:#94a3b8; font-size:0.72rem; font-weight:700; cursor:not-allowed; font-family:monospace;">⏳ Evaluando...</button>`;
             }
         } else {
-            // Botón habilitado y listo para reclamar
             const btnClaim = document.createElement("button");
-            btnClaim.style.cssText = `width:100%; padding:8px; border-radius:8px; border:none; background:#38bdf8; color:#0f172a; font-size:0.75rem; font-weight:800; cursor:pointer; transition: opacity 0.2s;`;
+            btnClaim.style.cssText = `width:100%; padding:8px; border-radius:8px; border:none; background:#38bdf8; color:#0f172a; font-size:0.75rem; font-weight:800; cursor:pointer;`;
             btnClaim.innerText = "Reclamar Premio 🎁";
             btnClaim.onclick = () => abrirFlujoCompraPremio(premio);
             wrapperBoton.appendChild(btnClaim);
         }
     });
 
-    // Iniciar o sincronizar el temporizador de cuentas regresivas en tiempo real
     activarRelojCuentasRegresivasPremios();
 }
 
-// 3. ADMINISTRADOR DE CONTADORES REGRESIVOS (SISTEMA DE 24 HORAS)
+// 3. ADMINISTRADOR DE CONTADORES REGRESIVOS
 function activarRelojCuentasRegresivasPremios() {
     if(gplusRelojPremiosInterval) clearInterval(gplusRelojPremiosInterval);
 
@@ -7979,8 +7931,8 @@ function activarRelojCuentasRegresivasPremios() {
 
         const ahora = new Date();
         const mañana = new Date();
-        mañana.setHours(24, 0, 0, 0); // Límite medianoche
-        const diferenciaMs = mañana - ahora;
+        mañana.setHours(24, 0, 0, 0);
+        const diferenciaMs = mañana - abrió = mañana - ahora;
 
         if (diferenciaMs <= 0) {
             clearInterval(gplusRelojPremiosInterval);
@@ -8002,7 +7954,7 @@ function activarRelojCuentasRegresivasPremios() {
     gplusRelojPremiosInterval = setInterval(refrescarRelojes, 1000);
 }
 
-// 4. FLUJO DE CAJA INTERACTIVO: MODAL, CARGA Y DESPACHO
+// 4. FLUJO DE CAJA INTERACTIVO
 function abrirFlujoCompraPremio(premio) {
     const overlay = document.getElementById("gplus-rewards-modal-overlay");
     const content = document.getElementById("gplus-rewards-modal-content");
@@ -8010,12 +7962,11 @@ function abrirFlujoCompraPremio(premio) {
 
     overlay.style.display = "flex";
 
-    // FASE 1: Confirmación (Aviso OK o Cancelar)
     content.innerHTML = `
         <div style="text-align:center;">
             <div style="font-size:2.5rem; margin-bottom:10px;">🎁</div>
             <h3 style="margin:0 0 8px 0; color:#fff; font-size:1.1rem; font-weight:800;">¿Confirmar Pedido?</h3>
-            <p style="margin:0 0 16px 0; color:#94a3b8; font-size:0.8rem; line-height:1.4;">Estás a punto de canjear <strong>${premio.titulo}</strong> por un costo de <strong style="color:#38bdf8;">${premio.precio} Pts</strong> de tu balance.</p>
+            <p style="margin:0 0 16px 0; color:#94a3b8; font-size:0.8rem; line-height:1.4;">Estás a punto de canjear <strong>${premio.titulo}</strong> por <strong style="color:#38bdf8;">${premio.precio} Pts</strong>.</p>
             <div style="display:flex; gap:10px;">
                 <button onclick="cerrarModalPremios()" style="flex:1; padding:10px; background:#475569; border:none; color:#fff; border-radius:10px; font-weight:700; font-size:0.8rem; cursor:pointer;">Cancelar</button>
                 <button id="gplus-btn-confirm-ok" style="flex:1; padding:10px; background:#22c55e; border:none; color:#fff; border-radius:10px; font-weight:700; font-size:0.8rem; cursor:pointer;">Confirmar OK</button>
@@ -8024,101 +7975,72 @@ function abrirFlujoCompraPremio(premio) {
     `;
 
     document.getElementById("gplus-btn-confirm-ok").onclick = () => {
-        // FASE 2: Pantalla de Carga y Descuento Financiero (5 Segundos)
         content.innerHTML = `
             <div style="text-align:center;">
                 <div style="font-size:2.5rem; margin-bottom:10px; animation: heartbeat 1s infinite alternate;">⚡</div>
                 <h4 style="margin:0; color:#fff; font-size:1rem; font-weight:800; text-transform:uppercase;">Procesando Operación</h4>
-                <p style="margin:6px 0 16px 0; color:#fdba74; font-size:0.75rem; font-weight:600;">Descontando ${premio.precio} Pts de tu saldo reglamentario...</p>
-                <div style="width:100%; height:6px; background:rgba(255,255,255,0.05); border-radius:99px; overflow:hidden; margin-bottom:12px;">
+                <div style="width:100%; height:6px; background:rgba(255,255,255,0.05); border-radius:99px; overflow:hidden; margin-top:12px;">
                     <div id="gplus-reward-loader-bar" style="width:0%; height:100%; background:linear-gradient(90deg, #38bdf8, #22c55e); transition: width 5s linear;"></div>
                 </div>
-                <span style="font-size:0.65rem; color:#64748b;">Por favor, prepara tus especificaciones a continuación...</span>
             </div>
-            <style> @keyframes heartbeat { 0% { transform: scale(1); } 100% { transform: scale(1.1); } } </style>
         `;
 
-        // Lanzar animación de carga visual inmediatamente
         setTimeout(() => {
             const bar = document.getElementById("gplus-reward-loader-bar");
             if(bar) bar.style.width = "100%";
         }, 50);
 
-        // Espera de 5 segundos reglamentarios para procesar caja y pasar al formulario
         setTimeout(() => {
-            // Ejecutar descuento real del saldo de puntos
-            const saldoActual = parseInt(localStorage.getItem("gplus_saldo_puntos"));
-            const nuevoSaldo = saldoActual - premio.precio;
-            localStorage.setItem("gplus_saldo_puntos", nuevoSaldo.toString());
+            const saldoActual = parseInt(localStorage.getItem("gplus_saldo_puntos") || "0");
+            localStorage.setItem("gplus_saldo_puntos", (saldoActual - premio.precio).toString());
 
-            // Guardar registros de uso en LocalStorage
             const totalHistorico = parseInt(localStorage.getItem(`gplus_reward_cnt_${premio.id}`) || "0") + 1;
             localStorage.setItem(`gplus_reward_cnt_${premio.id}`, totalHistorico.toString());
 
-            const hoyString = new Date().toDateString();
             if(premio.tipo === "UNICO") localStorage.setItem(`gplus_reward_done_${premio.id}`, "true");
-            if(premio.tipo === "DIARIO" || premio.tipo === "REPETIBLE") localStorage.setItem(`gplus_reward_date_${premio.id}`, hoyString);
+            if(premio.tipo === "DIARIO" || premio.tipo === "REPETIBLE") localStorage.setItem(`gplus_reward_date_${premio.id}`, new Date().toDateString());
 
-            // Emitir Toast y guardar historial de acciones del core
-            if (typeof showToast === "function") showToast(`¡Canje Exitoso! -${premio.precio} Pts.`, "success");
-            if (typeof registerActionToHistory === "function") {
-                registerActionToHistory("Canje Premio", `Adquiriste: ${premio.titulo} por ${premio.precio} Pts.`, "success");
-            }
-
-            // FASE 3: Apertura del Formulario de Despacho Manual para Telegram
             content.innerHTML = `
                 <div>
                     <h3 style="margin:0 0 4px 0; color:#fff; font-size:1rem; font-weight:800;">📝 Formulario de Pedido</h3>
-                    <p style="margin:0 0 14px 0; color:#64748b; font-size:0.72rem; line-height:1.3;">Tu pago fue procesado. Agrega indicaciones para enviar la orden manualmente por mensaje privado de Telegram.</p>
-                    
-                    <label style="display:block; font-size:0.7rem; font-weight:700; color:#94a3b8; text-transform:uppercase; margin-bottom:4px;">Indicaciones de Entrega</label>
-                    <textarea id="gplus-form-indicaciones" placeholder="Ej: Enlace de mi canal, ID de usuario, o especificaciones del banner..." style="width:100%; height:80px; background:#0f172a; border:1px solid rgba(255,255,255,0.08); border-radius:10px; color:#fff; padding:8px; font-size:0.78rem; font-family:inherit; box-sizing:border-box; resize:none; margin-bottom:12px;"></textarea>
-
-                    <button id="gplus-btn-submit-form" style="width:100%; padding:10px; background:#38bdf8; color:#0f172a; border:none; border-radius:10px; font-weight:800; font-size:0.8rem; cursor:pointer;">Enviar Pedido a Soporte ✈️</button>
+                    <textarea id="gplus-form-indicaciones" placeholder="Indicaciones de entrega..." style="width:100%; height:80px; background:#0f172a; border:1px solid rgba(255,255,255,0.08); border-radius:10px; color:#fff; padding:8px; box-sizing:border-box; resize:none; margin-bottom:12px;"></textarea>
+                    <button id="gplus-btn-submit-form" style="width:100%; padding:10px; background:#38bdf8; color:#0f172a; border:none; border-radius:10px; font-weight:800; cursor:pointer;">Enviar Pedido ✈️</button>
                 </div>
             `;
 
             document.getElementById("gplus-btn-submit-form").onclick = () => {
-                const indicaciones = document.getElementById("gplus-form-indicaciones").value.trim() || "Sin indicaciones adicionales.";
-                
-                // Extraer metadatos de usuario (Soporta variables del ecosistema state si existen)
+                const indicaciones = document.getElementById("gplus-form-indicaciones").value.trim() || "Sin indicaciones.";
                 const usernameTelegram = (typeof state !== 'undefined' && state.user?.username) ? state.user.username : "Usuario_GPlus";
                 const idTelegram = (typeof state !== 'undefined' && state.user?.idTelegram) ? state.user.idTelegram : "ID_Desconocido";
 
-                // Construcción de la plantilla del mensaje para Telegram
-                const textoPlanoMensaje = `🎁 NUEVO PEDIDO DE PREMIO GPLUS 🎁\n\n` +
-                                          `• Premio: ${premio.titulo}\n` +
-                                          `• Costo: ${premio.precio} Pts\n` +
-                                          `• Usuario: @${usernameTelegram}\n` +
-                                          `• ID: ${idTelegram}\n` +
-                                          `• Indicaciones: ${indicaciones}`;
-
-                // Codificar cadena para URL e invocar enlace profundo a Telegram para envío manual
-                const urlTelegramSoporte = `https://t.me/TuSoporteGoldenBot?text=${encodeURIComponent(textoPlanoMensaje)}`;
-                
-                window.open(urlTelegramSoporte, '_blank');
+                const texto = `🎁 NUEVO PEDIDO 🎁\n\n• Premio: ${premio.titulo}\n• Usuario: @${usernameTelegram}\n• ID: ${idTelegram}\n• Notas: ${indicaciones}`;
+                window.open(`https://t.me/TuSoporteGoldenBot?text=${encodeURIComponent(texto)}`, '_blank');
                 
                 cerrarModalPremios();
-                renderizarCatalogoPremios(); // Re-renderizar catálogo para aplicar bloqueos
+                renderizarCatalogoPremios();
             };
-
         }, 5000);
     };
 }
 
 function cerrarModalPremios() {
-    document.getElementById("gplus-rewards-modal-overlay").style.display = "none";
+    const overlay = document.getElementById("gplus-rewards-modal-overlay");
+    if(overlay) overlay.style.display = "none";
 }
 
-// 5. INTERRUPTORES DE NAVEGACIÓN Y FILTROS
+// 5. INTERRUPTORES DE NAVEGACIÓN Y FILTROS (Con validación protectora)
 function cambiarPestañaPremios(categoria) {
     gplusFiltroCategoria = categoria;
     
-    // Switch de Estilos en Botones de pestaña
-    document.getElementById("btn-tab-explorador").style.background = categoria === "explorador" ? "#38bdf8" : "transparent";
-    document.getElementById("btn-tab-explorador").style.color = categoria === "explorador" ? "#0f172a" : "#94a3b8";
-    document.getElementById("btn-tab-administrador").style.background = categoria === "administrador" ? "#38bdf8" : "transparent";
-    document.getElementById("btn-tab-administrador").style.color = categoria === "administrador" ? "#0f172a" : "#94a3b8";
+    const btnExp = document.getElementById("btn-tab-explorador");
+    const btnAdm = document.getElementById("btn-tab-administrador");
+    
+    if(btnExp && btnAdm) {
+        btnExp.style.background = categoria === "explorador" ? "#38bdf8" : "transparent";
+        btnExp.style.color = categoria === "explorador" ? "#0f172a" : "#94a3b8";
+        btnAdm.style.background = categoria === "administrador" ? "#38bdf8" : "transparent";
+        btnAdm.style.color = categoria === "administrador" ? "#0f172a" : "#94a3b8";
+    }
 
     renderizarCatalogoPremios();
 }
@@ -8126,12 +8048,18 @@ function cambiarPestañaPremios(categoria) {
 function filtrarPremiosOrden(orden) {
     gplusFiltroOrden = orden;
 
-    document.getElementById("btn-filtro-baratos").style.background = orden === "baratos" ? "rgba(56,189,248,0.1)" : "rgba(255,255,255,0.05)";
-    document.getElementById("btn-filtro-baratos").style.borderColor = orden === "baratos" ? "#38bdf8" : "rgba(255,255,255,0.05)";
-    document.getElementById("btn-filtro-caros").style.background = orden === "caros" ? "rgba(56,189,248,0.1)" : "rgba(255,255,255,0.05)";
-    document.getElementById("btn-filtro-caros").style.borderColor = orden === "caros" ? "#38bdf8" : "rgba(255,255,255,0.05)";
-    document.getElementById("btn-filtro-todos").style.background = orden === "todos" ? "#38bdf8" : "rgba(255,255,255,0.05)";
-    document.getElementById("btn-filtro-todos").style.color = orden === "todos" ? "#0f172a" : "#fff";
+    const btnBar = document.getElementById("btn-filtro-baratos");
+    const btnCar = document.getElementById("btn-filtro-caros");
+    const btnTod = document.getElementById("btn-filtro-todos");
+
+    if(btnBar && btnCar && btnTod) {
+        btnBar.style.background = orden === "baratos" ? "rgba(56,189,248,0.1)" : "rgba(255,255,255,0.05)";
+        btnBar.style.borderColor = orden === "baratos" ? "#38bdf8" : "rgba(255,255,255,0.05)";
+        btnCar.style.background = orden === "caros" ? "rgba(56,189,248,0.1)" : "rgba(255,255,255,0.05)";
+        btnCar.style.borderColor = orden === "caros" ? "#38bdf8" : "rgba(255,255,255,0.05)";
+        btnTod.style.background = orden === "todos" ? "#38bdf8" : "rgba(255,255,255,0.05)";
+        btnTod.style.color = orden === "todos" ? "#0f172a" : "#fff";
+    }
 
     renderizarCatalogoPremios();
 }
@@ -8141,20 +8069,21 @@ function cambiarModoVistaPremios(modo) {
     renderizarCatalogoPremios();
 }
 
-// Función para verificar y renderizar
+// Función de enlace requerida por tu ruteador central (switchView)
+function renderShopCatalog() {
+    renderizarCatalogoPremios();
+}
+
 function initGPlusRewards() {
     const grid = document.getElementById("gplus-rewards-grid");
     if (grid) {
         renderizarCatalogoPremios();
-        // Recargar iconos Lucide por si acaso
         if (typeof lucide !== 'undefined') lucide.createIcons();
     } else {
-        // Si aún no existe, reintenta en 500ms
         setTimeout(initGPlusRewards, 500);
     }
 }
 
-// Ejecutar
 initGPlusRewards();
 
 </script>
