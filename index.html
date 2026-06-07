@@ -3150,7 +3150,7 @@
                 </div>
                 <div>
                     <div class="gplus-price-row">5.99$ <span>/ mes</span></div>
-                    <button class="gplus-btn-action" onclick="abrirModalPasarelaPagoGPlus('1', '${state.user?.idTelegram || 0}', '${state.user?.username || 'user'}')">
+                    <button class="gplus-btn-action" onclick="abrirModalPasarelaPagoGPlus('mes', '${state.user?.idTelegram || 0}', '${state.user?.username || 'user'}')">
     Adquirir Plan
 </button> </div>
             </div>
@@ -3170,7 +3170,7 @@
                 </div>
                 <div>
                     <div class="gplus-price-row">29.99$ <span>/ 6 meses</span></div>
-                    <button class="gplus-btn-action" onclick="abrirModalPasarelaPagoGPlus('2', '${state.user?.idTelegram || 0}', '${state.user?.username || 'user'}')">
+                    <button class="gplus-btn-action" onclick="abrirModalPasarelaPagoGPlus('semestral', '${state.user?.idTelegram || 0}', '${state.user?.username || 'user'}')">
     Adquirir Plan
 </button>
                 </div>
@@ -3191,7 +3191,7 @@
                 </div>
                 <div>
                     <div class="gplus-price-row">49.99$ <span>/ año</span></div>
-                    <button class="gplus-btn-action" onclick="abrirModalPasarelaPagoGPlus('3', '${state.user?.idTelegram || 0}', '${state.user?.username || 'user'}')">
+                    <button class="gplus-btn-action" onclick="abrirModalPasarelaPagoGPlus('anual', '${state.user?.idTelegram || 0}', '${state.user?.username || 'user'}')">
     Adquirir Plan
 </button>
                 </div>
@@ -6402,8 +6402,8 @@ setTimeout(() => {
 
     // Al hacer click, guardamos la solicitud pendiente y abrimos soporte sin tocar la interfaz visual
     function abrirModalPasarelaPagoGPlus(planId, currentUserId, currentUsername) {
-    // 🛠️ 1. SALVAGUARDA DE ENTRADA: Evitamos que variables vacías congelen la app
-    const safePlanId = planId ? Number(planId) : 1;
+    // 🛠️ 1. SALVAGUARDA DE ENTRADA: Guardamos como texto string porque tus IDs son "mes", "semestral", etc.
+    const safePlanId = planId ? String(planId).trim() : "mes";
     const safeUserId = currentUserId ? String(currentUserId) : "00000000";
     const safeUsername = currentUsername ? String(currentUsername).replace('@', '') : "Usuario_GPlus";
 
@@ -6415,16 +6415,20 @@ setTimeout(() => {
         plan = DEF_PLANES.find(p => p.id === safePlanId);
     }
 
-    // Fallback de emergencia: Si tu array global falló, el script crea el plan dinámicamente para no romperse
+    // Fallback de emergencia: Si tu array global falló o no coincide el ID, usa tus datos maestros reales
     if (!plan) {
-        console.warn(`⚠️ DEF_PLANES no disponible o ID ${safePlanId} no encontrado. Creando plan temporal de emergencia.`);
-        plan = {
-            id: safePlanId,
-            title: safePlanId === 2 ? "GPlus Premium Pro" : "GPlus Premium",
-            price: safePlanId === 2 ? "19.99" : "9.99"
-        };
+        console.warn(`⚠️ DEF_PLANES no disponible o ID '${safePlanId}' no encontrado. Aplicando respaldo real.`);
+        
+        if (safePlanId === "anual") {
+            plan = { id: "anual", title: "GPlus Full", price: 89.99 };
+        } else if (safePlanId === "semestral") {
+            plan = { id: "semestral", title: "GPlus PRO", price: 49.99 };
+        } else {
+            plan = { id: "mes", title: "GPlus Estándar", price: 9.99 };
+        }
     }
 
+    // ... (A partir de aquí el código del innerHTML del modal sigue exactamente igual)
     // 🛠️ 3. CREACIÓN Y ASEGURAMIENTO DEL CONTENEDOR DOM
     let modal = document.getElementById("gplus-payment-flow-modal");
     if (!modal) {
