@@ -4280,17 +4280,15 @@ function escapeHtml(text) {
         }
 
         // CONTROL EXCLUSIVO EN "MIS CANALES GUARDADOS"
-function renderMyOwnedChannelsList() {
+
+            function renderMyOwnedChannelsList() {
     const container = document.getElementById("my-owned-channels-list");
     const tableBody = document.getElementById("user-channels-table-body");
     if (!container || !tableBody) return;
 
     // 1. VERIFICACIÓN DE SESIÓN / ESTADO CRÍTICO
-    // Si un canal tiene solicitud de baja activa (deleteRequested) pero pasa filtros de verificación o inicio
     INITIAL_CHANNELS_DATASET.forEach(c => {
         if (c.telegramUserId === state.user.idTelegram && c.deleteRequested && c.status === "Publicado") {
-            // Aquí puedes definir tu lógica de verificación de sesión: si deseas que cambie de estado inmediatamente
-            // pasamos de "Publicado" al estado "Sin Publicar" y limpiamos la alerta temporal
             c.status = "Sin Publicar";
             c.deleteRequested = false; 
         }
@@ -4298,17 +4296,16 @@ function renderMyOwnedChannelsList() {
 
     const myOwned = INITIAL_CHANNELS_DATASET.filter(c => c.telegramUserId === state.user.idTelegram);
     
-    // Recalcular contadores del panel superior incluyendo el nuevo estado
+    // Recalcular contadores del panel superior
     const total = myOwned.length;
     const review = myOwned.filter(c => c.status === "En Revisión").length;
     const published = myOwned.filter(c => c.status === "Publicado").length;
     const unpublished = myOwned.filter(c => c.status === "Sin Publicar").length;
 
-    document.getElementById("panel-cnt-total").innerText = total;
-    document.getElementById("panel-cnt-review").innerText = review;
-    document.getElementById("panel-cnt-published").innerText = published;
-    // Si tienes un elemento visual para "Sin Publicar" puedes actualizarlo aquí, ej:
-    document.getElementById("panel-cnt-unpublished").innerText = unpublished;
+    if (document.getElementById("panel-cnt-total")) document.getElementById("panel-cnt-total").innerText = total;
+    if (document.getElementById("panel-cnt-review")) document.getElementById("panel-cnt-review").innerText = review;
+    if (document.getElementById("panel-cnt-published")) document.getElementById("panel-cnt-published").innerText = published;
+    if (document.getElementById("panel-cnt-unpublished")) document.getElementById("panel-cnt-unpublished").innerText = unpublished;
 
     if (myOwned.length === 0) {
         tableBody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:var(--text-muted);">No posees canales registrados.</td></tr>`;
@@ -4316,13 +4313,14 @@ function renderMyOwnedChannelsList() {
         return;
     }
 
-    // Renderizar la tabla de control operativo con las reglas solicitadas
+    // =========================================================================
+    // 📊 RENDER 1: TABLA DE CONTROL OPERATIVO
+    // =========================================================================
     tableBody.innerHTML = myOwned.map(c => {
         let badgeClass = "status-review";
         if (c.status === "Publicado") badgeClass = "status-published";
-        if (c.status === "Sin Publicar") badgeClass = "status-free"; // O una clase gris que manejes
+        if (c.status === "Sin Publicar") badgeClass = "status-free";
 
-        // Condicional para mostrar el botón de "Volver a enviar" si está sin publicar
         const reSendButton = c.status === "Sin Publicar" ? `
             <button class="mini-action-btn" style="color:var(--telegram-blue);" onclick="handleReSendChannel(${c.id})">
                 <i data-lucide="send" style="width:11px; height:11px;"></i> Re-Enviar
@@ -4349,31 +4347,25 @@ function renderMyOwnedChannelsList() {
     }).join('');
 
     // =========================================================================
-    // BUSCA ESTA LÍNEA EXACTA EN TU CÓDIGO Y REEMPLAZA DE AQUÍ EN ADELANTE:
+    // 📱 RENDER 2: TARJETAS DE LOS CANALES (CORREGIDO)
     // =========================================================================
-    
-    // Renderizar abajo las tarjetas de los canales
     container.innerHTML = myOwned.map(c => {
-        // Si el usuario envió la solicitud de borrado pero sigue en la vista, inyectamos el mensaje arriba de la tarjeta
-        if (c.deleteRequested) {
-            return `
-                <div class="delete-warning-box" style="background:#fffbeb; border:1px solid #fef3c7; color:#b45309; padding:10px; border-radius:8px; margin-bottom:8px; font-size:0.8rem; font-weight:bold;">
-                    ⚠️ Tu canal dejará de aparecer en el directo de canales públicamente en las próximas horas.
-                </div>
-                ${buildChannelCardHtml(c)}
-            `;
-        }
+        // Alerta de borrado pendiente
+        const warningHtml = c.deleteRequested ? `
+            <div class="delete-warning-box" style="background:#fffbeb; border:1px solid #fef3c7; color:#b45309; padding:10px; border-radius:8px; margin-bottom:8px; font-size:0.8rem; font-weight:bold;">
+                ⚠️ Tu canal dejará de aparecer en el directorio de canales públicamente en las próximas horas.
+            </div>
+        ` : '';
         
-        // Solo mostramos de forma estándar en el contenedor público si sigue "Publicado"
+        // Generamos el HTML base de la tarjeta (Ahora corre para CUALQUIER estado)
+        const cardHtml = typeof buildChannelCardHtml === 'function' ? buildChannelCardHtml(c) : `<div class="card">${c.name}</div>`;
+        
+        // Creamos el botón de acción inferior dinámico según el estado del canal
+        let bottomButtonHtml = '';
+        
         if (c.status === "Publicado") {
-            // 1. Obtenemos el HTML de la tarjeta que ya tienes funcionando
-            const cardHtml = buildChannelCardHtml(c);
-            
-            // 2. Comprobamos si ya está destacado para cambiar el diseño del botón
             const isFeatured = c.isVip || c.isFeatured ? true : false;
-            
-            // 3. Creamos el botón dinámico acoplado al sistema de pagos por separado
-            const featureButtonHtml = `
+            bottomButtonHtml = `
                 <div class="owner-actions-wrapper" style="margin: 10px 0; padding: 0 4px;">
                     <button class="mini-action-btn" 
                             style="width: 100%; padding: 10px; border-radius: 8px; font-weight: 800; font-size: 0.78rem; text-transform: uppercase; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 6px;
@@ -4386,20 +4378,36 @@ function renderMyOwnedChannelsList() {
                     </button>
                 </div>
             `;
-            
-            // 4. Inyectamos el botón pegado debajo de la tarjeta
-            return `
-                <div class="my-owned-card-container" style="margin-bottom: 20px;">
-                    ${cardHtml}
-                    ${featureButtonHtml}
+        } else if (c.status === "En Revisión") {
+            bottomButtonHtml = `
+                <div style="margin: 10px 0; padding: 10px; text-align: center; background: rgba(234, 179, 8, 0.1); border: 1px solid rgba(234, 179, 8, 0.2); color: #eab308; border-radius: 8px; font-size: 0.75rem; font-weight: 700;">
+                    ⏳ Esperando aprobación de los moderadores
+                </div>
+            `;
+        } else {
+            // Estado: Sin Publicar / Rechazado
+            bottomButtonHtml = `
+                <div style="margin: 10px 0; padding: 10px; text-align: center; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); color: #ef4444; border-radius: 8px; font-size: 0.75rem; font-weight: 700;">
+                    ❌ Este canal está oculto en el directorio público
                 </div>
             `;
         }
-        return '';
+        
+        // Retornamos el bloque completo estructurado de forma segura
+        return `
+            <div class="my-owned-card-container" style="margin-bottom: 20px;">
+                ${warningHtml}
+                ${cardHtml}
+                ${bottomButtonHtml}
+            </div>
+        `;
     }).join('');
 
-    lucide.createIcons();
-}
+    // Aseguramos que Lucide dibuje los iconos de las tablas y botones nuevos
+    if (window.lucide) {
+        lucide.createIcons();
+    }
+}    
 
 // FUNCIÓN PARA EL BOTÓN DE VOLVER A ENVIAR EL CANAL
 function handleReSendChannel(id) {
