@@ -3150,8 +3150,9 @@
                 </div>
                 <div>
                     <div class="gplus-price-row">5.99$ <span>/ mes</span></div>
-                    <button class="gplus-btn-action" onclick="alert('Abriendo pasarela Mensual...')">Adquirir Plan</button>
-                </div>
+                    <button class="gplus-btn-action" onclick="abrirModalPasarelaPagoGPlus('1', '${state.user?.idTelegram || 0}', '${state.user?.username || 'user'}')">
+    Adquirir Plan
+</button> </div>
             </div>
 
             <div class="gplus-plan-card">
@@ -3168,8 +3169,10 @@
                     </ul>
                 </div>
                 <div>
-                    <div class="gplus-price-row">14.99$ <span>/ 3 meses</span></div>
-                    <button class="gplus-btn-action" onclick="alert('Abriendo pasarela Trimestral...')">Adquirir Plan</button>
+                    <div class="gplus-price-row">29.99$ <span>/ 6 meses</span></div>
+                    <button class="gplus-btn-action" onclick="abrirModalPasarelaPagoGPlus('2', '${state.user?.idTelegram || 0}', '${state.user?.username || 'user'}')">
+    Adquirir Plan
+</button>
                 </div>
             </div>
 
@@ -3187,8 +3190,10 @@
                     </ul>
                 </div>
                 <div>
-                    <div class="gplus-price-row">39.99$ <span>/ año</span></div>
-                    <button class="gplus-btn-action" onclick="alert('Abriendo pasarela Anual...')">Adquirir Plan</button>
+                    <div class="gplus-price-row">49.99$ <span>/ año</span></div>
+                    <button class="gplus-btn-action" onclick="abrirModalPasarelaPagoGPlus('3', '${state.user?.idTelegram || 0}', '${state.user?.username || 'user'}')">
+    Adquirir Plan
+</button>
                 </div>
             </div>
 
@@ -3213,8 +3218,8 @@
         onclick="if(typeof switchView === 'function') { switchView('view-profile-page'); } else { openProfileAsPage(); }" data-mision="explorar_mi_perfil">
    👤 Ver mi Perfil
 </button>
-<button class="drawer-btn" onclick="switchView('view-streak')">
-    <span>🔥 Mi Racha Diaria</span> <i data-lucide="chevron-right"></i>
+<button class="drawer-btn" onclick="switchView('profile')">
+    <span>🔥 Mi Perfil</span> <i data-lucide="chevron-right"></i>
 </button>
 
     <button onclick="switchView('crm-dashboard')" data-mision="explorar_crm">📊 Panel & CRM</button>
