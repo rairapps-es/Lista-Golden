@@ -4105,7 +4105,7 @@ window.navegarACanalOficial = function(url, nombreCanal) {
         state.user.range += 1;                                     // ¡Sube de nivel!
         puntosObjetivoSiguienteNivel = state.user.range * puntosPorNivel; // Nueva meta
         
-        console.log(`🎉 ¡Level Up! Subiste al Rango RPG Nivel ${state.user.range}`);
+        console.log(`🎉 ¡Level Up! Subiste al nivel ${state.user.range}`);
         if (typeof saveToLocalStorage === 'function') saveToLocalStorage();
     }
 
@@ -4233,10 +4233,10 @@ window.navegarACanalOficial = function(url, nombreCanal) {
             </div>
             
             <div id="accordion-${prefix}${c.id}" class="card-accordion-content">
-                <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:10px; line-height:1.4;">${c.description}</p>
+                <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:10px; margin-top:10px; line-height:1.4;">${c.description}</p>
                 <div class="extended-data-row">
-                    <span>Idioma: <strong>${c.lang}</strong></span>
-                    <span>Subs: <strong>${c.subs.toLocaleString()}</strong></span>
+                    <span>🌐 Idioma: <strong>${c.lang}</strong></span>
+                    <span>👥 Subs: <strong>${c.subs.toLocaleString()}</strong></span>
                 </div>
                 <button class="btn-subscribe-trigger" onclick="registerChannelAccess(${c.id})">Visitar Canal en Telegram</button>
             </div>
@@ -6518,12 +6518,128 @@ setTimeout(checkVipInternalRegistration, 100);
  * 📡 MOTOR DE TOURS HÍBRIDO (MISIONES ÚNICAS Y DIARIAS CON CARGA)
  * ==========================================================================
  */
+/**
+ * ==========================================================================
+ * 🎯 MOTOR DE MISIONES HÍBRIDAS CON TEMPORIZADOR REGRESIVO EN TARJETA
+ * ==========================================================================
+ */
+
+// 🕒 Variable global obligatoria para controlar el cronómetro en tiempo real
+let gplusIntervaloMisiones = null;
+
+// =========================================================================
+// 🔄 FUNCIÓN: ACTUALIZAR VISUAL DE LAS TARJETAS Y CONTROLAR RELOJ
+// =========================================================================
+function actualizarVisualMisiones() {
+    const hoyString = new Date().toDateString();
+    const elementosMision = document.querySelectorAll("[data-mision]");
+    let tieneDiariasCompletadas = false;
+
+    elementosMision.forEach(target => {
+        const missionId = target.getAttribute("data-mision");
+        const tipoMision = target.getAttribute("data-tipo") || "unica";
+        if (!missionId) return;
+
+        const cleanMissionId = missionId.trim().toLowerCase();
+        const storageKeyUnica = `gplus_tour_done_${cleanMissionId}`;
+        const storageKeyDiaria = `gplus_tour_date_${cleanMissionId}`;
+
+        let estaCompletada = false;
+
+        if (tipoMision === "diaria") {
+            if (localStorage.getItem(storageKeyDiaria) === hoyString) {
+                estaCompletada = true;
+                tieneDiariasCompletadas = true;
+            }
+        } else {
+            if (localStorage.getItem(storageKeyUnica) === "true") {
+                estaCompletada = true;
+            }
+        }
+
+        // Aplicación de estados físicos y visuales a la tarjeta/botón
+        if (estaCompletada) {
+            target.style.pointerEvents = "none"; // Desactiva clics por completo
+            
+            // Si no hemos respaldado el diseño o texto original, lo hacemos ahora
+            if (!target.getAttribute("data-texto-original")) {
+                target.setAttribute("data-texto-original", target.innerHTML); 
+            }
+            
+            if (tipoMision !== "diaria") {
+                // Estilo estático permanente para misiones únicas
+                target.style.opacity = "0.5";
+                target.innerHTML = `<span style="color: #22c55e; font-weight: bold; font-size: 0.85rem;">✓ Reclamada</span>`;
+            } else {
+                // Opacidad inicial para la diaria (el texto lo refresca el setInterval de abajo)
+                target.style.opacity = "0.8";
+            }
+        } else {
+            // Restaurar estado normal si ya pasó el ciclo de 24 horas
+            target.style.opacity = "1";
+            target.style.pointerEvents = "auto";
+            target.style.cursor = "pointer";
+            
+            if (target.getAttribute("data-texto-original")) {
+                target.innerHTML = target.getAttribute("data-texto-original");
+            }
+        }
+    });
+
+    // 🕒 MOTOR DEL CRONÓMETRO REGRESIVO EN LA TARJETA DIARIA
+    if (gplusIntervaloMisiones) clearInterval(gplusIntervaloMisiones);
+
+    if (tieneDiariasCompletadas) {
+        const refrescarReloj = () => {
+            const ahora = new Date();
+            const mañana = new Date();
+            mañana.setHours(24, 0, 0, 0); // Fijar exactamente a la media noche (00:00:00)
+
+            const diferenciaMs = mañana - ahora;
+
+            if (diferenciaMs <= 0) {
+                clearInterval(gplusIntervaloMisiones);
+                actualizarVisualMisiones(); // Reinicia y libera misiones al pasar la media noche
+                return;
+            }
+
+            const horas = String(Math.floor((diferenciaMs / (1000 * 60 * 60)) % 24)).padStart(2, "0");
+            const minutes = String(Math.floor((diferenciaMs / (1000 * 60)) % 60)).padStart(2, "0");
+            const segundos = String(Math.floor((diferenciaMs / 1000) % 60)).padStart(2, "0");
+
+            // Diseño del recuadro del contador en la tarjeta
+            const htmlContador = `
+                <div style="display: flex; align-items: center; justify-content: center; gap: 8px; background: #0f172a; border: 1px solid rgba(255,255,255,0.05); color: #94a3b8; padding: 12px; border-radius: 12px; font-size: 0.8rem; font-weight: 700; width: 100%; box-sizing: border-box; box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);">
+                    <span style="animation: gplus-spin-loader 3s linear infinite; display: inline-block; color: #f97316;">🔄</span> 
+                    <span>Disponible en <strong style="color: #fff; font-family: monospace;">${horas}:${minutes}:${segundos}</strong></span>
+                </div>
+                <style>
+                    @keyframes gplus-spin-loader { 0% { transform: rotate(360deg); } 100% { transform: rotate(0deg); } }
+                </style>
+            `;
+
+            // Buscamos las tarjetas diarias completadas en el HTML y les inyectamos el contador
+            document.querySelectorAll("[data-mision][data-tipo='diaria']").forEach(targetDiaria => {
+                const cleanId = targetDiaria.getAttribute("data-mision").trim().toLowerCase();
+                if (localStorage.getItem(`gplus_tour_date_${cleanId}`) === hoyString) {
+                    targetDiaria.innerHTML = htmlContador;
+                }
+            });
+        };
+
+        refrescarReloj();
+        gplusIntervaloMisiones = setInterval(refrescarReloj, 1000);
+    }
+}
+
+// =========================================================================
+// 🖱️ ESCUCHADOR DE EVENTOS (TU SCRIPT ORIGINAL ASIGNANDO PUNTOS)
+// =========================================================================
 document.addEventListener("click", function (event) {
     const target = event.target.closest("[data-mision]");
     if (!target) return;
 
     const missionId = target.getAttribute("data-mision");
-    // 🏷️ LEER EL TIPO DE MISIÓN: Si no pones nada, por defecto será 'unica'
     const tipoMision = target.getAttribute("data-tipo") || "unica"; 
     
     if (!missionId) return;
@@ -6531,18 +6647,15 @@ document.addEventListener("click", function (event) {
     const cleanMissionId = missionId.trim().toLowerCase();
     const hoyString = new Date().toDateString();
     
-    // Definimos llaves diferentes en LocalStorage según el tipo
     const storageKeyUnica = `gplus_tour_done_${cleanMissionId}`;
     const storageKeyDiaria = `gplus_tour_date_${cleanMissionId}`;
 
-    // 🛡️ CONTROL DE BLOQUEO SEGÚN EL TIPO
     if (tipoMision === "diaria") {
         if (localStorage.getItem(storageKeyDiaria) === hoyString) {
             console.log(`ℹ️ [Tour] Misión diaria ya cobrada hoy: ${cleanMissionId}`);
             return;
         }
     } else {
-        // Misión Única (Hito para siempre)
         if (localStorage.getItem(storageKeyUnica) === "true") {
             console.log(`ℹ️ [Tour] Misión única ya completada históricamente: ${cleanMissionId}`);
             return;
@@ -6551,7 +6664,6 @@ document.addEventListener("click", function (event) {
 
     console.log(`⏳ [Tour] Iniciando carga para misión [${tipoMision}]: ${cleanMissionId}`);
 
-    // --- DICCIONARIO PARA HISTORIAL ---
     const nombresMisiones = {
         "explorar_directorio": { titulo: "Exploración Diaria", desc: "Visitaste el directorio de canales." },
         "visitar_tienda_gplus": { titulo: "Visita Comercial Diaria", desc: "Exploraste los productos VIP." },
@@ -6565,7 +6677,6 @@ document.addEventListener("click", function (event) {
         desc: `Completaste la acción [${cleanMissionId}].` 
     };
 
-    // --- 🛠️ MODAL DE BARRA DE CARGA INYECTADO ---
     const modalCarga = document.createElement("div");
     modalCarga.style.cssText = `
         position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
@@ -6589,28 +6700,26 @@ document.addEventListener("click", function (event) {
     const barFill = document.getElementById("gplus-loader-fill");
     setTimeout(() => { if (barFill) barFill.style.width = "100%"; }, 50);
 
-    // --- 🎯 ADJUDICACIÓN DE RECOMPENSAS (TRAS 1.5 SEGUNDOS) ---
     setTimeout(() => {
         modalCarga.remove();
 
-        // Guardar bloqueo según corresponda
         if (tipoMision === "diaria") {
             localStorage.setItem(storageKeyDiaria, hoyString);
         } else {
             localStorage.setItem(storageKeyUnica, "true");
         }
 
-        // 1. Puntos
+        // 🌟 PUNTO CLAVE 1: Actualiza la tarjeta visualmente al terminar la barra de carga
+        actualizarVisualMisiones();
+
         if (typeof rewardPoints === "function") {
             rewardPoints(5, `Bono: ${infoMision.titulo}`);
         }
 
-        // 2. Historial
         if (typeof registerActionToHistory === "function") {
             registerActionToHistory(infoMision.titulo, `${infoMision.desc} +5 Pts.`, "success");
         }
 
-        // 3. Toast & Confeti
         if (typeof showToast === "function") {
             showToast(`¡Misión Completa! +5 Pts asignados.`, "success");
         }
@@ -6621,6 +6730,12 @@ document.addEventListener("click", function (event) {
 
     }, 1500);
 });
+
+// =========================================================================
+// 🚀 PUNTO CLAVE 2: ARRANQUE INICIAL AUTOMÁTICO EN LA CARGA DE LA APP
+// =========================================================================
+document.addEventListener("DOMContentLoaded", actualizarVisualMisiones);
+setTimeout(actualizarVisualMisiones, 400); // Doble verificación por asincronía en Telegram
 
     </script>
     <script>
