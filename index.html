@@ -2992,10 +2992,7 @@
     <div id="tab-content-contacts" class="tab-panel">
         
         <div class="crm-filter-bar" style="margin-bottom: 15px;">
-            <div class="search-wrapper">
-                <i data-lucide="search" class="search-icon"></i>
-                <input type="text" id="crm-search-input-contacts" placeholder="Buscar partner, notas o tag..." oninput="executeGlobalCrmFilter()">
-            </div>
+            
             <div class="filter-pills-scroll">
                 <button class="pill-btn active" data-filter="all-contacts" onclick="setUiFilter('crmCategory', 'all')">👥 Todos Partners</button>
                 <button class="pill-btn" data-filter="clientes" onclick="setUiFilter('crmCategory', 'clientes')">💎 Clientes</button>
@@ -3022,10 +3019,7 @@
     <div id="tab-content-ideas" class="tab-panel" style="display: none;">
         
         <div class="crm-filter-bar" style="margin-bottom: 15px;">
-            <div class="search-wrapper">
-                <i data-lucide="search" class="search-icon"></i>
-                <input type="text" id="crm-search-input-ideas" placeholder="Buscar idea o requerimiento..." oninput="executeGlobalCrmFilter()">
-            </div>
+            
             <div class="filter-pills-scroll">
                 <button class="pill-btn active" data-filter="ideas-all" onclick="setUiFilter('ideaStatus', 'all')">💡 Todas Ideas</button>
                 <button class="pill-btn" data-filter="ideas-proc" onclick="setUiFilter('ideaStatus', 'en-proceso')">🟡 En Proceso</button>
@@ -3149,7 +3143,7 @@
                     </ul>
                 </div>
                 <div>
-                    <div class="gplus-price-row">5.99$ <span>/ mes</span></div>
+                    <div class="gplus-price-row">4.99$ <span>/ mes</span></div>
                     <button class="gplus-btn-action" onclick="abrirModalPasarelaPagoGPlus('mes', '${state.user?.idTelegram || 0}', '${state.user?.username || 'user'}')">
     Adquirir Plan
 </button> </div>
@@ -3190,7 +3184,7 @@
                     </ul>
                 </div>
                 <div>
-                    <div class="gplus-price-row">49.99$ <span>/ año</span></div>
+                    <div class="gplus-price-row">59.99$ <span>/ año</span></div>
                     <button class="gplus-btn-action" onclick="abrirModalPasarelaPagoGPlus('anual', '${state.user?.idTelegram || 0}', '${state.user?.username || 'user'}')">
     Adquirir Plan
 </button>
@@ -3235,13 +3229,13 @@
         <div class="tab-item" id="tab-favorites" onclick="switchView('favorites')">
             <i data-lucide="star"></i><span>Favoritos</span>
         </div>
-        <div class="tab-item" id="tab-history" onclick="switchView('history')" data-mision="explorar_historial">
+        <div class="tab-item" id="tab-history" onclick="switchView('history')">
             <i data-lucide="history"></i><span>Historial</span>
         </div>
-        <div class="tab-item" id="tab-energy" onclick="switchView('energy')" data-mision="explorar_pts">
+        <div class="tab-item" id="tab-energy" onclick="switchView('energy')">
             <i data-lucide="zap"></i><span>Puntos</span>
         </div>
-        <div id="tab-profile" class="tab-item" onclick="switchView('profile')" data-mision="explorar_perfil" data-tipo="diaria">
+        <div id="tab-profile" class="tab-item" onclick="switchView('profile')">
     <i data-lucide="user" style="width: 20px; height: 20px;"></i>
     <span style="font-size: 0.7rem; margin-top: 4px;">Perfil</span>
 </div>
@@ -3424,7 +3418,7 @@ function checkVipInternalRegistration() {
             } else {
                 panel.style.display = "block";
                 if(state.user.isVipMember) {
-                    title.innerText = "Tus Beneficios VIP Activos:";
+                    title.innerText = "Tus Beneficios GPlus Activos:";
                     form.style.display = "none";
                 } else {
                     title.innerText = "Beneficios de la Suscripción GPlus:";
