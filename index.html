@@ -7952,64 +7952,6 @@ function abrirFlujoCompraPremio(premio) {
             if(premio.tipo === "UNICO") localStorage.setItem(`gplus_reward_done_${premio.id}`, "true");
             if(premio.tipo === "DIARIO" || premio.tipo === "REPETIBLE") localStorage.setItem(`gplus_reward_date_${premio.id}`, new Date().toDateString());
 
-            // Pintamos el formulario de pedido de forma limpia
-            content.innerHTML = `
-                <div>
-                    <h3 style="margin:0 0 4px 0; color:#fff; font-size:1rem; font-weight:800;">📝 Formulario de Pedido</h3>
-                    <textarea id="gplus-form-indicaciones" placeholder="Indicaciones de entrega..." style="width:100%; height:80px; background:#0f172a; border:1px solid rgba(255,255,255,0.08); border-radius:10px; color:#fff; padding:8px; box-sizing:border-box; resize:none; margin-bottom:12px;"></textarea>
-                    <button id="gplus-btn-submit-form" style="width:100%; padding:10px; background:#38bdf8; color:#0f172a; border:none; border-radius:10px; font-weight:800; cursor:pointer;">Enviar Pedido ✈️</button>
-                </div>
-            `;
-
-            // Enlazamos el click de envío una vez inyectado el HTML para que no se pierda el evento
-            document.getElementById("gplus-btn-submit-form").onclick = () => {
-                const indicaciones = document.getElementById("gplus-form-indicaciones").value.trim() || "Sin indicaciones adicionales.";
-                
-                // Extracción segura de datos desde tu objeto state real de Telegram
-                const usernameTelegram = (typeof state !== 'undefined' && state.user && state.user.username) ? state.user.username : "Usuario_GPlus";
-                const idTelegram = (typeof state !== 'undefined' && state.user && state.user.idTelegram) ? state.user.idTelegram : "ID_Desconocido";
-
-                // Plantilla estructurada del mensaje final
-                const texto = `🎁 NUEVO PEDIDO GPLUS 🎁\n\n` +
-                              `• Premio: ${premio.titulo}\n` +
-                              `• Costo: ${premio.precio} Pts\n` +
-                              `• Usuario: @${usernameTelegram}\n` +
-                              `• ID Telegram: ${idTelegram}\n` +
-                              `• Notas del Usuario: ${indicaciones}`;
-
-                // Construcción del enlace profundo a tu bot de soporte con el texto predefinido
-                const urlTelegramSoporte = `https://t.me/Airdayz?text=${encodeURIComponent(texto)}`;
-                
-                // Ejecución nativa: Prioriza el motor WebApp de Telegram para que no salte al navegador del móvil
-                if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.openTelegramLink) {
-                    window.Telegram.WebApp.openTelegramLink(urlTelegramSoporte);
-                } else {
-                    window.open(urlTelegramSoporte, '_blank');
-                }
-                
-                // Cerramos ventanas de cobro y refrescamos la interfaz
-                cerrarModalPremios();
-                if (typeof renderizarCatalogoPremios === 'function') {
-                    renderizarCatalogoPremios();
-                }
-            };
-
-        }, 5000); // Fin de los 5 segundos de animación de carga
-    };
-}
-
-        }, 50);
-
-        setTimeout(() => {
-            const saldoActual = parseInt(localStorage.getItem("gplus_saldo_puntos") || "0");
-            localStorage.setItem("gplus_saldo_puntos", (saldoActual - premio.precio).toString());
-
-            const totalHistorico = parseInt(localStorage.getItem(`gplus_reward_cnt_${premio.id}`) || "0") + 1;
-            localStorage.setItem(`gplus_reward_cnt_${premio.id}`, totalHistorico.toString());
-
-            if(premio.tipo === "UNICO") localStorage.setItem(`gplus_reward_done_${premio.id}`, "true");
-            if(premio.tipo === "DIARIO" || premio.tipo === "REPETIBLE") localStorage.setItem(`gplus_reward_date_${premio.id}`, new Date().toDateString());
-
             content.innerHTML = `
                 <div>
                     <h3 style="margin:0 0 4px 0; color:#fff; font-size:1rem; font-weight:800;">📝 Formulario de Pedido</h3>
