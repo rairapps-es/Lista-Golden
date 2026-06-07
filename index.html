@@ -2775,7 +2775,7 @@
     </div>
 </main>
     
-    <main id="view-shop1" class="app-view">
+    <main id="view-shoc" class="app-view">
         <h2 class="view-title"><i data-lucide="shopping-bag" style="color:var(--mystic-purple)"></i> Forja de Avatar</h2>
         <div class="shop-layout">
             
@@ -3269,54 +3269,6 @@
     </div>
     </main>
 
-    <main id="view-shop" class="app-view" style="font-family: system-ui, -apple-system, sans-serif; box-sizing: border-box;">
-    
-    <h2 class="view-title">
-        <i data-lucide="gift" style="color:var(--vip-gold)"></i> Catálogo VIP GPlus
-    </h2>
-    <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:14px;">
-        Canjea tus puntos acumulados por premios exclusivos y herramientas de Inteligencia Artificial.
-    </p>
-
-    <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255,255,255,0.08); padding: 16px; border-radius: 16px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-        <div>
-            <span style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); font-weight: 700;">Tu Balance Disponible</span>
-            <h2 style="margin: 4px 0 0 0; color: #fff; font-size: 1.5rem; font-weight: 800; display: flex; align-items: center; gap: 6px;">
-                ⭐ <span id="gplus-user-points">1500</span> <span style="font-size: 0.75rem; color: var(--vip-gold); font-weight: 500;">Pts</span>
-            </h2>
-        </div>
-        <div style="text-align: right;">
-            <span style="font-size: 0.65rem; background: rgba(255, 215, 0, 0.1); color: var(--vip-gold); padding: 4px 10px; border-radius: 99px; font-weight: 700; text-transform: uppercase; border: 1px solid rgba(255, 215, 0, 0.2);">Miembro VIP</span>
-        </div>
-    </div>
-
-    <div style="display: flex; background: rgba(255,255,255,0.05); padding: 4px; border-radius: 12px; margin-bottom: 15px; gap: 4px; border: 1px solid rgba(255,255,255,0.05);">
-        <button onclick="cambiarPestañaPremios('explorador')" id="btn-tab-explorador" style="flex: 1; padding: 10px; border: none; border-radius: 8px; font-weight: 700; font-size: 0.85rem; cursor: pointer; transition: all 0.2s; background: var(--vip-gold); color: #000;">🧭 Explorador</button>
-        <button onclick="cambiarPestañaPremios('administrador')" id="btn-tab-administrador" style="flex: 1; padding: 10px; border: none; border-radius: 8px; font-weight: 700; font-size: 0.85rem; cursor: pointer; transition: all 0.2s; background: transparent; color: var(--text-muted);">🛠️ Administrador</button>
-    </div>
-
-    <div style="background: rgba(255,255,255,0.02); padding: 12px; border-radius: 14px; margin-bottom: 20px; display: flex; flex-direction: column; gap: 10px; border: 1px solid rgba(255,255,255,0.03);">
-        <div style="display: flex; gap: 6px;">
-            <button onclick="filtrarPremiosOrden('baratos')" id="btn-filtro-baratos" style="flex: 1; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.05); color: #fff; padding: 6px; border-radius: 8px; font-size: 0.75rem; font-weight: 600; cursor: pointer;">🪙 Más Baratos</button>
-            <button onclick="filtrarPremiosOrden('caros')" id="btn-filtro-caros" style="flex: 1; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.05); color: #fff; padding: 6px; border-radius: 8px; font-size: 0.75rem; font-weight: 600; cursor: pointer;">💎 Mayor Valor</button>
-            <button onclick="filtrarPremiosOrden('todos')" id="btn-filtro-todos" style="flex: 0.5; background: var(--vip-gold); border: none; color: #000; padding: 6px; border-radius: 8px; font-size: 0.75rem; font-weight: 700; cursor: pointer;">Todos</button>
-        </div>
-        
-        <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 8px;">
-            <span style="font-size: 0.72rem; color: var(--text-muted); font-weight: 600;">Modo de Vista:</span>
-            <div style="display: flex; gap: 4px;">
-                <button onclick="cambiarModoVistaPremios('grid')" style="background: rgba(255,255,255,0.05); border: none; color: #fff; padding: 4px 8px; border-radius: 6px; font-size: 0.7rem; cursor: pointer;">Grid</button>
-                <button onclick="cambiarModoVistaPremios('compacta')" style="background: rgba(255,255,255,0.05); border: none; color: #fff; padding: 4px 8px; border-radius: 6px; font-size: 0.7rem; cursor: pointer;">Compacta</button>
-                <button onclick="cambiarModoVistaPremios('1to1')" style="background: rgba(255,255,255,0.05); border: none; color: #fff; padding: 4px 8px; border-radius: 6px; font-size: 0.7rem; cursor: pointer;">1:1</button>
-                <button onclick="cambiarModoVistaPremios('horizontal')" style="background: rgba(255,255,255,0.05); border: none; color: #fff; padding: 4px 8px; border-radius: 6px; font-size: 0.7rem; cursor: pointer;">Full</button>
-                <button onclick="cambiarModoVistaPremios('desplegable')" style="background: rgba(255,255,255,0.05); border: none; color: #fff; padding: 4px 8px; border-radius: 6px; font-size: 0.7rem; cursor: pointer;">Lista</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="gplus-rewards-grid" class="view-grid"></div>
-</main>
-
 <div id="gplus-rewards-modal-overlay" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(8px); display: none; justify-content: center; align-items: center; z-index: 200000; padding: 20px; box-sizing: border-box;">
     <div id="gplus-rewards-modal-content" style="background: #111827; border: 1px solid rgba(255,255,255,0.08); padding: 24px; border-radius: 20px; width: 100%; max-width: 360px; box-shadow: 0 25px 50px rgba(0,0,0,0.6);"></div>
 </div>
@@ -3454,19 +3406,25 @@
         let activeCategoryFilter = "all";
 
         document.addEventListener("DOMContentLoaded", () => {
-            loadFromLocalStorage();
-            initTelegramContext();
-            checkVipInternalRegistration();
-            executeDailyCheckIn();
-            renderAppUiComponents();
-            renderTopPodium();
-            renderShopCarrousels();
-            updateAdminToggleUI();
-            renderCategorySliders();
-            initDynamicSliders();
-            lucide.createIcons();
-            addLog("Ecosistema unificado bajo ID único de Telegram.");
-        });
+    loadFromLocalStorage();
+    initTelegramContext();
+    checkVipInternalRegistration();
+    executeDailyCheckIn();
+    renderAppUiComponents();
+    renderTopPodium();
+    renderShopCarrousels();
+    updateAdminToggleUI();
+    renderCategorySliders();
+    initDynamicSliders();
+    
+    // 🔥 NUEVO: Arranca y acopla el motor de las tiendas shop1 y shop2 en el DOM global
+    if (typeof initGPlusRewards === 'function') {
+        initGPlusRewards();
+    }
+
+    lucide.createIcons();
+    addLog("Ecosistema unificado bajo ID único de Telegram.");
+});
 
         function saveToLocalStorage() {
             localStorage.setItem('canales_top_state_v3', JSON.stringify({
