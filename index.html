@@ -7681,6 +7681,36 @@ console.log("🚀 Módulo CRM completamente blindado, persistente y expuesto en 
 </div>
 
 <script>
+    // 🎨 INYECCIÓN NATIVA DE ESTILOS PARA LAS TARJETAS (Pega esto al inicio de tu <script>)
+if (!document.getElementById("gplus-rewards-styles")) {
+    const estiloPremios = document.createElement("style");
+    estiloPremios.id = "gplus-rewards-styles";
+    estiloPremios.innerHTML = `
+        /* Modo Grid Estándar (2 columnas en móvil) */
+        .gplus-view-grid {
+            display: grid !important;
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 12px !important;
+            width: 100% !important;
+        }
+        /* Modo Compacto (3 columnas ultra-pequeñas) */
+        .gplus-view-compacta {
+            display: grid !important;
+            grid-template-columns: repeat(3, 1fr) !important;
+            gap: 8px !important;
+            width: 100% !important;
+        }
+        /* Modo 1:1 y Full Horizontal (1 columna grande) */
+        .gplus-view-1to1, .gplus-view-horizontal, .gplus-view-desplegable {
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 14px !important;
+            width: 100% !important;
+        }
+    `;
+    document.head.appendChild(estiloPremios);
+}
+
 // 1. BASE DE DATOS DE PREMIOS CONFIGURABLE
 const PREMIOS_DB = [
     {
