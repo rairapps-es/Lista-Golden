@@ -2824,9 +2824,48 @@
     </main>
 
     <main id="view-energy" class="app-view">
-        <h2 class="view-title"><i data-lucide="zap" style="color:var(--vip-gold)"></i> Tabla Informativa de Energía</h2>
-        <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:14px;">Acumula puntos de energía para subir tu nivel y desbloquea la personalización de avatares.</p>
+        <h2 class="view-title"><i data-lucide="zap" style="color:var(--vip-gold)"></i> Misiones y Energía</h2>
+        <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:14px;">Completa misiones y acumula puntos de energía para subir tu nivel.</p>
         
+    <div class="missions-section-container" style="width: 100%; max-width: 420px; margin-top: 25px; box-sizing: border-box;">
+    
+    <h3 style="color: #94a3b8; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; font-weight: 800;">
+        🗺️ Tour de Exploración
+    </h3>
+
+    <div class="mission-row-card" data-mision="explorar_directorio" data-tipo="diaria" onclick="switchView('directory')">
+    <div class="mission-text-meta">
+        <h4>Exploración Diaria</h4>
+        <p>Visita los canales disponibles hoy</p>
+    </div>
+    <div class="mission-reward-badge">+5 Pts</div>
+</div>
+
+<div class="mission-row-card" data-mision="visitar_tienda_gplus" data-tipo="diaria" onclick="switchView('shop')">
+    <div class="mission-text-meta">
+        <h4>Revisar Ofertas VIP</h4>
+        <p>Entra a la tienda a ver las novedades</p>
+    </div>
+    <div class="mission-reward-badge">+5 Pts</div>
+</div>
+
+    <div class="mission-row-card" data-mision="unirse_canal_oficial" data-tipo="unica" onclick="window.open('https://t.me/ListaGolden', '_blank')">
+    <div class="mission-text-meta">
+        <h4>📢 Canal Oficial GPlus</h4>
+        <p>Únete para no perderte actualizaciones (Solo una vez)</p>
+    </div>
+    <div class="mission-reward-badge">+5 Pts</div>
+</div>
+
+<div class="mission-row-card" data-mision="completar_perfil" data-tipo="unica" onclick="switchView('profile')">
+    <div class="mission-text-meta">
+        <h4>👤 Ajustes de Cuenta</h4>
+        <p>Sincroniza tus datos de creador por primera vez</p>
+    </div>
+    <div class="mission-reward-badge">+5 Pts</div>
+</div>
+
+</div>
         <table class="energy-table">
             <thead>
                 <tr><th>Acción del Usuario</th><th>Monto</th><th>Regla / Frecuencia</th></tr>
@@ -3162,89 +3201,6 @@
     </div>
     </main>
     <!-- 🔥 PÁGINA INDIVIDUAL: CONTENEDOR PRINCIPAL DE RACHAS DE FUEGO -->
-<main id="view-streak" class="app-view" style="display: none; display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 80vh; padding: 20px; box-sizing: border-box;">
-    
-    <!-- Contenedor Espectacular de la Tarjeta -->
-    <div class="streak-main-container" style="width: 100%; max-width: 420px;">
-        <div class="streak-card-neon">
-            
-            <!-- Aura de fuego parpadeante trasera -->
-            <div class="fire-glow-overlay"></div>
-            
-            <!-- Encabezado del Módulo -->
-            <div class="streak-header">
-                <span class="streak-badge-title">Multiplicador Diario</span>
-                <div class="streak-fire-wrapper" id="streak-fire-icon-container">
-                    <i data-lucide="flame" class="streak-flame-icon animated-burn"></i>
-                </div>
-            </div>
-
-            <!-- Contador Central Gigante -->
-            <div class="streak-counter-display">
-                <h2 id="streak-number-count">0</h2>
-                <p id="streak-status-text">Días Seguidos</p>
-            </div>
-
-            <!-- Barra Visual de Progreso Semanal -->
-            <div class="streak-timeline">
-    <div class="timeline-track">
-        <div id="streak-timeline-fill" class="timeline-fill" style="width: 0%;"></div>
-    </div>
-    <div class="timeline-days-labels" id="streak-days-row">
-        <span id="streak-day-1">Lun</span>
-        <span id="streak-day-2">Mar</span>
-        <span id="streak-day-3">Mié</span>
-        <span id="streak-day-4">Jue</span>
-        <span id="streak-day-5">Vie</span>
-        <span id="streak-day-6">Sáb</span>
-        <span id="streak-day-0">Dom</span>
-    </div>
-</div>
-
-        </div>
-    </div>
-
-    <div class="missions-section-container" style="width: 100%; max-width: 420px; margin-top: 25px; box-sizing: border-box;">
-    
-    <h3 style="color: #94a3b8; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; font-weight: 800;">
-        🗺️ Tour de Exploración
-    </h3>
-
-    <div class="mission-row-card" data-mision="explorar_directorio" data-tipo="diaria" onclick="switchView('directory')">
-    <div class="mission-text-meta">
-        <h4>Exploración Diaria</h4>
-        <p>Visita los canales disponibles hoy</p>
-    </div>
-    <div class="mission-reward-badge">+5 Pts</div>
-</div>
-
-<div class="mission-row-card" data-mision="visitar_tienda_gplus" data-tipo="diaria" onclick="switchView('shop')">
-    <div class="mission-text-meta">
-        <h4>Revisar Ofertas VIP</h4>
-        <p>Entra a la tienda a ver las novedades</p>
-    </div>
-    <div class="mission-reward-badge">+5 Pts</div>
-</div>
-
-    <div class="mission-row-card" data-mision="unirse_canal_oficial" data-tipo="unica" onclick="window.open('https://t.me/ListaGolden', '_blank')">
-    <div class="mission-text-meta">
-        <h4>📢 Canal Oficial GPlus</h4>
-        <p>Únete para no perderte actualizaciones (Solo una vez)</p>
-    </div>
-    <div class="mission-reward-badge">+5 Pts</div>
-</div>
-
-<div class="mission-row-card" data-mision="completar_perfil" data-tipo="unica" onclick="switchView('profile')">
-    <div class="mission-text-meta">
-        <h4>👤 Ajustes de Cuenta</h4>
-        <p>Sincroniza tus datos de creador por primera vez</p>
-    </div>
-    <div class="mission-reward-badge">+5 Pts</div>
-</div>
-
-</div>
-
-</main>
 
 <button onclick="switchView('shop')" data-mision="explorar_tienda>🛍️ Visitar Tienda</button>
 
