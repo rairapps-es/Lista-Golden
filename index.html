@@ -7752,19 +7752,28 @@ if(!localStorage.getItem("gplus_saldo_puntos")){
 }
 
 // 2. FUNCIÓN DE RENDERIZACIÓN PRINCIPAL DEL CATÁLOGO
-function renderizarCatalogoPremios() {
-    const gridContainer = document.getElementById("gplus-rewards-grid");
+function renderizarCatalogoPremios(targetShop = "shop1") {
+    gplusTiendaActual = targetShop; 
+    
+    const suffix = targetShop === "shop1" ? "1" : "2";
+    const gridContainer = document.getElementById(`gplus-rewards-grid${suffix}`);
     if(!gridContainer) return; 
 
-    const saldoActual = parseInt(localStorage.getItem("gplus_saldo_puntos") || "0");
-    const pointsEl = document.getElementById("gplus-user-points");
+    // 🔄 SINCRONIZACIÓN DIRECTA CON TU VARIABLE ORIGINAL
+    // Si state.user.balance no existe por seguridad, usamos 0
+    const saldoActual = (typeof state !== 'undefined' && state.user && typeof state.user.balance !== 'undefined') 
+        ? state.user.balance 
+        : 0;
+
+    const pointsEl = document.getElementById(targetShop === "shop1" ? "gplus-user-points" : "gplus-user-points2");
     if(pointsEl) {
         pointsEl.innerText = saldoActual;
     }
 
     const hoyString = new Date().toDateString();
     let premiosFiltrados = [...PREMIOS_DB];
-
+    
+    // ... [El resto de la función filter, sort y forEach se queda exactamente igual] ...
     premiosFiltrados = premiosFiltrados.filter(p => p.categoria === gplusFiltroCategoria);
 
     if(gplusFiltroOrden === "baratos"){
@@ -7942,15 +7951,21 @@ function abrirFlujoCompraPremio(premio) {
             if(bar) bar.style.width = "100%";
         }, 50);
 
-        setTimeout(() => {
-            const saldoActual = parseInt(localStorage.getItem("gplus_saldo_puntos") || "0");
-            localStorage.setItem("gplus_saldo_puntos", (saldoActual - premio.precio).toString());
+                setTimeout(() => {
+            // 🔄 DESCUENTO DIRECTO EN TU VARIABLE ORIGINAL DE ESTADO
+            if (typeof state !== 'undefined' && state.user && typeof state.user.balance !== 'undefined') {
+                state.user.balance -= premio.precio; // Restamos el costo del premio del estado real
+            }
 
+            // Guardamos el registro de control del premio (para límites de compra)
             const totalHistorico = parseInt(localStorage.getItem(`gplus_reward_cnt_${premio.id}`) || "0") + 1;
             localStorage.setItem(`gplus_reward_cnt_${premio.id}`, totalHistorico.toString());
 
             if(premio.tipo === "UNICO") localStorage.setItem(`gplus_reward_done_${premio.id}`, "true");
             if(premio.tipo === "DIARIO" || premio.tipo === "REPETIBLE") localStorage.setItem(`gplus_reward_date_${premio.id}`, new Date().toDateString());
+
+            // Si tienes una función en tu interfaz que pinte el balance en el menú superior o barra, llámala aquí, por ejemplo:
+            // if (typeof actualizarBalanceInterfaz === 'function') actualizarBalanceInterfaz();
 
             content.innerHTML = `
                 <div>
@@ -7959,6 +7974,8 @@ function abrirFlujoCompraPremio(premio) {
                     <button id="gplus-btn-submit-form" style="width:100%; padding:10px; background:#38bdf8; color:#0f172a; border:none; border-radius:10px; font-weight:800; cursor:pointer;">Enviar Pedido ✈️</button>
                 </div>
             `;
+            
+            // ... [El resto del onclick del formulario se queda igual] ...
 
             document.getElementById("gplus-btn-submit-form").onclick = () => {
                 const indicaciones = document.getElementById("gplus-form-indicaciones").value.trim() || "Sin indicaciones.";
@@ -7971,8 +7988,7 @@ function abrirFlujoCompraPremio(premio) {
                 cerrarModalPremios();
                 renderizarCatalogoPremios();
             };
-        }, 5000); 
-    };
+        }, 5000);
 }
 
 function cerrarModalPremios() {
