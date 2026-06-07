@@ -3269,7 +3269,7 @@
     </div>
     </main>
 
-    <main id="view-rewards" class="app-view" style="font-family: system-ui, -apple-system, sans-serif; box-sizing: border-box;">
+    <main id="view-shop" class="app-view" style="font-family: system-ui, -apple-system, sans-serif; box-sizing: border-box;">
     
     <h2 class="view-title">
         <i data-lucide="gift" style="color:var(--vip-gold)"></i> Catálogo VIP GPlus
@@ -8067,18 +8067,22 @@ function renderShopCatalog() {
     renderizarCatalogoPremios();
 }
 
+// REEMPLAZA LA FUNCIÓN DE INICIO DE TU SCRIPT POR ESTA:
 function initGPlusRewards() {
     const grid = document.getElementById("gplus-rewards-grid");
     if (grid) {
         renderizarCatalogoPremios();
         if (typeof lucide !== 'undefined') lucide.createIcons();
     } else {
-        setTimeout(initGPlusRewards, 500);
+        // Si el DOM aún se está cargando, vuelve a intentar en un instante
+        setTimeout(initGPlusRewards, 100);
     }
 }
 
-initGPlusRewards();
+// Vinculación explícita para evitar pérdidas de contexto
+window.renderShopCatalog = renderShopCatalog;
 
+initGPlusRewards();
 
 </script>
 
