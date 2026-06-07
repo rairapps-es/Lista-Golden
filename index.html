@@ -2496,7 +2496,7 @@
             <p style="font-size:0.75rem; color:var(--text-muted); margin-bottom:12px;">Estás viendo este banner porque cambiaste al modo ADMIN.</p>
             <button class="btn-subscribe-trigger" 
             style="background:var(--vip-gold); color:black; width:auto; margin:0 auto; padding:8px 16px;" 
-            onclick="if(typeof switchView === 'function') { switchView('view-my-channels'); } else { showToast('Abriendo tus canales...', 'gold'); }">
+            onclick="if(typeof switchView === 'function') { switchView('my-channels'); } else { showToast('Abriendo tus canales...', 'gold'); }">
         Configurar Espacios
     </button>
         </div>
@@ -2761,10 +2761,10 @@
 
     <div class="drawer-links">
         <button class="drawer-btn" onclick="switchView('shop')">
-            <span>🛍️ Tienda de Recompensas</span> <i data-lucide="chevron-right"></i>
+            <span>🛍️ Planes de Suscripción</span> <i data-lucide="chevron-right"></i>
         </button>
         <button class="drawer-btn" onclick="switchView('energy')">
-            <span>⚡ Cómo Ganar Puntos</span> <i data-lucide="chevron-right"></i>
+            <span>⚡ Misiones & Energía</span> <i data-lucide="chevron-right"></i>
         </button>
         <button id="epic-avatar-link" class="drawer-btn locked" onclick="handlePremiumDrawerAccess()">
             <span id="drawer-locked-text">🔒 Avatar Premium (Requiere Rango 5)</span> <i data-lucide="lock" id="drawer-locked-icon"></i>
@@ -2819,7 +2819,7 @@
 
     <main id="view-energy" class="app-view">
         <h2 class="view-title"><i data-lucide="zap" style="color:var(--vip-gold)"></i> Misiones y Energía</h2>
-        <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:14px;">Completa misiones y acumula puntos de energía para subir tu nivel.</p>
+        <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:14px;">Completa misiones y acumula energía para subir tu nivel.</p>
 
         <div class="missions-steps-container" style="width: 100%; max-width: 420px; margin-top: 25px; box-sizing: border-box; font-family: system-ui, sans-serif;">
     
@@ -3026,7 +3026,7 @@
     <main id="view-crm-dashboard" class="app-view">
         <div class="crm-header-dashboard">
         <h2 class="view-title"><i data-lucide="layout-dashboard" style="color:var(--mystic-purple)"></i> Panel de Control & CRM</h2>
-        <p class="crm-subtitle">Gestiona tu cartera de partners e incuba tus ideas de desarrollo al instante.</p>
+        <p class="crm-subtitle">Gestiona tu cartera de partners e incuba tus ideas al instante.</p>
     </div>
 
     <div class="crm-bento-metrics">
@@ -3268,7 +3268,7 @@
     </div>
     </main>
 
-    <main id="view-rewards" class="app-view" style="font-family: system-ui, -apple-system, sans-serif; box-sizing: border-box;">
+    <section id="view-rewards" class="app-view" style="font-family: system-ui, -apple-system, sans-serif; box-sizing: border-box;">
     
     <h2 class="view-title">
         <i data-lucide="gift" style="color:var(--vip-gold)"></i> Catálogo VIP GPlus
@@ -3314,7 +3314,7 @@
     </div>
 
     <div id="gplus-rewards-grid" class="view-grid"></div>
-</main>
+</section>
 
 <div id="gplus-rewards-modal-overlay" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(8px); display: none; justify-content: center; align-items: center; z-index: 200000; padding: 20px; box-sizing: border-box;">
     <div id="gplus-rewards-modal-content" style="background: #111827; border: 1px solid rgba(255,255,255,0.08); padding: 24px; border-radius: 20px; width: 100%; max-width: 360px; box-shadow: 0 25px 50px rgba(0,0,0,0.6);"></div>
