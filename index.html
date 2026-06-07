@@ -2833,39 +2833,60 @@
         🗺️ Tour de Exploración
     </h3>
 
-    <div class="mission-row-card" data-mision="explorar_directorio" data-tipo="diaria" onclick="switchView('directory')">
-    <div class="mission-text-meta">
-        <h4>Exploración Diaria</h4>
-        <p>Visita los canales disponibles hoy</p>
+    <div class="mission-row-card" style="display: flex; flex-direction: column; gap: 10px; background: #1e293b; padding: 16px; border-radius: 16px; margin-bottom: 12px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;" onclick="switchView('directory')">
+            <div class="mission-text-meta">
+                <h4 style="margin:0; color:#fff;">Exploración Diaria</h4>
+                <p style="margin:4px 0 0 0; color:#64748b; font-size:0.8rem;">Visita los canales disponibles hoy</p>
+            </div>
+            <div class="mission-reward-badge" style="background:#f97316; color:#fff; padding:4px 8px; border-radius:8px; font-size:0.8rem; font-weight:bold;">+5 Pts</div>
+        </div>
+        <div data-mision="explorar_directorio" data-tipo="diaria" style="width: 100%;">
+            <button style="width: 100%; background: #2481cc; color: #fff; border: none; padding: 8px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 0.8rem;">Reclamar Puntos ⚡</button>
+        </div>
     </div>
-    <div class="mission-reward-badge">+5 Pts</div>
+
+    <div class="mission-row-card" style="display: flex; flex-direction: column; gap: 10px; background: #1e293b; padding: 16px; border-radius: 16px; margin-bottom: 12px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;" onclick="switchView('shop')">
+            <div class="mission-text-meta">
+                <h4 style="margin:0; color:#fff;">Revisar Ofertas VIP</h4>
+                <p style="margin:4px 0 0 0; color:#64748b; font-size:0.8rem;">Entra a la tienda a ver las novedades</p>
+            </div>
+            <div class="mission-reward-badge" style="background:#f97316; color:#fff; padding:4px 8px; border-radius:8px; font-size:0.8rem; font-weight:bold;">+5 Pts</div>
+        </div>
+        <div data-mision="visitar_tienda_gplus" data-tipo="diaria" style="width: 100%;">
+            <button style="width: 100%; background: #2481cc; color: #fff; border: none; padding: 8px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 0.8rem;">Reclamar Puntos ⚡</button>
+        </div>
+    </div>
+
+    <div class="mission-row-card" style="display: flex; flex-direction: column; gap: 10px; background: #1e293b; padding: 16px; border-radius: 16px; margin-bottom: 12px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;" onclick="window.open('https://t.me/ListaGolden', '_blank')">
+            <div class="mission-text-meta">
+                <h4 style="margin:0; color:#fff;">📢 Canal Oficial GPlus</h4>
+                <p style="margin:4px 0 0 0; color:#64748b; font-size:0.8rem;">Únete para no perderte actualizaciones (Solo una vez)</p>
+            </div>
+            <div class="mission-reward-badge" style="background:#f97316; color:#fff; padding:4px 8px; border-radius:8px; font-size:0.8rem; font-weight:bold;">+5 Pts</div>
+        </div>
+        <div data-mision="unirse_canal_oficial" data-tipo="unica" style="width: 100%;">
+            <button style="width: 100%; background: #22c55e; color: #fff; border: none; padding: 8px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 0.8rem;">Verificar Unirme 🔒</button>
+        </div>
+    </div>
+
+    <div class="mission-row-card" style="display: flex; flex-direction: column; gap: 10px; background: #1e293b; padding: 16px; border-radius: 16px; margin-bottom: 12px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;" onclick="switchView('profile')">
+            <div class="mission-text-meta">
+                <h4 style="margin:0; color:#fff;">👤 Ajustes de Cuenta</h4>
+                <p style="margin:4px 0 0 0; color:#64748b; font-size:0.8rem;">Sincroniza tus datos de creador por primera vez</p>
+            </div>
+            <div class="mission-reward-badge" style="background:#f97316; color:#fff; padding:4px 8px; border-radius:8px; font-size:0.8rem; font-weight:bold;">+5 Pts</div>
+        </div>
+        <div data-mision="completar_perfil" data-tipo="unica" style="width: 100%;">
+            <button style="width: 100%; background: #22c55e; color: #fff; border: none; padding: 8px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 0.8rem;">Verificar Perfil 🔒</button>
+        </div>
+    </div>
+
 </div>
 
-<div class="mission-row-card" data-mision="visitar_tienda_gplus" data-tipo="diaria" onclick="switchView('shop')">
-    <div class="mission-text-meta">
-        <h4>Revisar Ofertas VIP</h4>
-        <p>Entra a la tienda a ver las novedades</p>
-    </div>
-    <div class="mission-reward-badge">+5 Pts</div>
-</div>
-
-    <div class="mission-row-card" data-mision="unirse_canal_oficial" data-tipo="unica" onclick="window.open('https://t.me/ListaGolden', '_blank')">
-    <div class="mission-text-meta">
-        <h4>📢 Canal Oficial GPlus</h4>
-        <p>Únete para no perderte actualizaciones (Solo una vez)</p>
-    </div>
-    <div class="mission-reward-badge">+5 Pts</div>
-</div>
-
-<div class="mission-row-card" data-mision="completar_perfil" data-tipo="unica" onclick="switchView('profile')">
-    <div class="mission-text-meta">
-        <h4>👤 Ajustes de Cuenta</h4>
-        <p>Sincroniza tus datos de creador por primera vez</p>
-    </div>
-    <div class="mission-reward-badge">+5 Pts</div>
-</div>
-
-</div>
         <table class="energy-table">
             <thead>
                 <tr><th>Acción del Usuario</th><th>Monto</th><th>Regla / Frecuencia</th></tr>
@@ -6518,12 +6539,8 @@ setTimeout(checkVipInternalRegistration, 100);
  * ==========================================================================
  */
 
-// 🕒 Variable global obligatoria para controlar el cronómetro en tiempo real
 let gplusIntervaloMisiones = null;
 
-// =========================================================================
-// 🔄 FUNCIÓN: ACTUALIZAR VISUAL DE LAS TARJETAS Y CONTROLAR RELOJ
-// =========================================================================
 function actualizarVisualMisiones() {
     const hoyString = new Date().toDateString();
     const elementosMision = document.querySelectorAll("[data-mision]");
@@ -6551,49 +6568,37 @@ function actualizarVisualMisiones() {
             }
         }
 
-        // Aplicación de estados físicos y visuales a la tarjeta/botón
         if (estaCompletada) {
-            target.style.pointerEvents = "none"; // Desactiva clics por completo
+            target.style.pointerEvents = "none"; 
             
-            // Si no hemos respaldado el diseño o texto original, lo hacemos ahora
             if (!target.getAttribute("data-texto-original")) {
                 target.setAttribute("data-texto-original", target.innerHTML); 
             }
             
             if (tipoMision !== "diaria") {
-                // Estilo estático permanente para misiones únicas
-                target.style.opacity = "0.5";
-                target.innerHTML = `<span style="color: #22c55e; font-weight: bold; font-size: 0.85rem;">✓ Reclamada</span>`;
-            } else {
-                // Opacidad inicial para la diaria (el texto lo refresca el setInterval de abajo)
-                target.style.opacity = "0.8";
+                target.innerHTML = `<div style="display: flex; align-items: center; justify-content: center; background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.2); color: #22c55e; padding: 8px; border-radius: 8px; font-size: 0.78rem; font-weight: 700; width: 100%; box-sizing: border-box;">✓ Reclamado</div>`;
             }
         } else {
-            // Restaurar estado normal si ya pasó el ciclo de 24 horas
-            target.style.opacity = "1";
             target.style.pointerEvents = "auto";
-            target.style.cursor = "pointer";
-            
             if (target.getAttribute("data-texto-original")) {
                 target.innerHTML = target.getAttribute("data-texto-original");
             }
         }
     });
 
-    // 🕒 MOTOR DEL CRONÓMETRO REGRESIVO EN LA TARJETA DIARIA
     if (gplusIntervaloMisiones) clearInterval(gplusIntervaloMisiones);
 
     if (tieneDiariasCompletadas) {
         const refrescarReloj = () => {
             const ahora = new Date();
             const mañana = new Date();
-            mañana.setHours(24, 0, 0, 0); // Fijar exactamente a la media noche (00:00:00)
+            mañana.setHours(24, 0, 0, 0); 
 
             const diferenciaMs = mañana - ahora;
 
             if (diferenciaMs <= 0) {
                 clearInterval(gplusIntervaloMisiones);
-                actualizarVisualMisiones(); // Reinicia y libera misiones al pasar la media noche
+                actualizarVisualMisiones();
                 return;
             }
 
@@ -6601,10 +6606,9 @@ function actualizarVisualMisiones() {
             const minutes = String(Math.floor((diferenciaMs / (1000 * 60)) % 60)).padStart(2, "0");
             const segundos = String(Math.floor((diferenciaMs / 1000) % 60)).padStart(2, "0");
 
-            // Diseño del recuadro del contador en la tarjeta
             const htmlContador = `
-                <div style="display: flex; align-items: center; justify-content: center; gap: 8px; background: #0f172a; border: 1px solid rgba(255,255,255,0.05); color: #94a3b8; padding: 12px; border-radius: 12px; font-size: 0.8rem; font-weight: 700; width: 100%; box-sizing: border-box; box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);">
-                    <span style="animation: gplus-spin-loader 3s linear infinite; display: inline-block; color: #f97316;">🔄</span> 
+                <div style="display: flex; align-items: center; justify-content: center; gap: 6px; background: #0f172a; border: 1px solid rgba(255,255,255,0.05); color: #94a3b8; padding: 8px; border-radius: 8px; font-size: 0.75rem; font-weight: 700; width: 100%; box-sizing: border-box;">
+                    <span style="animation: gplus-spin-loader 3s linear infinite; display: inline-block; color: #f97316; font-size:0.8rem;">🔄</span> 
                     <span>Disponible en <strong style="color: #fff; font-family: monospace;">${horas}:${minutes}:${segundos}</strong></span>
                 </div>
                 <style>
@@ -6612,7 +6616,6 @@ function actualizarVisualMisiones() {
                 </style>
             `;
 
-            // Buscamos las tarjetas diarias completadas en el HTML y les inyectamos el contador
             document.querySelectorAll("[data-mision][data-tipo='diaria']").forEach(targetDiaria => {
                 const cleanId = targetDiaria.getAttribute("data-mision").trim().toLowerCase();
                 if (localStorage.getItem(`gplus_tour_date_${cleanId}`) === hoyString) {
