@@ -2814,12 +2814,6 @@
                 <div style="display:flex; flex-direction:column; gap:16px;" id="grid-combos"></div>
             </div>
 
-            <div class="roulette-card" style="background: linear-gradient(135deg, #112c24 0%, #121824 100%); border-color: var(--success-green);">
-                <div style="font-size: 2.2rem; margin-bottom: 6px;">🎁</div>
-                <h3 style="font-size:1rem; font-weight:800; margin-bottom:4px;">Caja de Energía Diaria</h3>
-                <p style="font-size:0.75rem; color:var(--text-muted); margin-bottom:10px;">Obtén entre 5 y 50 puntos gratis cada 24h para subir tu Rango.</p>
-                <button id="gacha-trigger-btn" class="btn-subscribe-trigger" style="background:var(--success-green); color:black; width:auto; margin:0 auto; padding:10px 24px;" onclick="claimDailyGacha()">Abrir Cofre Gratis</button>
-            </div>
         </div>
     </main>
 
@@ -2873,6 +2867,14 @@
     </div>
 
 </div>
+
+        <div class="roulette-card" style="background: linear-gradient(135deg, #112c24 0%, #121824 100%); border-color: var(--success-green);">
+                <div style="font-size: 2.2rem; margin-bottom: 6px;">🎁</div>
+                <h3 style="font-size:1rem; font-weight:800; margin-bottom:4px;">Caja de Energía Diaria</h3>
+                <p style="font-size:0.75rem; color:var(--text-muted); margin-bottom:10px;">Obtén entre 5 y 50 puntos gratis cada 24h para subir tu Rango.</p>
+                <button id="gacha-trigger-btn" class="btn-subscribe-trigger" style="background:var(--success-green); color:black; width:auto; margin:0 auto; padding:10px 24px;" onclick="claimDailyGacha()">Abrir Cofre Gratis</button>
+            </div>
+        
     <div class="missions-section-container" style="width: 100%; max-width: 420px; margin-top: 25px; box-sizing: border-box;">
     
     <h3 style="color: #94a3b8; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; font-weight: 800;">
@@ -3836,7 +3838,15 @@ function checkDailyGachaStatus() {
     }
 }
 
-      function switchView(viewId) {
+      // 1️⃣ Definimos el manejador global del botón atrás para evitar duplicados
+function handleTelegramBack() {
+    switchView('home');
+    if (window.Telegram && window.Telegram.WebApp) {
+        window.Telegram.WebApp.BackButton.hide();
+    }
+}
+
+function switchView(viewId) {
     state.adminFilterOnly = false; 
     document.querySelectorAll('.app-view').forEach(v => v.classList.remove('active-view'));
     document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active-tab'));
@@ -3847,39 +3857,25 @@ function checkDailyGachaStatus() {
     const targetTab = document.getElementById(`tab-${viewId}`);
     if (targetTab) targetTab.classList.add('active-tab');
 
-    // 🌟 Lógica al entrar a la sección de perfil
-    if (viewId === 'profile') {
-        if (typeof updateAvatarRenderers === 'function') {
-            updateAvatarRenderers(); // Sincroniza la foto real de Telegram
-        }
-        
-        // 🔙 Activamos el botón "Atrás" nativo de Telegram al entrar por menú inferior
-        if (window.Telegram && window.Telegram.WebApp) {
-            const backButton = window.Telegram.WebApp.BackButton;
+    // 📱 LÓGICA CENTRALIZADA DEL BOTÓN ATRÁS DE TELEGRAM
+    if (window.Telegram && window.Telegram.WebApp) {
+        const backButton = window.Telegram.WebApp.BackButton;
+
+        if (viewId === 'profile' || viewId === 'streak') {
+            // Sincronizar avatar si entra a perfil
+            if (viewId === 'profile' && typeof updateAvatarRenderers === 'function') {
+                updateAvatarRenderers();
+            }
+
+            // Removemos de forma segura pasándole la referencia de la función
+            backButton.offClick(handleTelegramBack); 
+            // Escuchamos el click una sola vez de forma limpia
+            backButton.onClick(handleTelegramBack);
             backButton.show();
-            backButton.offClick();
-            backButton.onClick(() => {
-                switchView('home'); // Regresa a la home al pulsar atrás
-                backButton.hide();
-            });
-        }
-    } 
-    // 🔥 NUEVO: Activar botón atrás nativo también al visitar la pantalla individual de la Racha
-    else if (viewId === 'streak') {
-        if (window.Telegram && window.Telegram.WebApp) {
-            const backButton = window.Telegram.WebApp.BackButton;
-            backButton.show();
-            backButton.offClick();
-            backButton.onClick(() => {
-                switchView('home'); // Regresa a la home al pulsar atrás desde la racha
-                backButton.hide();
-            });
-        }
-    } 
-    else {
-        // 🔄 Si entra a cualquier OTRA pestaña (home, shop...), ocultamos el botón atrás de Telegram
-        if (window.Telegram && window.Telegram.WebApp) {
-            window.Telegram.WebApp.BackButton.hide();
+        } else {
+            // Si entra a cualquier otra sección (home, shop...), ocultamos y limpiamos el botón
+            backButton.hide();
+            backButton.offClick(handleTelegramBack);
         }
     }
 
@@ -3895,7 +3891,6 @@ function checkDailyGachaStatus() {
     // 🔥 MODIFICADO: Muestra tu catálogo clásico y arranca el motor independiente de GPlus
     if (viewId === 'shop') { 
         renderShopCatalog(); 
-        // Si tu script autoejecutable de GPlus ya cargó en segundo plano, refrescamos tarjetas
         if (typeof checkVipInternalRegistration === 'function') {
             checkVipInternalRegistration();
         }
@@ -3915,7 +3910,7 @@ function checkDailyGachaStatus() {
     // Aseguramos que los iconos se dibujen bien
     if (window.lucide) lucide.createIcons();
 }
-  
+        
         function toggleProfileDrawer() {
     // 🌟 Ahora solo actúa como un puente directo al sistema centralizado de navegación
     if (typeof switchView === 'function') {
