@@ -2826,7 +2826,53 @@
     <main id="view-energy" class="app-view">
         <h2 class="view-title"><i data-lucide="zap" style="color:var(--vip-gold)"></i> Misiones y Energía</h2>
         <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:14px;">Completa misiones y acumula puntos de energía para subir tu nivel.</p>
-        
+
+        <div class="missions-steps-container" style="width: 100%; max-width: 420px; margin-top: 25px; box-sizing: border-box; font-family: system-ui, sans-serif;">
+    
+    <h3 style="color: #94a3b8; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px; font-weight: 800;">
+        📺 Misión Multi-Paso: Visualización Dinámica
+    </h3>
+
+    <div class="gplus-step-card" id="card-step-1" style="background: #1e293b; padding: 16px; border-radius: 16px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.05);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <div>
+                <h4 style="margin: 0; color: #fff; font-size: 0.95rem;">Paso 1: Primer Anuncio</h4>
+                <p style="margin: 4px 0 0 0; color: #64748b; font-size: 0.8rem;">Mira el contenido patrocinado por 30s</p>
+            </div>
+            <div style="background: #f97316; color: #fff; padding: 4px 8px; border-radius: 8px; font-size: 0.75rem; font-weight: bold;">+5 Pts</div>
+        </div>
+        <div data-mision-paso="anuncio_dinamico_p1" data-num-paso="1" style="width: 100%;">
+            <button style="width: 100%; background: #2481cc; color: #fff; border: none; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 0.8rem;">Ver Anuncio 🎬</button>
+        </div>
+    </div>
+
+    <div class="gplus-step-card" id="card-step-2" style="background: #1e293b; padding: 16px; border-radius: 16px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.05); opacity: 0.4; pointer-events: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <div>
+                <h4 style="margin: 0; color: #fff; font-size: 0.95rem;">Paso 2: Segundo Anuncio</h4>
+                <p style="margin: 4px 0 0 0; color: #64748b; font-size: 0.8rem;">Continúa con el siguiente bloque dinámico</p>
+            </div>
+            <div style="background: #f97316; color: #fff; padding: 4px 8px; border-radius: 8px; font-size: 0.75rem; font-weight: bold;">+5 Pts</div>
+        </div>
+        <div data-mision-paso="anuncio_dinamico_p2" data-num-paso="2" style="width: 100%;">
+            <button style="width: 100%; background: #2481cc; color: #fff; border: none; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 0.8rem;">Bloqueado 🔒</button>
+        </div>
+    </div>
+
+    <div class="gplus-step-card" id="card-step-3" style="background: #1e293b; padding: 16px; border-radius: 16px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.05); opacity: 0.4; pointer-events: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <div>
+                <h4 style="margin: 0; color: #fff; font-size: 0.95rem;">Paso 3: Verificación Final</h4>
+                <p style="margin: 4px 0 0 0; color: #64748b; font-size: 0.8rem;">Completa el último bloque para finalizar el tour diario</p>
+            </div>
+            <div style="background: #f97316; color: #fff; padding: 4px 8px; border-radius: 8px; font-size: 0.75rem; font-weight: bold;">+5 Pts</div>
+        </div>
+        <div data-mision-paso="anuncio_dinamico_p3" data-num-paso="3" style="width: 100%;">
+            <button style="width: 100%; background: #2481cc; color: #fff; border: none; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 0.8rem;">Bloqueado 🔒</button>
+        </div>
+    </div>
+
+</div>
     <div class="missions-section-container" style="width: 100%; max-width: 420px; margin-top: 25px; box-sizing: border-box;">
     
     <h3 style="color: #94a3b8; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; font-weight: 800;">
@@ -6733,6 +6779,151 @@ document.addEventListener("click", function (event) {
 // =========================================================================
 document.addEventListener("DOMContentLoaded", actualizarVisualMisiones);
 setTimeout(actualizarVisualMisiones, 400); // Doble verificación por asincronía en Telegram
+
+        /**
+ * ==========================================================================
+ * 📺 MOTOR DE MISIONES POR PASOS CON AD-TIMER DINÁMICO
+ * ==========================================================================
+ */
+
+// Listener para detectar clics en los botones de pasos
+document.addEventListener("click", function (event) {
+    const target = event.target.closest("[data-mision-paso]");
+    if (!target) return;
+
+    const pasoId = target.getAttribute("data-mision-paso");
+    const numPaso = parseInt(target.getAttribute("data-num-paso"));
+    const hoyString = new Date().toDateString();
+    
+    const storageKey = `gplus_step_${numPaso}_date_${pasoId}`;
+
+    // Verificación de seguridad por si ya se cobró hoy
+    if (localStorage.getItem(storageKey) === hoyString) return;
+
+    // Ejecutar lógica del anuncio simulado
+    iniciarTemporizadorAnuncio(target, pasoId, numPaso);
+});
+
+// FUNCIÓN DEL TEMPORIZADOR Y BARRA DE PROGRESO IN-BUTTON
+function iniciarTemporizadorAnuncio(contenedor, pasoId, numPaso) {
+    const tiempoTotal = 30; // 30 segundos configurables
+    let tiempoRestante = tiempoTotal;
+    
+    // Desactivamos clics temporalmente en este paso para que no reinicie el cronómetro
+    contenedor.style.pointerEvents = "none";
+
+    // Reemplazamos el botón por la barra de progreso y contador
+    const refrescarRenderTimer = () => {
+        const porcentajeProgreso = ((tiempoTotal - tiempoRestante) / tiempoTotal) * 100;
+        
+        contenedor.innerHTML = `
+            <div style="width: 100%; background: #0f172a; padding: 8px 12px; border-radius: 8px; box-sizing: border-box; text-align: center; border: 1px solid rgba(255,255,255,0.03);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; font-size: 0.75rem; font-weight: bold; color: #fdba74;">
+                    <span>🎬 Visualizando Anuncio Dinámico...</span>
+                    <span style="font-family: monospace;">${tiempoRestante}s</span>
+                </div>
+                <div style="width: 100%; height: 6px; background: rgba(255,255,255,0.05); border-radius: 99px; overflow: hidden;">
+                    <div style="width: ${porcentajeProgreso}%; height: 100%; background: linear-gradient(90deg, #f97316, #ef4444); transition: width 0.25s linear;"></div>
+                </div>
+            </div>
+        `;
+    };
+
+    refrescarRenderTimer();
+
+    // Bucle de cuenta atrás
+    const intervaloAd = setInterval(() => {
+        tiempoRestante--;
+        refrescarRenderTimer();
+
+        if (tiempoRestante <= 0) {
+            clearInterval(intervaloAd);
+            completarPasoExitoso(contenedor, pasoId, numPaso);
+        }
+    }, 1000);
+}
+
+// PROCESAMIENTO DE RECOMPENSA Y APERTURA DEL SIGUIENTE NIVEL
+function completarPasoExitoso(contenedor, pasoId, numPaso) {
+    const hoyString = new Date().toDateString();
+    localStorage.setItem(`gplus_step_${numPaso}_date_${pasoId}`, hoyString);
+
+    // 1. Mostrar estado de completado en este paso
+    contenedor.innerHTML = `
+        <div style="display: flex; align-items: center; justify-content: center; background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.2); color: #22c55e; padding: 8px; border-radius: 8px; font-size: 0.78rem; font-weight: 700; width: 100%; box-sizing: border-box;">
+            ✓ Paso Completado
+        </div>
+    `;
+
+    // 2. Adjudicación de los 5 puntos globales
+    if (typeof rewardPoints === "function") {
+        rewardPoints(5, `Paso ${numPaso}: Visualización de Anuncio`);
+    }
+    if (typeof registerActionToHistory === "function") {
+        registerActionToHistory(`Anuncio Paso ${numPaso}`, "Visualización completada 30s. +5 Pts", "success");
+    }
+    if (typeof showToast === "function") {
+        showToast(`¡Paso ${numPaso} Listo! +5 Pts asignados.`, "success");
+    }
+    if (typeof triggerConfettiExplosion === "function") {
+        triggerConfettiExplosion();
+    }
+
+    // 3. Evaluar y desbloquear visualmente el paso siguiente inmediatamente
+    evaluarFasesPasosDiarios();
+}
+
+// EVALUADOR PERSISTENTE (COMPRUEBA EL ESTADO AL CARGAR LA APP)
+function evaluarFasesPasosDiarios() {
+    const hoyString = new Date().toDateString();
+    
+    // Lista de IDs de tus pasos para mapear LocalStorage
+    const mapeoPasos = [
+        { num: 1, id: "anuncio_dinamico_p1" },
+        { num: 2, id: "anuncio_dinamico_p2" },
+        { num: 3, id: "anuncio_dinamico_p3" }
+    ];
+
+    let ultimoCompletado = 0;
+
+    // Comprobamos qué pasos se han completado hoy
+    mapeoPasos.forEach(paso => {
+        const hechoHoy = localStorage.getItem(`gplus_step_${paso.num}_date_${paso.id}`) === hoyString;
+        const contenedor = document.querySelector(`[data-mision-paso="${paso.id}"]`);
+        const tarjeta = document.getElementById(`card-step-${paso.num}`);
+
+        if (hechoHoy) {
+            ultimoCompletado = paso.num;
+            if (contenedor) {
+                contenedor.style.pointerEvents = "none";
+                contenedor.innerHTML = `<div style="display: flex; align-items: center; justify-content: center; background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.2); color: #22c55e; padding: 8px; border-radius: 8px; font-size: 0.78rem; font-weight: 700; width: 100%;">✓ Paso Completado</div>`;
+            }
+            if (tarjeta) {
+                tarjeta.style.opacity = "0.6";
+                tarjeta.style.pointerEvents = "none";
+            }
+        }
+    });
+
+    // Activar el siguiente paso de la cadena correlativa
+    const siguientePasoNum = ultimoCompletado + 1;
+    const siguientePasoMeta = mapeoPasos.find(p => p.num === siguientePasoNum);
+
+    if (siguientePasoMeta) {
+        const tarjetaSiguiente = document.getElementById(`card-step-${siguientePasoMeta.num}`);
+        const contenedorSiguiente = document.querySelector(`[data-mision-paso="${siguientePasoMeta.id}"]`);
+
+        if (tarjetaSiguiente && contenedorSiguiente) {
+            tarjetaSiguiente.style.opacity = "1";
+            tarjetaSiguiente.style.pointerEvents = "auto";
+            contenedorSiguiente.innerHTML = `<button style="width: 100%; background: #2481cc; color: #fff; border: none; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 0.8rem;">Ver Anuncio 🎬</button>`;
+        }
+    }
+}
+
+// INICIALIZADORES AL ARRANCAR LA WEBAPP
+document.addEventListener("DOMContentLoaded", evaluarFasesPasosDiarios);
+setTimeout(evaluarFasesPasosDiarios, 400);
 
     </script>
     <script>
