@@ -7951,10 +7951,10 @@ function abrirFlujoCompraPremio(premio) {
             if(bar) bar.style.width = "100%";
         }, 50);
 
-                setTimeout(() => {
+        setTimeout(() => {
             // 🔄 DESCUENTO DIRECTO EN TU VARIABLE ORIGINAL DE ESTADO
             if (typeof state !== 'undefined' && state.user && typeof state.user.balance !== 'undefined') {
-                state.user.balance -= premio.precio; // Restamos el costo del premio del estado real
+                state.user.balance -= premio.precio; 
             }
 
             // Guardamos el registro de control del premio (para límites de compra)
@@ -7964,8 +7964,12 @@ function abrirFlujoCompraPremio(premio) {
             if(premio.tipo === "UNICO") localStorage.setItem(`gplus_reward_done_${premio.id}`, "true");
             if(premio.tipo === "DIARIO" || premio.tipo === "REPETIBLE") localStorage.setItem(`gplus_reward_date_${premio.id}`, new Date().toDateString());
 
-            // Si tienes una función en tu interfaz que pinte el balance en el menú superior o barra, llámala aquí, por ejemplo:
-            // if (typeof actualizarBalanceInterfaz === 'function') actualizarBalanceInterfaz();
+            // Forzar actualización inmediata visual del saldo en la tienda antes de enviar
+            const sufijoSincro = (typeof gplusTiendaActual !== 'undefined' ? gplusTiendaActual : "shop1") === "shop1" ? "" : "2";
+            const pointsEl = document.getElementById(`gplus-user-points${sufijoSincro}`);
+            if(pointsEl && typeof state !== 'undefined') {
+                pointsEl.innerText = state.user.balance;
+            }
 
             content.innerHTML = `
                 <div>
@@ -7974,8 +7978,6 @@ function abrirFlujoCompraPremio(premio) {
                     <button id="gplus-btn-submit-form" style="width:100%; padding:10px; background:#38bdf8; color:#0f172a; border:none; border-radius:10px; font-weight:800; cursor:pointer;">Enviar Pedido ✈️</button>
                 </div>
             `;
-            
-            // ... [El resto del onclick del formulario se queda igual] ...
 
             document.getElementById("gplus-btn-submit-form").onclick = () => {
                 const indicaciones = document.getElementById("gplus-form-indicaciones").value.trim() || "Sin indicaciones.";
@@ -7986,9 +7988,10 @@ function abrirFlujoCompraPremio(premio) {
                 window.open(`https://t.me/TuSoporteGoldenBot?text=${encodeURIComponent(texto)}`, '_blank');
                 
                 cerrarModalPremios();
-                renderizarCatalogoPremios();
+                renderizarCatalogoPremios(typeof gplusTiendaActual !== 'undefined' ? gplusTiendaActual : "shop1");
             };
         }, 5000);
+    };
 }
 
 function cerrarModalPremios() {
@@ -8010,7 +8013,7 @@ function cambiarPestañaPremios(categoria) {
         btnAdm.style.color = categoria === "administrador" ? "#0f172a" : "#94a3b8";
     }
 
-    renderizarCatalogoPremios();
+    renderizarCatalogoPremios(typeof gplusTiendaActual !== 'undefined' ? gplusTiendaActual : "shop1");
 }
 
 function filtrarPremiosOrden(orden) {
@@ -8029,32 +8032,31 @@ function filtrarPremiosOrden(orden) {
         btnTod.style.color = orden === "todos" ? "#0f172a" : "#fff";
     }
 
-    renderizarCatalogoPremios();
+    renderizarCatalogoPremios(typeof gplusTiendaActual !== 'undefined' ? gplusTiendaActual : "shop1");
 }
 
 function cambiarModoVistaPremios(modo) {
     gplusModoVista = modo;
-    renderizarCatalogoPremios();
+    renderizarCatalogoPremios(typeof gplusTiendaActual !== 'undefined' ? gplusTiendaActual : "shop1");
 }
 
-function renderShopCatalog() {
-    renderizarCatalogoPremios();
+function renderShopCatalog(targetShop = "shop1") {
+    renderizarCatalogoPremios(targetShop);
 }
 
-// REEMPLAZA LA FUNCIÓN DE INICIO DE TU SCRIPT POR ESTA:
 function initGPlusRewards() {
-    const grid = document.getElementById("gplus-rewards-grid");
-    if (grid) {
-        renderizarCatalogoPremios();
+    const grid1 = document.getElementById("gplus-rewards-grid1");
+    const grid2 = document.getElementById("gplus-rewards-grid2");
+    if (grid1 || grid2) {
+        renderizarCatalogoPremios(grid1 ? "shop1" : "shop2");
         if (typeof lucide !== 'undefined') lucide.createIcons();
     } else {
-        // Si el DOM aún se está cargando, vuelve a intentar en un instante
         setTimeout(initGPlusRewards, 100);
     }
 }
 
-// Vinculación explícita para evitar pérdidas de contexto
 window.renderShopCatalog = renderShopCatalog;
+window.initGPlusRewards = initGPlusRewards;
 
 initGPlusRewards();
 
