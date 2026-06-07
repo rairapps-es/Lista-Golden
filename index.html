@@ -3880,7 +3880,7 @@ function switchView(viewId) {
     }
 
     // =========================================================================
-    // TU LÓGICA DE RENDERIZADO (OPTIMIZADA PARA EVITAR CONGELAMIENTOS EN DOM)
+    // TU LÓGICA DE RENDERIZADO (OPTIMIZADA CON RETRASO DE ASINCRONÍA)
     // =========================================================================
     if (viewId === 'directory') renderDirectoryList();
     if (viewId === 'favorites') renderFavoritesList();
@@ -3888,28 +3888,21 @@ function switchView(viewId) {
     if (viewId === 'history') { showFullHistory = false; renderHistoryList(); }
     if (viewId === 'home') { renderVipSlider(); renderTopPodium(); }
     
-    // 🔥 CORRECCIÓN CRÍTICA: Renderizado con retraso controlado (Asíncrono)
+    // 🔥 CORRECCIÓN ASÍNCRONA: Espera a que el DOM esté listo antes de pintar las tarjetas
     if (viewId === 'shop') { 
-        // Le damos 60ms al navegador para que renderice el HTML de la tienda en pantalla
         setTimeout(() => {
             if (typeof renderShopCatalog === 'function') {
                 renderShopCatalog(); 
-            } else if (typeof GPLUS_forzarRenderTienda === 'function') {
-                GPLUS_forzarRenderTienda(); // Respaldo por si usaste el script encapsulado
             }
-            
             if (typeof checkVipInternalRegistration === 'function') {
                 checkVipInternalRegistration();
             }
-            // Re-aseguramos que los iconos internos de las tarjetas se dibujen
             if (window.lucide) lucide.createIcons();
         }, 60);
     }
     
-    // 🔥 NUEVO: Panel de contactos
     if (viewId === 'crm-dashboard') renderCrmDashboard();
 
-    // 🔥 NUEVO: Repintado de racha
     if (viewId === 'streak') {
         if (typeof actualizarInterfazRacha === 'function') {
             const rachaGuardada = parseInt(localStorage.getItem("gplus_streak_count")) || 1;
@@ -3917,7 +3910,6 @@ function switchView(viewId) {
         }
     }
     
-    // Aseguramos que los iconos generales se dibujen bien
     if (window.lucide) lucide.createIcons();
 }
 
@@ -7688,8 +7680,8 @@ console.log("🚀 Módulo CRM completamente blindado, persistente y expuesto en 
 </div>
 
 <script>
-    
-// 🎨 INYECCIÓN NATIVA DE ESTILOS PARA LAS TARJETAS
+
+    // 🎨 INYECCIÓN NATIVA DE ESTILOS PARA LAS TARJETAS
 if (!document.getElementById("gplus-rewards-styles")) {
     const estiloPremios = document.createElement("style");
     estiloPremios.id = "gplus-rewards-styles";
@@ -7804,9 +7796,8 @@ if(!localStorage.getItem("gplus_saldo_puntos")){
 // 2. FUNCIÓN DE RENDERIZACIÓN PRINCIPAL DEL CATÁLOGO
 function renderizarCatalogoPremios() {
     const gridContainer = document.getElementById("gplus-rewards-grid");
-    if(!gridContainer) return; // 🛡️ Evita que colapse el script si el contenedor no está montado
+    if(!gridContainer) return; 
 
-    // Actualizar Saldo en la Interfaz (Comprobación segura)
     const saldoActual = parseInt(localStorage.getItem("gplus_saldo_puntos") || "0");
     const pointsEl = document.getElementById("gplus-user-points");
     if(pointsEl) {
@@ -7816,21 +7807,17 @@ function renderizarCatalogoPremios() {
     const hoyString = new Date().toDateString();
     let premiosFiltrados = [...PREMIOS_DB];
 
-    // Filtrar por Pestaña
     premiosFiltrados = premiosFiltrados.filter(p => p.categoria === gplusFiltroCategoria);
 
-    // Filtrar por Orden de Precios
     if(gplusFiltroOrden === "baratos"){
         premiosFiltrados.sort((a, b) => a.precio - b.precio);
     } else if(gplusFiltroOrden === "caros") {
         premiosFiltrados.sort((a, b) => b.precio - a.precio);
     }
 
-    // Limpiar contenedor
     gridContainer.innerHTML = "";
     gridContainer.className = `gplus-view-${gplusModoVista}`;
 
-    // Bucle de renderizado de tarjetas
     premiosFiltrados.forEach(premio => {
         const totalReclamado = parseInt(localStorage.getItem(`gplus_reward_cnt_${premio.id}`) || "0");
         const bloqueadoUnico = premio.tipo === "UNICO" && localStorage.getItem(`gplus_reward_done_${premio.id}`) === "true";
@@ -7925,7 +7912,7 @@ function renderizarCatalogoPremios() {
     activarRelojCuentasRegresivasPremios();
 }
 
-// 3. ADMINISTRADOR DE CONTADORES REGRESIVOS
+// 3. ADMINISTRADOR DE CONTADORES REGRESIVOS (Sintaxis Reparada)
 function activarRelojCuentasRegresivasPremios() {
     if(gplusRelojPremiosInterval) clearInterval(gplusRelojPremiosInterval);
 
@@ -7939,7 +7926,7 @@ function activarRelojCuentasRegresivasPremios() {
         const ahora = new Date();
         const mañana = new Date();
         mañana.setHours(24, 0, 0, 0);
-        const diferenciaMs = mañana - abrió = mañana - ahora;
+        const diferenciaMs = mañana - ahora; 
 
         if (diferenciaMs <= 0) {
             clearInterval(gplusRelojPremiosInterval);
@@ -7948,12 +7935,12 @@ function activarRelojCuentasRegresivasPremios() {
         }
 
         const horas = String(Math.floor((diferenciaMs / (1000 * 60 * 60)) % 24)).padStart(2, "0");
-        const minutos = String(Math.floor((diferenciaMs / (1000 * 60)) % 60)).padStart(2, "0");
+        const minutes = String(Math.floor((diferenciaMs / (1000 * 60)) % 60)).padStart(2, "0");
         const segundos = String(Math.floor((diferenciaMs / 1000) % 60)).padStart(2, "0");
 
         selectores.forEach(el => {
             const tipo = el.getAttribute("data-tipo-premio");
-            el.innerText = `⏳ ${tipo === 'DIARIO' ? 'Renueva' : 'Disponible'} en ${horas}:${minutos}:${segundos}`;
+            el.innerText = `⏳ ${tipo === 'DIARIO' ? 'Renueva' : 'Disponible'} en ${horas}:${minutes}:${segundos}`;
         });
     };
 
@@ -7961,7 +7948,7 @@ function activarRelojCuentasRegresivasPremios() {
     gplusRelojPremiosInterval = setInterval(refrescarRelojes, 1000);
 }
 
-// 4. FLUJO DE CAJA INTERACTIVO
+// 4. FLUJO DE CAJA INTERACTIVO (Temporizadores corregidos)
 function abrirFlujoCompraPremio(premio) {
     const overlay = document.getElementById("gplus-rewards-modal-overlay");
     const content = document.getElementById("gplus-rewards-modal-content");
@@ -8026,7 +8013,7 @@ function abrirFlujoCompraPremio(premio) {
                 cerrarModalPremios();
                 renderizarCatalogoPremios();
             };
-        }, 5000);
+        }, 5000); 
     };
 }
 
@@ -8035,7 +8022,7 @@ function cerrarModalPremios() {
     if(overlay) overlay.style.display = "none";
 }
 
-// 5. INTERRUPTORES DE NAVEGACIÓN Y FILTROS (Con validación protectora)
+// 5. INTERRUPTORES DE NAVEGACIÓN Y FILTROS
 function cambiarPestañaPremios(categoria) {
     gplusFiltroCategoria = categoria;
     
@@ -8076,7 +8063,6 @@ function cambiarModoVistaPremios(modo) {
     renderizarCatalogoPremios();
 }
 
-// Función de enlace requerida por tu ruteador central (switchView)
 function renderShopCatalog() {
     renderizarCatalogoPremios();
 }
@@ -8092,6 +8078,7 @@ function initGPlusRewards() {
 }
 
 initGPlusRewards();
+
 
 </script>
 
