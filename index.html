@@ -5015,8 +5015,11 @@ function closeShareModal() {
  * Ejecuta la API de redirección o copia en base a la red social elegida (Edición Telegram WebApp)
  */
 function executeShareAction(network) {
-    // Detectamos la URL exacta en la que corre la aplicación actual
-    const webAppUrl = window.location.origin + window.location.pathname;
+    // 🎯 TU NUEVA REGLA DE ORO: Enlace manual que reemplaza a window.location
+    const ENLACE_MANUAL_PERSONALIZADO = "https://t.me/ListaGolden"; 
+    
+    // Usamos tu enlace manual en lugar de la URL del navegador
+    const webAppUrl = ENLACE_MANUAL_PERSONALIZADO;
     
     // Plantilla de mensaje predefinido con saltos de línea limpios
     const messageText = `¡Mira este canal de Telegram en el Directorio! 🚀\n\n• Canal: ${activeShareData.name}\n• Alias: ${activeShareData.user}\n\nEncuentra más canales recomendados aquí 👇`;
@@ -5045,27 +5048,28 @@ function executeShareAction(network) {
             finalUrl = `https://www.reddit.com/submit?url=${urlEncoded}&title=${encodeURIComponent("Canal Recomendado: " + activeShareData.name)}`;
             break;
         case 'email':
+            // ✉️ AHORA INYECTA TU ENLACE MANUAL EN EL CUERPO DEL CORREO
             finalUrl = `mailto:?subject=${encodeURIComponent("Recomendación de Canal: " + activeShareData.name)}&body=${encodeURIComponent(messageText + "\n\n" + webAppUrl)}`;
             break;
         case 'copy':
-            // Método Primario: API Portapapeles asíncrona moderna
+            // 📋 AHORA COPIA TU ENLACE MANUAL AL PORTAPAPELES
             if (navigator.clipboard && navigator.clipboard.writeText) {
                 navigator.clipboard.writeText(webAppUrl).then(() => {
-                    showToast("¡Enlace copiado al portapapeles!", "success");
+                    showToast("¡Enlace personalizado copiado!", "success");
                 }).catch(() => {
                     showToast("Error al copiar el enlace", "error");
                 });
             } else {
-                // Método Secundario (Fallback): Creación de Textarea fantasma para entornos Webview
+                // Método Secundario (Fallback) para Webviews
                 const textArea = document.createElement("textarea");
                 textArea.value = webAppUrl;
-                textArea.style.position = 'fixed'; // Evita scroll abrupto en la pantalla
+                textArea.style.position = 'fixed';
                 textArea.style.opacity = '0';
                 document.body.appendChild(textArea);
                 textArea.select();
                 try {
                     document.execCommand('copy');
-                    showToast("¡Enlace copiado al portapapeles!", "success");
+                    showToast("¡Enlace personalizado copiado!", "success");
                 } catch (err) {
                     showToast("No se pudo copiar el enlace", "error");
                 }
@@ -5074,20 +5078,15 @@ function executeShareAction(network) {
             break;
     }
 
-    // 🔥 EL NUEVO MOTOR DE DESVÍO INTELIGENTE (PARCHE DE CORREO ABSOLUTO):
     if (finalUrl !== "") {
         if (network === 'email') {
-            // TRUCO MAESTRO: Si es correo, creamos un enlace invisible en el HTML
-            // y lo clicamos mediante código. Esto engaña al Webview de Telegram
-            // y le obliga a abrir la app de correo del móvil sin pasar por openLink.
             const correoLink = document.createElement('a');
             correoLink.href = finalUrl;
             correoLink.style.display = 'none';
             document.body.appendChild(correoLink);
-            correoLink.click(); // 👈 Clic fantasma instantáneo
+            correoLink.click();
             document.body.removeChild(correoLink);
         } else {
-            // Para las demás redes (WhatsApp, X, FB...) seguimos usando el openLink nativo que te funciona perfecto
             if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.openLink) {
                 window.Telegram.WebApp.openLink(finalUrl);
             } else {
@@ -5096,12 +5095,11 @@ function executeShareAction(network) {
         }
     }
 
-    // Cerramos el panel automáticamente en todas las redes para agilizar el flujo,
-    // excepto en "copiar enlace", manteniendo el modal abierto para que luzca el Toast de éxito.
     if (network !== 'copy') {
         closeShareModal();
     }
 }
+
         function renderCategorySliders() {
     // 1. Filtrar e Inyectar canales de Tecnología
     const techContainer = document.getElementById("tech-slider");
@@ -5247,7 +5245,7 @@ function executeGPlusOrder() {
 
     const servicioTipo = "Membresía GPlus ⚡";
     const tituloLog = `Pedido Realizado: ${servicioTipo}`;
-    const descLog = `Plan Todo en Uno Solicitado (59.00 USD / mes)`;
+    const descLog = `Plan Todo en Uno Solicitado (4.99 USD / mes)`;
 
     // Guardamos localmente en Compras, Acciones y Pedidos utilizando la función auxiliar
     if (typeof registerOrderInStateHistory === "function") {
@@ -5255,7 +5253,7 @@ function executeGPlusOrder() {
     }
 
     // Componemos el mensaje para el chat privado de Airdayz
-    const msg = `⚡ NUEVA SOLICITUD GPLUS ⚡\n\n• Emisor: ${username}\n• ID Telegram: ${idTelegram}\n• Servicio: Suscripción GPlus Todo en Uno\n• Total Mensual: 59.00 USD\n• Estado: Esperando Pago`;
+    const msg = `⚡ NUEVA SOLICITUD GPLUS ⚡\n\n• Emisor: ${username}\n• ID Telegram: ${idTelegram}\n• Servicio: Suscripción GPlus Todo en Uno\n• Total Mensual: 4.99 USD\n• Estado: Esperando Pago`;
     
     const telegramUrl = `https://t.me/Airdayz?text=${encodeURIComponent(msg)}`;
     
@@ -5276,8 +5274,6 @@ function executeGPlusOrder() {
 // MOTOR DE VERIFICACIÓN PRIMERA SESIÓN Y CELEBRACIÓN DE CONFETI
 // ==========================================================================
 function checkFirstSessionFeaturedCeleb() {
-    // Buscamos si el usuario tiene un canal verificado y destacado en el dataset
-    // Filtra si coincide que el usuario es el dueño legítimo del canal verificado
     if (typeof INITIAL_CHANNELS_DATASET === "undefined") return;
 
     // Buscamos un canal que pertenezca al usuario verificado actual y tenga el flag isVip o isFeatured activo
@@ -5285,15 +5281,19 @@ function checkFirstSessionFeaturedCeleb() {
 
     if (userVipChannel) {
         const keyLocalStorage = `celeb_shown_${userVipChannel.id}`;
-        const alreadyShown = localStorage.getItem(keyLocalStorage);
+        
+        // 📅 OBTENER LA FECHA DE HOY EN TEXTO (Ej: "Sun Jun 07 2026")
+        const hoyString = new Date().toDateString();
+        const lastShownDate = localStorage.getItem(keyLocalStorage);
 
-        // Si es la primera vez que se valida este canal en la sesión del ordenador
-        if (!alreadyShown) {
-            localStorage.setItem(keyLocalStorage, "true");
+        // 🎯 VALIDACIÓN: Solo se ejecuta si nunca se ha mostrado, o si la última fecha guardada NO es la de hoy
+        if (!lastShownDate || lastShownDate !== hoyString) {
+            
+            // Guardamos la fecha de hoy para bloquearlo por el resto del día
+            localStorage.setItem(keyLocalStorage, hoyString);
 
             const targetBox = document.getElementById("congrats-card-target");
             if (targetBox) {
-                // Inyectamos la tarjeta usando tu función exacta con un envoltorio súper iluminado
                 targetBox.innerHTML = `
                     <div class="potentiated-card-wrap">
                         ${buildChannelCardHtml(userVipChannel, 'congrats-')}
@@ -5303,10 +5303,16 @@ function checkFirstSessionFeaturedCeleb() {
 
             // Desplegar la ventana emergente con un leve delay de carga limpia
             setTimeout(() => {
-                document.getElementById("modal-congrats-vip").style.display = "flex";
-                triggerConfetiParticlesExplosion();
+                const modal = document.getElementById("modal-congrats-vip");
+                if (modal) modal.style.display = "flex";
+                
+                if (typeof triggerConfetiParticlesExplosion === "function") {
+                    triggerConfetiParticlesExplosion();
+                }
                 if (typeof lucide !== 'undefined') lucide.createIcons();
             }, 1200);
+        } else {
+            console.log(`ℹ️ [Celeb] El mensaje VIP diario ya fue mostrado hoy (${hoyString}) para el canal ID: ${userVipChannel.id}`);
         }
     }
 }
@@ -5552,7 +5558,7 @@ function initOnlineUsersSimulator(elementId) {
     const domElement = document.getElementById(elementId);
     if (!domElement) return;
 
-    const MIN_USERS = 42;
+    const MIN_USERS = 92;
     const MAX_USERS = 378;
 
     let currentOnline = parseInt(localStorage.getItem('simulated_online_users'));
@@ -6346,6 +6352,7 @@ function renderizarTarjetasPlanesGPlus(sub, planPendiente, currentUserId, curren
 }
 
 function abrirModalPasarelaPagoGPlus(planId, currentUserId, currentUsername) {
+    if (typeof DEF_PLANES === "undefined") return;
     const plan = DEF_PLANES.find(p => p.id === planId);
     if (!plan) return;
 
@@ -6353,47 +6360,80 @@ function abrirModalPasarelaPagoGPlus(planId, currentUserId, currentUsername) {
     if (!modal) {
         modal = document.createElement("div");
         modal.id = "gplus-payment-flow-modal";
-        modal.style = "position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(6,9,15,0.85); backdrop-filter:blur(6px); display:flex; align-items:center; justify-content:center; z-index:100000;";
+        modal.style = "position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(6,9,15,0.9); backdrop-filter:blur(8px); display:flex; align-items:center; justify-content:center; z-index:200000; font-family:system-ui, sans-serif;";
         document.body.appendChild(modal);
     }
 
+    // Inyectamos la estructura con el sistema de pestañas (Tabs)
     modal.innerHTML = `
-        <div style="background:#17212b; width:90%; max-width:380px; border-radius:24px; padding:25px; color:#fff; position:relative; border: 1px solid rgba(255,255,255,0.1);">
+        <div style="background:#17212b; width:92%; max-width:380px; border-radius:24px; padding:25px; color:#fff; position:relative; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 20px 50px rgba(0,0,0,0.5);">
+            <!-- Botón Cerrar -->
             <button onclick="document.getElementById('gplus-payment-flow-modal').style.display='none'" style="position:absolute; top:18px; right:18px; background:none; border:none; color:#6c7883; cursor:pointer; font-size:1.1rem;">✕</button>
-            <h3 style="margin-top:0; font-size:1.2rem; font-weight:800;">Adquirir ${plan.title}</h3>
-            <p style="font-size:0.8rem; color:#cbd5e1; margin-bottom:15px;">Envía exactamente <strong>$${plan.price} USDT (TRC20)</strong> a la billetera:</p>
-            <div style="background:#0e1621; padding:12px; border-radius:10px; font-family:monospace; font-size:0.75rem; word-break:break-all; margin-bottom:20px; color:#2481cc; text-align:center; font-weight:bold;">
-                TU_DIRECCION_USDT_AQUI
+            
+            <h3 style="margin-top:0; font-size:1.2rem; font-weight:800; text-align:center;">Adquirir ${plan.title}</h3>
+            <p style="text-align:center; margin: -5px 0 15px 0; color:#cbd5e1; font-size:0.85rem;">Total a pagar: <strong style="color:#22c55e;">$${plan.price} USD</strong></p>
+
+            <!-- 🎛️ SELECTOR DE PESTAÑAS (TABS) -->
+            <div style="display: flex; background: rgba(0,0,0,0.2); padding: 4px; border-radius: 12px; margin-bottom: 18px; border: 1px solid rgba(255,255,255,0.05);">
+                <button id="gplus-tab-crypto" onclick="alternarTabsGPlusPasarela('crypto')" style="flex: 1; padding: 10px; border-radius: 9px; border: none; font-weight: 700; font-size: 0.78rem; cursor: pointer; transition: all 0.2s; background: #2481cc; color: #fff;">
+                    🪙 USDT / CRYPTO
+                </button>
+                <button id="gplus-tab-paypal" onclick="alternarTabsGPlusPasarela('paypal')" style="flex: 1; padding: 10px; border-radius: 9px; border: none; font-weight: 700; font-size: 0.78rem; cursor: pointer; transition: all 0.2s; background: transparent; color: #6c7883;">
+                    💳 PAYPAL
+                </button>
             </div>
-            <button id="verify-gplus-btn-action" style="width:100%; background:#22c55e; color:#fff; border:none; padding:14px; border-radius:12px; font-weight:800; cursor:pointer;">
+
+            <!-- 📦 CONTENIDOS DINÁMICOS -->
+            <!-- Opción Crypto -->
+            <div id="gplus-box-crypto" style="display:block; background:#0e1621; padding:14px; border-radius:14px; margin-bottom:20px; border: 1px solid rgba(255,255,255,0.02);">
+                <p style="margin:0 0 8px 0; font-size:0.75rem; color:#8596a5;">Envía el importe en red <strong>TRC20 (USDT)</strong>:</p>
+                <div style="padding:10px; background:rgba(255,255,255,0.03); border-radius:8px; font-family:monospace; font-size:0.7rem; word-break:break-all; color:#fdba74; text-align:center; margin-bottom:8px; border:1px solid rgba(255,255,255,0.05);">
+                    TU_DIRECCION_USDT_AQUI
+                </div>
+                <button onclick="navigator.clipboard.writeText('TU_DIRECCION_USDT_AQUI'); if(typeof showToast==='function') showToast('¡Billetera Copiada! 📋', 'success');" style="width:100%; background:rgba(255,255,255,0.05); color:#fff; border:1px solid rgba(255,255,255,0.1); padding:6px; border-radius:6px; font-size:0.7rem; font-weight:bold; cursor:pointer;">Copiar Dirección</button>
+            </div>
+
+            <!-- Opción PayPal -->
+            <div id="gplus-box-paypal" style="display:none; background:#0e1621; padding:14px; border-radius:14px; margin-bottom:20px; border: 1px solid rgba(255,255,255,0.02);">
+                <p style="margin:0 0 10px 0; font-size:0.75rem; color:#8596a5;">Completa tu transacción de forma segura en la plataforma:</p>
+                <button onclick="window.Telegram && window.Telegram.WebApp ? Telegram.WebApp.openLink('https://paypal.me/tu_cuenta') : window.open('https://paypal.me/tu_cuenta', '_blank')" style="width:100%; background:#0070ba; color:#fff; border:none; padding:10px; border-radius:8px; font-size:0.78rem; font-weight:800; cursor:pointer; box-shadow:0 4px 10px rgba(0,112,186,0.2);">
+                    🚀 Pagar con PayPal
+                </button>
+            </div>
+
+            <!-- 🛠️ BOTÓN DE CONFIRMACIÓN INFERIOR -->
+            <button id="verify-gplus-btn-action" style="width:100%; background:#22c55e; color:#fff; border:none; padding:14px; border-radius:12px; font-weight:800; cursor:pointer; text-transform:uppercase; font-size:0.78rem; letter-spacing:0.5px; box-shadow:0 4px 12px rgba(34,197,94,0.2);">
                 Ya pagué, verificar mi suscripción
             </button>
         </div>
     `;
     modal.style.display = "flex";
 
+    // Al hacer click, guardamos la solicitud pendiente y abrimos soporte sin tocar la interfaz visual
     document.getElementById("verify-gplus-btn-action").onclick = () => {
         const idStr = String(currentUserId);
         localStorage.setItem(`gplus_pending_${idStr}`, plan.id);
         modal.style.display = "none";
         
-        checkVipInternalRegistration();
+        // Ejecuta tu función de comprobación nativa (que lee el estado real)
+        if (typeof checkVipInternalRegistration === "function") {
+            checkVipInternalRegistration();
+        }
 
-        const mensajeTelegram = `🔔 ¡NUEVA SOLICITUD GPLUS PREMIUM! 🔔\n\n👤 Usuario: @${currentUsername}\n🆔 Telegram ID: ${currentUserId}\n📦 Plan Solicitado: ${plan.title}\n💰 Costo: $${plan.price} USDT\n\nPor favor, autoriza mi pago metiendo mi ID en la lista VIP_TELEGRAM_IDS.`;
-        window.open(`${LINK_SOPORTE_TELEGRAM}?text=${encodeURIComponent(mensajeTelegram)}`, '_blank');
+        // Envío del mensaje formateado al bot de soporte de Telegram
+        const mensajeTelegram = `🔔 ¡NUEVA SOLICITUD GPLUS PREMIUM! 🔔\n\n👤 Usuario: @${currentUsername}\n🆔 Telegram ID: ${currentUserId}\n📦 Plan Solicitado: ${plan.title}\n💰 Costo: $${plan.price} USD\n\n.`;
+        
+        if (typeof LINK_SOPORTE_TELEGRAM !== "undefined") {
+            const finalLink = `${LINK_SOPORTE_TELEGRAM}?text=${encodeURIComponent(mensajeTelegram)}`;
+            if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.openLink) {
+                window.Telegram.WebApp.openLink(finalLink);
+            } else {
+                window.open(finalLink, '_blank');
+            }
+        }
     };
 }
 
-function sincronizarEtiquetasExternasGPlus(sub) {
-    const bPerfil = document.getElementById(ID_ETIQUETA_PERFIL);
-    const bMenu = document.getElementById(ID_ETIQUETA_MENU);
-
-    if (bPerfil) {
-        bPerfil.innerHTML = sub.isVip ? `✨ ${sub.planName}` : "Gratis";
-        bPerfil.style.background = sub.isVip ? "#22c55e" : "#6c7883";
-        bPerfil.style.color = "#ffffff";
-        bPerfil.style.padding = "4px 8px";
-        bPerfil.style.borderRadius = "6px";
         bPerfil.style.fontSize = "0.75rem";
         bPerfil.style.fontWeight = "bold";
     }
@@ -6610,21 +6650,21 @@ const DEF_PLANES = [
                 <div class="header-indep-gplus">
                     <div class="info-indep-gplus">
                         <h3>Estado de tu Suscripción GPlus</h3>
-                        <p>ID Sesión: <span>${suscripcionValida.idTelegram}</span> • Plan: <strong>${nombrePlanSuperior}</strong></p>
+                        <p>ID: <span>${suscripcionValida.idTelegram}</span> • Plan: <strong>${nombrePlanSuperior}</strong></p>
                     </div>
                     <span class="badge-indep-gplus ${claseBadge}">${textoEstado}</span>
                 </div>
                 <div class="grid-indep-gplus">
                     <div class="col-indep-gplus">
-                        <span class="label-indep-gplus">Tipo de Duración</span>
+                        <span class="label-indep-gplus">Duración</span>
                         <strong class="value-indep-gplus">${suscripcionValida.tipoDuracion}</strong>
                     </div>
                     <div class="col-indep-gplus">
-                        <span class="label-indep-gplus">Fecha de Inicio</span>
+                        <span class="label-indep-gplus">🗓️ Fecha de Inicio</span>
                         <strong class="value-indep-gplus">${formatearFecha(suscripcionValida.fechaInicio)}</strong>
                     </div>
                     <div class="col-indep-gplus">
-                        <span class="label-indep-gplus">Fecha de Vencimiento</span>
+                        <span class="label-indep-gplus">⌛ Fecha de Vencimiento</span>
                         <strong class="value-indep-gplus highlight-indep-date">${formatearFecha(suscripcionValida.fechaFin)}</strong>
                     </div>
                 </div>
@@ -6643,7 +6683,7 @@ const DEF_PLANES = [
 
             // Si es el activo, preparamos las variables de bloqueo. Si no, vacías (normales)
             const estiloTarjeta = esElPlanActivo ? 'style="opacity: 0.55; pointer-events: none; border: 1px dashed rgba(34, 197, 94, 0.5);"' : '';
-            const textoBoton   = esElPlanActivo ? "✓ Plan ya Activo" : "Adquirir Plan";
+            const textoBoton   = esElPlanActivo ? "✓ Mi Plan Activo" : "Adquirir Plan";
             const estiloBoton  = esElPlanActivo ? 'style="background: #1e293b; color: #22c55e; box-shadow: none;" disabled' : '';
 
             const listaBeneficios = plan.benefits.map(b => `<li><span>✓</span> ${b}</li>`).join("");
