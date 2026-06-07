@@ -3224,10 +3224,6 @@
 
     <button onclick="switchView('crm-dashboard')" data-mision="explorar_crm">📊 Panel & CRM</button>
     
-    <button onclick="abrirModalPasarelaPagoGPlus(1, '12345678', 'UsuarioPrueba')" style="position:fixed; top:10px; left:10px; z-index:999999; background:red; color:white; padding:10px;">
-    🚨 PROBAR PASARELA FORZADA
-</button>
-    
 <a href="#" onclick="switchView('favorites'); return false;" data-mision="explorar_favoritos">⭐ Mis Favoritos</a>
     <nav class="tab-bar">
         <div class="tab-item active-tab" id="tab-home" onclick="switchView('home')">
@@ -6723,7 +6719,7 @@ const DEF_PLANES = [
                 </div>
                 <div class="grid-indep-gplus">
                     <div class="col-indep-gplus">
-                        <span class="label-indep-gplus">Duración</span>
+                        <span class="label-indep-gplus">🚀 Duración</span>
                         <strong class="value-indep-gplus">${suscripcionValida.tipoDuracion}</strong>
                     </div>
                     <div class="col-indep-gplus">
@@ -6769,7 +6765,7 @@ const DEF_PLANES = [
                     </div>
                     <div>
                         <div class="gplus-price-row">${plan.price}$ <span>/ ${plan.duration.toLowerCase()}</span></div>
-                        <button class="gplus-btn-action" ${estiloBoton} onclick="alert('Abriendo pasarela para ${plan.title}...')">${textoBoton}</button>
+                        <button class="gplus-btn-action" ${estiloBoton} onclick="abrirModalPasarelaPagoGPlus('${plan.id}', '${state.user?.idTelegram || 0}', '${state.user?.username || 'user'}')">${textoBoton}</button>
                     </div>
                 </div>
             `;
