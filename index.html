@@ -7904,20 +7904,23 @@ function procesarYGenerarQR() {
 }
 
 // ==========================================
-// 5. MANIPULACIÓN DEL CANVAS PARA DESCARGA
+// CONTROL DE DESCARGA OPTIMIZADO PARA TELEGRAM
 // ==========================================
 function configurarBotonDescargaQR() {
     const btnDescargar = document.getElementById("qr-btn-download");
     if (!btnDescargar) return;
 
+    // Cambiamos el texto del botón para guiar mejor al usuario en Telegram
+    btnDescargar.innerHTML = `👁️ Ver en pantalla completa para guardar`;
+
     btnDescargar.onclick = () => {
         const contenedorQR = document.getElementById("qrResult");
-        // qrcode.js suele renderizar tanto un elemento <canvas> como una <img>. Extraemos el canvas prioritariamente.
         const elementoCanvas = contenedorQR.querySelector("canvas");
         const elementoImg = contenedorQR.querySelector("img");
 
         let urlImagenDescarga = "";
 
+        // Extraer la imagen base64 generada por la librería
         if (elementoCanvas) {
             urlImagenDescarga = elementoCanvas.toDataURL("image/png");
         } else if (elementoImg && elementoImg.src) {
@@ -7925,19 +7928,43 @@ function configurarBotonDescargaQR() {
         }
 
         if (!urlImagenDescarga) {
-            alert("No se pudo estructurar el archivo de imagen para la descarga.");
+            alert("No se pudo procesar la matriz del código QR.");
             return;
         }
 
-        // Crear ancla oculta temporal para disparar la descarga nativa en el explorador
-        const enlaceTemporal = document.createElement("a");
-        enlaceTemporal.href = urlImagenDescarga;
-        enlaceTemporal.download = `GPlus_QR_${Date.now()}.png`;
-        document.body.appendChild(enlaceTemporal);
-        enlaceTemporal.click();
-        document.body.removeChild(enlaceTemporal);
+        // 🚀 TRUCO DE SEGURIDAD PARA MINI APPS:
+        // Abrimos una ventana emergente limpia con la imagen pura.
+        // El usuario solo tendrá que mantener presionado el dedo sobre el QR y darle a "Guardar en Fotos".
+        const ventanaEmergente = window.open();
+        if (ventanaEmergente) {
+            ventanaEmergente.document.write(`
+                <html lang="es">
+                <head>
+                    <title>GPlus QR Studio - Guardar</title>
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                </head>
+                <body style="background: #0b0f19; margin: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; font-family: system-ui, sans-serif; color: #fff; text-align: center; padding: 20px; box-sizing: border-box;">
+                    <p style="font-size: 0.9rem; font-weight: bold; color: #10b981; margin-bottom: 20px; letter-spacing: 0.5px;">
+                        👇 MANTÉN PRESIONADO PARA GUARDAR 👇
+                    </p>
+                    <div style="background: #fff; padding: 16px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
+                        <img src="${urlImagenDescarga}" style="width: 230px; height: 230px; display: block;" alt="GPlus QR Code"/>
+                    </div>
+                    <p style="font-size: 0.75rem; color: #9ca3af; margin-top: 20px; max-width: 250px; line-height: 1.4;">
+                        Selecciona <b>"Guardar en Fotos"</b> o <b>"Compartir"</b> en el menú de tu dispositivo.
+                    </p>
+                 body>
+                html>
+            `);
+            ventanaEmergente.document.close();
+        } else {
+            // Plan de contingencia si Telegram bloquea también los popups vacíos:
+            // Alertar al usuario para que le saque una captura de pantalla directa al módulo.
+            alert("⚠️ GPlus Nota: Telegram restringe descargas directas. Por favor, realiza una captura de pantalla al código QR para guardarlo.");
+        }
     };
 }
+
 // ==========================================
 // CONTROL DE VISIBILIDAD DEL QR STUDIO
 // ==========================================
