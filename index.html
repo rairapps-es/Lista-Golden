@@ -3383,16 +3383,17 @@
     
 <button class="btn-subscribe-trigger" 
         style="background: var(--vip-gold); color: black; width: auto; margin: 0 auto; padding: 8px 16px; font-weight: bold; border: none; border-radius: 8px; cursor: pointer;" 
-        onclick="if(typeof switchView === 'function') { switchView('view-profile-page'); } else { openProfileAsPage(); }" data-mision="explorar_mi_perfil">
+        onclick="if(typeof switchView === 'function') { switchView('view-profile-page'); } else { openProfileAsPage(); }">
    👤 Ver mi Perfil
 </button>
 <button class="drawer-btn" onclick="switchView('profile')">
     <span>🔥 Mi Perfil</span> <i data-lucide="chevron-right"></i>
 </button>
 
-    <button onclick="switchView('crm-dashboard')" data-mision="explorar_crm">📊 Panel & CRM</button>
+    <button onclick="switchView('crm-dashboard')">📊 Panel & CRM</button>
     
-<a href="#" onclick="switchView('favorites'); return false;" data-mision="explorar_favoritos">⭐ Mis Favoritos</a>
+<a href="#" onclick="switchView('favorites'); return false;">⭐ Mis Favoritos</a>
+    
     <div style="text-align: center; margin-bottom: 20px;">
     <button onclick="toggleQRStudio()" id="btn-toggle-qr" style="padding: 10px 20px; background: rgba(16, 185, 129, 0.1); border: 1px solid #10b981; color: #10b981; border-radius: 8px; font-weight: 700; font-size: 0.8rem; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s;">
         <span>🔮</span> Abrir GPlus QR Studio
