@@ -4224,7 +4224,7 @@ function checkDailyGachaStatus() {
     if (viewId === 'my-channels') renderMyOwnedChannelsList();
     if (viewId === 'history') { showFullHistory = false; renderHistoryList(); }
     if (viewId === 'home') { renderVipSlider(); renderTopPodium(); }
-    
+    if (viewId === 'premios')      sincronizarSaldosVault();
     // 🔥 MODIFICADO: Muestra tu catálogo clásico y arranca el motor independiente de GPlus
     if (viewId === 'shop') { 
         renderShopCatalog(); 
@@ -4237,6 +4237,8 @@ function checkDailyGachaStatus() {
     // 🔥 NUEVO: Renderiza el panel de contactos e ideas al pulsar el botón 'crm-dashboard'
     if (viewId === 'crm-dashboard') renderCrmDashboard();
 
+          if (viewId === 'premios') sincronizarSaldosVault();
+          
     // 🔥 NUEVO: Repintado agresivo en caliente de la racha para evitar que nazca en 0 o rota
     if (viewId === 'streak') {
         if (typeof actualizarInterfazRacha === 'function') {
@@ -8437,48 +8439,34 @@ const VAULT_PREMIOS = [
 let vault_diamantes = parseInt(localStorage.getItem("gplus_saldo_diamantes")) || 100;
 
 function sincronizarSaldosVault() {
-    const saldoPuntosActual = (state.user && state.user.balance !== undefined) ? state.user.balance : 0;
+    // 1. Extraer puntos del estado global de tu Web App
+    let saldoPuntosActual = 0;
+    if (typeof state !== 'undefined' && state.user && state.user.balance !== undefined) {
+        saldoPuntosActual = state.user.balance;
+    } else {
+        // Intento secundario: Si tu objeto global se llama diferente (ej. usuarioActivo.puntos)
+        // Puedes ajustar esta línea si es necesario
+        console.warn("Vault: Esperando a que el estado global 'state.user.balance' esté listo.");
+    }
+
+    // 2. Guardar y asegurar el saldo de gemas local
     localStorage.setItem("gplus_saldo_diamantes", vault_diamantes);
-    if (document.getElementById("vault-txt-puntos")) document.getElementById("vault-txt-puntos").innerText = saldoPuntosActual;
-    if (document.getElementById("vault-txt-diamantes")) document.getElementById("vault-txt-diamantes").innerText = vault_diamantes;
-}
 
-// =========================================================================
-// 2. FUNCIÓN DE RECLAMAR PREMIOS (TU FUNCIÓN PRINCIPAL)
-// =========================================================================
-function reclamarPremioBasico(idPremio) {
-    const premio = VAULT_PREMIOS.find(p => p.id === idPremio);
-    if (!premio) return;
+    // 3. Inyectar con seguridad en los marcadores de la sección de Premios
+    const txtPuntos = document.getElementById("vault-txt-puntos");
+    const txtGemas = document.getElementById("vault-txt-diamantes");
 
-    const esPuntos = premio.moneda === "puntos";
-    const saldoActual = esPuntos ? ((state.user && state.user.balance !== undefined) ? state.user.balance : 0) : vault_diamantes;
-    const nombreMoneda = esPuntos ? "Puntos" : "Gemas/Diamantes";
-
-    if (saldoActual < premio.precio) {
-        alert(`❌ Saldo insuficiente. Necesitas ${premio.precio} ${nombreMoneda} y tienes ${saldoActual}.`);
-        return;
+    if (txtPuntos) {
+        txtPuntos.innerText = Number(saldoPuntosActual).toLocaleString(); // Añade formato de miles (ej: 1,500)
     }
-
-    const mensajeConfirmacion = `¿Confirmar canje de "${premio.titulo}"?\nSe restarán ${premio.precio} ${nombreMoneda} de tu cuenta.`;
-    const usuarioAcepto = confirm(mensajeConfirmacion);
-
-    if (usuarioAcepto) {
-        if (esPuntos) {
-            state.user.balance -= premio.precio;
-            if (document.getElementById("header-balance")) document.getElementById("header-balance").innerText = state.user.balance;
-            if (document.getElementById("profile-balance")) document.getElementById("profile-balance").innerText = state.user.balance;
-            if (document.getElementById("drawer-balance")) document.getElementById("drawer-balance").innerText = state.user.balance;
-        } else {
-            vault_diamantes -= premio.precio;
-        }
-
-        sincronizarSaldosVault();
-
-        const textoMensaje = `🛒 NUEVO PEDIDO DIRECTO\n=========================\n▪️ Premio: ${premio.titulo}\n▪️ Coste: ${premio.precio} ${nombreMoneda.toUpperCase()}\n▪️ Estado: 🟡 EN PROGRESO\n=========================\n👉 Envía este mensaje para procesar tu entrega.\n👤 ID de Usuario: [Escribe tu ID de Telegram aquí]`;
-        window.open(`https://t.me/Airdayz?text=${encodeURIComponent(textoMensaje)}`, '_blank');
+    if (txtGemas) {
+        txtGemas.innerText = Number(vault_diamantes).toLocaleString();
     }
 }
 
+// Asegurar que actualice cuando el enrutador nativo cambie a la vista de premios
+// Agrega esto al final de tu función switchView(viewName) si tienes una:
+// if (viewName === 'premios') sincronizarSaldosVault();
 // =========================================================================
 // 3. FUNCIÓN DE FILTRADO DE CATÁLOGO (LA QUE AGREGAMOS ANTES)
 // =========================================================================
