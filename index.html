@@ -7762,6 +7762,11 @@ console.log("🚀 Módulo CRM completamente blindado, persistente y expuesto en 
     transform: scale(0.98);
 }
 </style>
+<div>Puntos: <span id="vault-txt-puntos">0</span></div>
+<div>Gemas: <span id="vault-txt-diamantes">0</span></div>
+
+<button onclick="reclamarPremioBasico('v_premium_30')">Reclamar Premium (1500 Pts)</button>
+<button onclick="reclamarPremioBasico('v_pack_gemas')">Reclamar Pack Gemas (500 Gemas)</button>
 
     <script>
         // ==========================================
@@ -7992,6 +7997,89 @@ function toggleQRStudio() {
         botonToggle.style.color = "#10b981";
     }
 }
+
+        // ==========================================
+// 1. CONFIGURACIÓN DE PREMIOS BÁSICA
+// ==========================================
+const VAULT_PREMIOS = [
+    { id: "v_premium_30", titulo: "Premium 30 Días", precio: 1500, moneda: "puntos" },
+    { id: "v_pack_gemas", titulo: "Megapack Gemas", precio: 500, moneda: "diamantes" },
+    { id: "v_avatar_custom", titulo: "Avatar Personalizado", precio: 200, moneda: "diamantes" }
+];
+
+// Variables de saldo integradas con LocalStorage
+let vault_puntos = parseInt(localStorage.getItem("gplus_saldo_puntos")) || 2000;
+let vault_diamantes = parseInt(localStorage.getItem("gplus_saldo_diamantes")) || 100;
+
+// Sincronizar saldos iniciales al cargar la app
+function sincronizarSaldosVault() {
+    localStorage.setItem("gplus_saldo_puntos", vault_puntos);
+    localStorage.setItem("gplus_saldo_diamantes", vault_diamantes);
+    
+    // Actualizar textos en tu interfaz (asegúrate de tener estos ID en tu HTML)
+    if(document.getElementById("vault-txt-puntos")) document.getElementById("vault-txt-puntos").innerText = vault_puntos;
+    if(document.getElementById("vault-txt-diamantes")) document.getElementById("vault-txt-diamantes").innerText = vault_diamantes;
+}
+
+// ==========================================
+// 2. FUNCIÓN PRINCIPAL DE CANJE DIRECTO
+// ==========================================
+function reclamarPremioBasico(idPremio) {
+    // Buscar el premio seleccionado
+    const premio = VAULT_PREMIOS.find(p => p.id === idPremio);
+    if (!premio) return;
+
+    // Determinar billetera a usar
+    const esPuntos = premio.moneda === "puntos";
+    const saldoActual = esPuntos ? vault_puntos : vault_diamantes;
+    const nombreMoneda = esPuntos ? "Puntos" : "Gemas/Diamantes";
+
+    // 1. VALIDACIÓN DE SALDO
+    if (saldoActual < premio.precio) {
+        alert(`❌ Saldo insuficiente. Necesitas ${premio.precio} ${nombreMoneda} y tienes ${saldoActual}.`);
+        return;
+    }
+
+    // 2. AVISO DE CONFIRMACIÓN (OK / CANCELAR)
+    const mensajeConfirmacion = `¿Confirmar canje de "${premio.titulo}"?\nSe restarán ${premio.precio} ${nombreMoneda} de tu cuenta.`;
+    const usuarioAcepto = confirm(mensajeConfirmacion);
+
+    if (usuarioAcepto) {
+        // 3. DESCONTAR PUNTOS / GEMAS
+        if (esPuntos) {
+            vault_puntos -= premio.precio;
+        } else {
+            vault_diamantes -= premio.precio;
+        }
+
+        // Guardar en LocalStorage y refrescar pantalla
+        sincronizarSaldosVault();
+
+        // 4. GENERAR DATOS Y ENVIAR AL CHAT PRIVADO DE TELEGRAM
+        const mensajeTelegram = encodeURIComponent(
+            `🛒 NUEVO PEDIDO DIRECTO\n` +
+            `=========================\n` +
+            `▪️ Premio: ${premio.titulo}\n` +
+            `▪️ Coste: ${premio.precio} ${nombreMoneda.toUpperCase()}\n` +
+            `▪️ Estado: 🟡 EN PROGRESO\n` +
+            `=========================\n` +
+            `Por favor, escribe abajo tu ID de Telegram o datos de cuenta para la entrega:\n` +
+            `👉 ID Telegram: `
+        );
+
+        // Reemplaza "TuChatPrivado_bot" o "TuUsuarioTelegram" por tu enlace directo
+        const urlTelegram = `https://t.me/share/url?url=${mensajeTelegram}`;
+        
+        // Abrir Telegram
+        window.open(urlTelegram, '_blank');
+    } else {
+        // Si cancela, simplemente se cierra el aviso y no hace nada
+        console.log("Canje cancelado por el usuario.");
+    }
+}
+
+// Inicializar al cargar la página
+document.addEventListener("DOMContentLoaded", sincronizarSaldosVault);
 
     </script>
 </body>
