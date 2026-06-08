@@ -8333,36 +8333,95 @@ function toggleQRStudio() {
     }
 </style>
     <script>
+        // ==========================================
+// 1. FUNCIÓN DE CANJE DE PREMIOS (TU CÓDIGO)
 // ==========================================
-// 1. CONFIGURACIÓN DE PREMIOS BÁSICA
-// ==========================================
-const VAULT_PREMIOS = [
-    { id: "v_premium_30", titulo: "Premium 30 Días", precio: 1500, moneda: "puntos" },
-    { id: "v_pack_gemas", titulo: "Megapack Gemas", precio: 500, moneda: "diamantes" },
-    { id: "v_avatar_custom", titulo: "Avatar Personalizado", precio: 200, moneda: "diamantes" }
-];
+function reclamarPremioBasico(idPremio) {
+    const premio = VAULT_PREMIOS.find(p => p.id === idPremio);
+    if (!premio) return;
 
-// Nueva variable exclusiva para diamantes (con persistencia local)
-let vault_diamantes = parseInt(localStorage.getItem("gplus_saldo_diamantes")) || 100;
+    const esPuntos = premio.moneda === "puntos";
+    
+    const saldoActual = esPuntos 
+        ? ((state.user && state.user.balance !== undefined) ? state.user.balance : 0)
+        : vault_diamantes;
+        
+    const nombreMoneda = esPuntos ? "Puntos" : "Gemas/Diamantes";
 
-// Sincronizar marcadores visuales en la interfaz
-function sincronizarSaldosVault() {
-    // 1. Leer los puntos reales desde tu objeto global "state"
-    const saldoPuntosActual = (state.user && state.user.balance !== undefined) ? state.user.balance : 0;
-    
-    // 2. Guardar estado de la nueva variable de diamantes
-    localStorage.setItem("gplus_saldo_diamantes", vault_diamantes);
-    
-    // 3. Pintar en tus contenedores del módulo de premios (asegúrate de que existan estos ID)
-    if (document.getElementById("vault-txt-puntos")) {
-        document.getElementById("vault-txt-puntos").innerText = saldoPuntosActual;
+    if (saldoActual < premio.precio) {
+        alert(`❌ Saldo insuficiente. Necesitas ${premio.precio} ${nombreMoneda} y tienes ${saldoActual}.`);
+        return;
     }
-    if (document.getElementById("vault-txt-diamantes")) {
-        document.getElementById("vault-txt-diamantes").innerText = vault_diamantes;
+
+    const mensajeConfirmacion = `¿Confirmar canje de "${premio.titulo}"?\nSe restarán ${premio.precio} ${nombreMoneda} de tu cuenta.`;
+    const usuarioAcepto = confirm(mensajeConfirmacion);
+
+    if (usuarioAcepto) {
+        if (esPuntos) {
+            state.user.balance -= premio.precio;
+            
+            const balanceHeader = document.getElementById("header-balance");
+            if (balanceHeader) { balanceHeader.innerText = state.user.balance; }
+
+            const balanceProfile = document.getElementById("profile-balance") || document.getElementById("drawer-balance");
+            if (balanceProfile) { balanceProfile.innerText = state.user.balance; }
+        } else {
+            vault_diamantes -= premio.precio;
+        }
+
+        sincronizarSaldosVault();
+
+        const textoMensaje = 
+            `🛒 NUEVO PEDIDO DIRECTO\n` +
+            `=========================\n` +
+            `▪️ Premio: ${premio.titulo}\n` +
+            `▪️ Coste: ${premio.precio} ${nombreMoneda.toUpperCase()}\n` +
+            `▪️ Estado: 🟡 EN PROGRESO\n` +
+            `=========================\n` +
+            `👉 Envía este mensaje para procesar tu entrega.\n` +
+            `👤 ID de Usuario: [Escribe tu ID de Telegram aquí]`;
+
+        const tuAliasTelegram = "Airdayz"; 
+        const urlTelegram = `https://t.me/${tuAliasTelegram}?text=${encodeURIComponent(textoMensaje)}`;
+        
+        window.open(urlTelegram, '_blank');
+        
+    } else {
+        console.log("Canje cancelado por el usuario.");
     }
 }
 
-// =========================================================================
+
+// =========================================================
+// 2. 🔥 AQUÍ SE AGREGA TU NUEVA FUNCIÓN DE FILTRADO
+// =========================================================
+function filtrarCatalogoVault(categoria) {
+    // Quita la clase activa de todos los botones de filtro
+    const botones = document.querySelectorAll(".vault-filter-btn");
+    botones.forEach(btn => btn.classList.remove("active"));
+
+    // Añade la clase activa al botón específico que tocaste
+    const eventoActual = window.event;
+    if (eventoActual && eventoActual.target) {
+        eventoActual.target.classList.add("active");
+    }
+
+    // Busca todas las tarjetas de premios
+    const tarjetas = document.querySelectorAll(".vault-card");
+    
+    // Oculta o muestra según corresponda
+    tarjetas.forEach(tarjeta => {
+        const monedaTarjeta = tarjeta.getAttribute("data-moneda");
+
+        if (categoria === "all" || monedaTarjeta === categoria) {
+            tarjeta.style.display = "flex"; // Se muestra
+        } else {
+            tarjeta.style.display = "none"; // Se oculta
+        }
+    });
+}
+
+        // =========================================================================
 // 1. CONFIGURACIONES GENERALES E INICIALIZADORES (LO QUE YA TENÍAS)
 // =========================================================================
 const VAULT_PREMIOS = [
