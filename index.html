@@ -2393,10 +2393,10 @@
 
     <div class="drawer-links" style="width: 100%; margin-top: 10px;">
         <button class="drawer-btn" style="width: 100%;" onclick="toggleProfileDrawer(); switchView('shop')">
-            <span>🛍️ Tienda de Recompensas</span> <i data-lucide="chevron-right"></i>
+            <span>🛍️ Suscripción Premium</span> <i data-lucide="chevron-right"></i>
         </button>
         <button class="drawer-btn" style="width: 100%;" onclick="toggleProfileDrawer(); switchView('energy')">
-            <span>⚡ Cómo Ganar Puntos</span> <i data-lucide="chevron-right"></i>
+            <span>⚡ Misiones & Energía</span> <i data-lucide="chevron-right"></i>
         </button>
         <button id="epic-avatar-link" class="drawer-btn locked" style="width: 100%;" onclick="handlePremiumDrawerAccess()">
             <span id="drawer-locked-text">🔒 Avatar Premium (Requiere Rango 5)</span> <i data-lucide="lock" id="drawer-locked-icon"></i>
@@ -2424,7 +2424,7 @@
 <!-- BLOQUE DE SLIDERS Y ANUNCIO PREMIUM (LISTA GOLDEN) -->
 <!-- ========================================================================= -->
 
-<div class="slider-wrapper">
+<div class="slider-wrapper admin-only">
     <div id="slider-destacados-container" class="custom-snap-slider">
         </div>
 </div>
@@ -2603,9 +2603,9 @@
 
         <label style="font-size:0.75rem; font-weight:700; color:#9ca3af;">1. Selecciona la Duración:</label>
         <div class="selector-pill-grid">
-            <div class="select-pill active" id="pill-d1" onclick="selectDuration(7, 15, 'pill-d1')"><span style="font-size:0.85rem; font-weight:800;">7 Días</span><br><span style="font-size:0.7rem; color:#9ca3af;">2,99€</span></div>
-            <div class="select-pill" id="pill-d2" onclick="selectDuration(15, 25, 'pill-d2')"><span style="font-size:0.85rem; font-weight:800;">15 Días</span><br><span style="font-size:0.7rem; color:#9ca3af;">5,79€</span></div>
-            <div class="select-pill" id="pill-d3" onclick="selectDuration(30, 40, 'pill-d3')"><span style="font-size:0.85rem; font-weight:800;">1 Mes</span><br><span style="font-size:0.7rem; color:#9ca3af;">11,29€</span></div>
+            <div class="select-pill active" id="pill-d1" onclick="selectDuration(7, 3, 'pill-d1')"><span style="font-size:0.85rem; font-weight:800;">7 Días</span><br><span style="font-size:0.7rem; color:#9ca3af;">2,99€</span></div>
+            <div class="select-pill" id="pill-d2" onclick="selectDuration(15, 6, 'pill-d2')"><span style="font-size:0.85rem; font-weight:800;">15 Días</span><br><span style="font-size:0.7rem; color:#9ca3af;">5,79€</span></div>
+            <div class="select-pill" id="pill-d3" onclick="selectDuration(30, 12, 'pill-d3')"><span style="font-size:0.85rem; font-weight:800;">1 Mes</span><br><span style="font-size:0.7rem; color:#9ca3af;">11,29€</span></div>
         </div>
 
         <label style="font-size:0.75rem; font-weight:700; color:#9ca3af;">2. Método de Pago:</label>
@@ -2616,7 +2616,7 @@
 
         <div style="display:flex; justify-content:space-between; align-items:center; background:#111827; padding:14px; border-radius:10px; border:1px solid #374151; margin:16px 0;">
             <span style="font-size:0.8rem; color:#9ca3af;">Total a Pagar:</span>
-            <span id="ad-total-checkout" style="font-size:1.3rem; font-weight:900; color:#3b82f6;">15.00 USD</span>
+            <span id="ad-total-checkout" style="font-size:1.3rem; font-weight:900; color:#3b82f6;">3.00 USD</span>
         </div>
 
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
@@ -2824,7 +2824,7 @@
         <div class="missions-steps-container" style="width: 100%; max-width: 420px; margin-top: 25px; box-sizing: border-box; font-family: system-ui, sans-serif;">
     
     <h3 style="color: #94a3b8; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px; font-weight: 800;">
-        📺 Misión Multi-Paso: Visualización Dinámica
+        📺 Misión Multi-Paso Diaria
     </h3>
 
     <div class="gplus-step-card" id="card-step-1" style="background: #1e293b; padding: 16px; border-radius: 16px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.05);">
@@ -3266,9 +3266,8 @@
         <!-- Deja este bloque vacío. Al cargar la página, el JavaScript 
              lo rellenará solo con tus 3 planes de DEF_PLANES -->
     </div>
-    </main>
 
-    <section id="view-rewards" class="app-view" style="font-family: system-ui, -apple-system, sans-serif; box-sizing: border-box;">
+   <section id="view-rewards" class="app-view" style="font-family: system-ui, -apple-system, sans-serif; box-sizing: border-box;">
     
     <h2 class="view-title">
         <i data-lucide="gift" style="color:var(--vip-gold)"></i> Catálogo VIP GPlus
@@ -3314,14 +3313,14 @@
     </div>
 
     <div id="gplus-rewards-grid" class="view-grid"></div>
-</section>
-
-<div id="gplus-rewards-modal-overlay" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(8px); display: none; justify-content: center; align-items: center; z-index: 200000; padding: 20px; box-sizing: border-box;">
+</section> 
+    <div id="gplus-rewards-modal-overlay" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(8px); display: none; justify-content: center; align-items: center; z-index: 200000; padding: 20px; box-sizing: border-box;">
     <div id="gplus-rewards-modal-content" style="background: #111827; border: 1px solid rgba(255,255,255,0.08); padding: 24px; border-radius: 20px; width: 100%; max-width: 360px; box-shadow: 0 25px 50px rgba(0,0,0,0.6);"></div>
 </div>
 <button onclick="switchView('view-rewards')" style="display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; max-width: 420px; background: var(--vip-gold); color: #000; border: none; padding: 12px; border-radius: 12px; font-weight: 800; font-size: 0.9rem; cursor: pointer; box-shadow: 0 4px 12px rgba(255, 215, 0, 0.15); transition: transform 0.1s ease;">
     <i data-lucide="gift" style="width: 18px; height: 18px;"></i> 🎁 Ver Catálogo VIP
 </button>
+    </main>
   
     <!-- 🔥 PÁGINA INDIVIDUAL: CONTENEDOR PRINCIPAL DE RACHAS DE FUEGO -->
 
