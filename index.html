@@ -8372,6 +8372,39 @@ function reclamarPremioBasico(idPremio) {
         console.log("Canje cancelado por el usuario.");
     }
 }
+        // =========================================================
+// 2. 🔥 AQUÍ SE AGREGA TU NUEVA FUNCIÓN DE FILTRADO
+// =========================================================
+function filtrarCatalogoVault(categoria) {
+    // Quita la clase activa de todos los botones de filtro
+    const botones = document.querySelectorAll(".vault-filter-btn");
+    botones.forEach(btn => btn.classList.remove("active"));
+
+    // Añade la clase activa al botón específico que tocaste
+    const eventoActual = window.event;
+    if (eventoActual && eventoActual.target) {
+        eventoActual.target.classList.add("active");
+    }
+
+    // Busca todas las tarjetas de premios
+    const tarjetas = document.querySelectorAll(".vault-card");
+    
+    // Oculta o muestra según corresponda
+    tarjetas.forEach(tarjeta => {
+        const monedaTarjeta = tarjeta.getAttribute("data-moneda");
+
+        if (categoria === "all" || monedaTarjeta === categoria) {
+            tarjeta.style.display = "flex"; // Se muestra
+        } else {
+            tarjeta.style.display = "none"; // Se oculta
+        }
+    });
+}
+
+// ==========================================
+// 3. INICIALIZADORES AL CARGAR LA APP
+// ==========================================
+document.addEventListener("DOMContentLoaded", sincronizarSaldosVault);
 
     </script>
 </body>
