@@ -7904,14 +7904,14 @@ function procesarYGenerarQR() {
 }
 
 // ==========================================
-// CONTROL DE DESCARGA OPTIMIZADO PARA TELEGRAM
+// CONTROL DE DESCARGA ADAPTADO 100% A TELEGRAM
 // ==========================================
 function configurarBotonDescargaQR() {
     const btnDescargar = document.getElementById("qr-btn-download");
     if (!btnDescargar) return;
 
-    // Cambiamos el texto del botón para guiar mejor al usuario en Telegram
-    btnDescargar.innerHTML = `👁️ Ver en pantalla completa para guardar`;
+    // Cambiamos el texto para que el usuario entienda la acción en Telegram
+    btnDescargar.innerHTML = `📱 Guardar / Ampliar Código QR`;
 
     btnDescargar.onclick = () => {
         const contenedorQR = document.getElementById("qrResult");
@@ -7920,7 +7920,7 @@ function configurarBotonDescargaQR() {
 
         let urlImagenDescarga = "";
 
-        // Extraer la imagen base64 generada por la librería
+        // Extraer la imagen base64 generada por tu librería qrcode.js
         if (elementoCanvas) {
             urlImagenDescarga = elementoCanvas.toDataURL("image/png");
         } else if (elementoImg && elementoImg.src) {
@@ -7932,36 +7932,36 @@ function configurarBotonDescargaQR() {
             return;
         }
 
-        // 🚀 TRUCO DE SEGURIDAD PARA MINI APPS:
-        // Abrimos una ventana emergente limpia con la imagen pura.
-        // El usuario solo tendrá que mantener presionado el dedo sobre el QR y darle a "Guardar en Fotos".
-        const ventanaEmergente = window.open();
-        if (ventanaEmergente) {
-            ventanaEmergente.document.write(`
-                <html lang="es">
-                <head>
-                    <title>GPlus QR Studio - Guardar</title>
-                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                </head>
-                <body style="background: #0b0f19; margin: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; font-family: system-ui, sans-serif; color: #fff; text-align: center; padding: 20px; box-sizing: border-box;">
-                    <p style="font-size: 0.9rem; font-weight: bold; color: #10b981; margin-bottom: 20px; letter-spacing: 0.5px;">
-                        👇 MANTÉN PRESIONADO PARA GUARDAR 👇
-                    </p>
-                    <div style="background: #fff; padding: 16px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
-                        <img src="${urlImagenDescarga}" style="width: 230px; height: 230px; display: block;" alt="GPlus QR Code"/>
-                    </div>
-                    <p style="font-size: 0.75rem; color: #9ca3af; margin-top: 20px; max-width: 250px; line-height: 1.4;">
-                        Selecciona <b>"Guardar en Fotos"</b> o <b>"Compartir"</b> en el menú de tu dispositivo.
-                    </p>
-                 body>
-                html>
-            `);
-            ventanaEmergente.document.close();
-        } else {
-            // Plan de contingencia si Telegram bloquea también los popups vacíos:
-            // Alertar al usuario para que le saque una captura de pantalla directa al módulo.
-            alert("⚠️ GPlus Nota: Telegram restringe descargas directas. Por favor, realiza una captura de pantalla al código QR para guardarlo.");
-        }
+        // 🚀 CREAMOS UN CAPA MODAL EN TIEMPO REAL DENTRO DE TU PROPIO HTML
+        const capaFlotante = document.createElement("div");
+        capaFlotante.id = "tg-qr-overlay-fix";
+        capaFlotante.style.cssText = `
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: #0b0f19; z-index: 999999; display: flex;
+            flex-direction: column; justify-content: center; align-items: center;
+            font-family: system-ui, sans-serif; color: #fff; padding: 20px; box-sizing: border-box;
+        `;
+
+        capaFlotante.innerHTML = `
+            <p style="font-size: 0.9rem; font-weight: 800; color: #10b981; margin-bottom: 25px; letter-spacing: 0.5px; text-transform: uppercase;">
+                👇 MANTÉN PRESIONADO PARA GUARDAR 👇
+            </p>
+            
+            <div style="background: #fff; padding: 16px; border-radius: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.6);">
+                <img src="${urlImagenDescarga}" style="width: 240px; height: 240px; display: block;" alt="GPlus QR"/>
+            </div>
+            
+            <p style="font-size: 0.75rem; color: #9ca3af; margin-top: 20px; max-width: 260px; line-height: 1.4; text-align: center;">
+                Selecciona <b>"Guardar en Fotos"</b>, <b>"Añadir a carrete"</b> o <b>"Compartir"</b>.
+            </p>
+
+            <button onclick="document.getElementById('tg-qr-overlay-fix').remove();" style="margin-top: 40px; padding: 10px 24px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #ef4444; font-weight: 700; font-size: 0.8rem; border-radius: 8px; cursor: pointer;">
+                ❌ Volver al Generador
+            </button>
+        `;
+
+        // Lo inyectamos directamente al cuerpo de la aplicación
+        document.body.appendChild(capaFlotante);
     };
 }
 
