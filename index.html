@@ -7904,23 +7904,23 @@ function procesarYGenerarQR() {
 }
 
 // ==========================================
-// CONTROL DE DESCARGA ADAPTADO 100% A TELEGRAM
+// CONTROL DE DESCARGA ADAPTADO 100% A TELEGRAM (CONVERSIÓN BINARIA)
 // ==========================================
 function configurarBotonDescargaQR() {
     const btnDescargar = document.getElementById("qr-btn-download");
     if (!btnDescargar) return;
 
-    // Cambiamos el texto para que el usuario entienda la acción en Telegram
-    btnDescargar.innerHTML = `📱 Guardar / Ampliar Código QR`;
+    // Cambiamos el texto para indicar que se compartirá/guardará de forma nativa
+    btnDescargar.innerHTML = `🚀 Compartir / Guardar QR`;
 
-    btnDescargar.onclick = () => {
+    btnDescargar.onclick = async () => {
         const contenedorQR = document.getElementById("qrResult");
         const elementoCanvas = contenedorQR.querySelector("canvas");
         const elementoImg = contenedorQR.querySelector("img");
 
         let urlImagenDescarga = "";
 
-        // Extraer la imagen base64 generada por tu librería qrcode.js
+        // Extraer el Base64 generado por la librería
         if (elementoCanvas) {
             urlImagenDescarga = elementoCanvas.toDataURL("image/png");
         } else if (elementoImg && elementoImg.src) {
@@ -7928,40 +7928,41 @@ function configurarBotonDescargaQR() {
         }
 
         if (!urlImagenDescarga) {
-            alert("No se pudo procesar la matriz del código QR.");
+            alert("No se pudo procesar el código QR.");
             return;
         }
 
-        // 🚀 CREAMOS UN CAPA MODAL EN TIEMPO REAL DENTRO DE TU PROPIO HTML
-        const capaFlotante = document.createElement("div");
-        capaFlotante.id = "tg-qr-overlay-fix";
-        capaFlotante.style.cssText = `
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background: #0b0f19; z-index: 999999; display: flex;
-            flex-direction: column; justify-content: center; align-items: center;
-            font-family: system-ui, sans-serif; color: #fff; padding: 20px; box-sizing: border-box;
-        `;
+        try {
+            // 1. Convertimos el "data:image/png;base64,..." en un archivo binario real (.png) en la memoria del tlf
+            const respuesta = await fetch(urlImagenDescarga);
+            const blobImagen = await respuesta.blob();
+            const archivoImagen = new File([blobImagen], `GPlus_QR_${Date.now()}.png`, { type: "image/png" });
 
-        capaFlotante.innerHTML = `
-            <p style="font-size: 0.9rem; font-weight: 800; color: #10b981; margin-bottom: 25px; letter-spacing: 0.5px; text-transform: uppercase;">
-                👇 MANTÉN PRESIONADO PARA GUARDAR 👇
-            </p>
-            
-            <div style="background: #fff; padding: 16px; border-radius: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.6);">
-                <img src="${urlImagenDescarga}" style="width: 240px; height: 240px; display: block;" alt="GPlus QR"/>
-            </div>
-            
-            <p style="font-size: 0.75rem; color: #9ca3af; margin-top: 20px; max-width: 260px; line-height: 1.4; text-align: center;">
-                Selecciona <b>"Guardar en Fotos"</b>, <b>"Añadir a carrete"</b> o <b>"Compartir"</b>.
-            </p>
+            // 2. Comprobamos si el dispositivo soporta el menú de compartir nativo con archivos (iOS y Android modernos lo hacen)
+            if (navigator.canShare && navigator.canShare({ files: [archivoImagen] })) {
+                await navigator.share({
+                    files: [archivoImagen],
+                    title: 'GPlus QR Studio',
+                    text: 'Aquí tienes tu código QR generado.'
+                });
+            } 
+            // 3. Plan de contingencia A: Si está dentro de Telegram WebApp y tenemos la SDK activa, usamos su alerta interactiva
+            else if (window.Telegram && window.Telegram.WebApp) {
+                window.Telegram.WebApp.showPopup({
+                    title: 'Dispositivo Restringido',
+                    message: 'Telegram bloquea la descarga directa de este formato. Por favor, realiza una captura de pantalla (pantallazo) al código QR para guardarlo en tu galería.',
+                    buttons: [{ type: 'ok', text: 'Entendido' }]
+                });
+            } 
+            // 4. Plan de contingencia B: Navegador clásico
+            else {
+                alert("Tu dispositivo no soporta la transferencia de archivos directos. Por favor, toma una captura de pantalla del QR.");
+            }
 
-            <button onclick="document.getElementById('tg-qr-overlay-fix').remove();" style="margin-top: 40px; padding: 10px 24px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #ef4444; font-weight: 700; font-size: 0.8rem; border-radius: 8px; cursor: pointer;">
-                ❌ Volver al Generador
-            </button>
-        `;
-
-        // Lo inyectamos directamente al cuerpo de la aplicación
-        document.body.appendChild(capaFlotante);
+        } catch (error) {
+            console.error("Error en el procesado del archivo de salida:", error);
+            alert("Por seguridad, toma una captura de pantalla de tu código QR para guardarlo.");
+        }
     };
 }
 
