@@ -8330,14 +8330,24 @@ function reclamarPremioBasico(idPremio) {
             // Restamos directamente a tu objeto de estado global
             state.user.balance -= premio.precio;
             
-            // 🔥 IMPORTANTE: Si tienes una función encargada de guardar el "state" en el servidor 
-            // o de actualizar los headers de tu webapp (como el código de tu fragmento), invócala aquí:
-            // Ejemplo: actualizarInterfazDeUsuarioNativa(); 
+            // Sincronizar inmediatamente los elementos nativos de tu Web App
+            const balanceHeader = document.getElementById("header-balance");
+            if (balanceHeader) {
+                balanceHeader.innerText = state.user.balance;
+            }
+
+            const balanceProfile = document.getElementById("profile-balance") || document.getElementById("drawer-balance");
+            if (balanceProfile) {
+                balanceProfile.innerText = state.user.balance;
+            }
+            
+            // Si manejas persistencia en LocalStorage para todo el objeto "state", puedes guardarlo aquí:
+            // localStorage.setItem("gplus_user_state", JSON.stringify(state));
         } else {
             vault_diamantes -= premio.precio;
         }
 
-        // Actualizar visualmente los marcadores del módulo
+        // Actualizar los marcadores específicos de la sección de premios
         sincronizarSaldosVault();
 
         // 4. PLANTILLA DE TEXTO E INYECCIÓN DIRECTA AL CHAT
@@ -8351,7 +8361,7 @@ function reclamarPremioBasico(idPremio) {
             `👉 Envía este mensaje para procesar tu entrega.\n` +
             `👤 ID de Usuario: [Escribe tu ID de Telegram aquí]`;
 
-        // Configura aquí tu alias personal de Telegram (sin el '@')
+        // Tu alias configurado correctamente
         const tuAliasTelegram = "Airdayz"; 
         const urlTelegram = `https://t.me/${tuAliasTelegram}?text=${encodeURIComponent(textoMensaje)}`;
         
@@ -8363,8 +8373,6 @@ function reclamarPremioBasico(idPremio) {
     }
 }
 
-// Inicializador opcional al cargar el DOM
-document.addEventListener("DOMContentLoaded", sincronizarSaldosVault);
     </script>
 </body>
 </html>
