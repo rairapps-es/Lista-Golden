@@ -3320,6 +3320,70 @@
 </main>
 <main id="view-premios" class="app-view" style="font-family: system-ui, -apple-system, sans-serif; max-width: 1200px; margin: 0 auto; padding-left: 20px; padding-right: 20px; padding-top: 80px;">
 
+    <!-- ==========================================
+     MÓDULO DE GEMAS (REFILL)
+=========================================== -->
+<div class="vault-studio-container" style="margin-top: 25px; border-color: rgba(168, 85, 247, 0.2); background: linear-gradient(180deg, #0b0f19 0%, #120b1e 100%);">
+    <div class="vault-header" style="margin-bottom: 16px;">
+        <h2 style="background: linear-gradient(90deg, #a855f7, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+            <span>💎</span> GEMS REFILL
+        </h2>
+        <p style="margin: 3px 0 0 0; font-size: 0.7rem; color: #9ca3af;">Introduce la clave única de tu compra para reclamar gemas</p>
+    </div>
+
+    <div style="background: rgba(255,255,255,0.02); padding: 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 16px;">
+        <label style="font-size: 0.65rem; color: #ec4899; font-weight: 800; text-transform: uppercase; display: block; margin-bottom: 6px;">Clave Única de Compra</label>
+        <input type="text" id="v-gems-auth-key" placeholder="Pega aquí la clave única que te fue otorgada" style="width: 100%; background: #070b10; border: 1px solid rgba(255,255,255,0.08); border-radius: 6px; color: #fff; padding: 10px; font-size: 0.75rem; box-sizing: border-box; outline: none; letter-spacing: 1px; text-align: center;">
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 10px;">
+        <div style="background: #111827; border: 1px solid rgba(255,255,255,0.05); padding: 10px 14px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
+            <div style="font-size: 0.8rem; font-weight: 800; color: #fff;">Saco de 100 Gemas</div>
+            <button onclick="procesarPedidoGemas('pack_g_100')" style="padding: 8px 14px; background: linear-gradient(90deg, #a855f7, #ec4899); border: none; border-radius: 8px; color: #fff; font-size: 0.7rem; font-weight: 800; cursor: pointer;">Reclamar 💎</button>
+        </div>
+        <div style="background: #111827; border: 1px solid rgba(255,255,255,0.05); padding: 10px 14px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
+            <div style="font-size: 0.8rem; font-weight: 800; color: #fff;">Cofre de 500 Gemas</div>
+            <button onclick="procesarPedidoGemas('pack_g_500')" style="padding: 8px 14px; background: linear-gradient(90deg, #a855f7, #ec4899); border: none; border-radius: 8px; color: #fff; font-size: 0.7rem; font-weight: 800; cursor: pointer;">Reclamar 💎</button>
+        </div>
+        <div style="background: #111827; border: 1px solid rgba(255,255,255,0.05); padding: 10px 14px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
+            <div style="font-size: 0.8rem; font-weight: 800; color: #fff;">Carga de 1000 Gemas</div>
+            <button onclick="procesarPedidoGemas('pack_g_1000')" style="padding: 8px 14px; background: linear-gradient(90deg, #a855f7, #ec4899); border: none; border-radius: 8px; color: #fff; font-size: 0.7rem; font-weight: 800; cursor: pointer;">Reclamar 💎</button>
+        </div>
+    </div>
+</div>
+
+<!-- ==========================================
+     MÓDULO DE ENERGÍA (REFILL)
+=========================================== -->
+<div class="vault-studio-container" style="margin-top: 25px; border-color: rgba(56, 189, 248, 0.2); background: linear-gradient(180deg, #0b0f19 0%, #081626 100%);">
+    <div class="vault-header" style="margin-bottom: 16px;">
+        <h2 style="background: linear-gradient(90deg, #38bdf8, #0ea5e9); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+            <span>⚡</span> ENERGY REFILL
+        </h2>
+        <p style="margin: 3px 0 0 0; font-size: 0.7rem; color: #9ca3af;">Introduce la clave única de tu compra para activar energía</p>
+    </div>
+
+    <div style="background: rgba(255,255,255,0.02); padding: 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 16px;">
+        <label style="font-size: 0.65rem; color: #38bdf8; font-weight: 800; text-transform: uppercase; display: block; margin-bottom: 6px;">Clave Única de Compra</label>
+        <input type="text" id="v-pts-auth-key" placeholder="Pega aquí la clave única que te fue otorgada" style="width: 100%; background: #070b10; border: 1px solid rgba(255,255,255,0.08); border-radius: 6px; color: #fff; padding: 10px; font-size: 0.75rem; box-sizing: border-box; outline: none; letter-spacing: 1px; text-align: center;">
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 10px;">
+        <div style="background: #111827; border: 1px solid rgba(255,255,255,0.05); padding: 10px 14px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
+            <div style="font-size: 0.8rem; font-weight: 800; color: #fff;">Batería de 500 Puntos</div>
+            <button onclick="procesarPedidoPuntos('pack_p_500')" style="padding: 8px 14px; background: linear-gradient(90deg, #38bdf8, #0ea5e9); border: none; border-radius: 8px; color: #0f172a; font-size: 0.7rem; font-weight: 800; cursor: pointer;">Reclamar ⚡</button>
+        </div>
+        <div style="background: #111827; border: 1px solid rgba(255,255,255,0.05); padding: 10px 14px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
+            <div style="font-size: 0.8rem; font-weight: 800; color: #fff;">Célula de 2000 Puntos</div>
+            <button onclick="procesarPedidoPuntos('pack_p_2000')" style="padding: 8px 14px; background: linear-gradient(90deg, #38bdf8, #0ea5e9); border: none; border-radius: 8px; color: #0f172a; font-size: 0.7rem; font-weight: 800; cursor: pointer;">Reclamar ⚡</button>
+        </div>
+        <div style="background: #111827; border: 1px solid rgba(255,255,255,0.05); padding: 10px 14px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
+            <div style="font-size: 0.8rem; font-weight: 800; color: #fff;">Megavatio de 5000 Puntos</div>
+            <button onclick="procesarPedidoPuntos('pack_p_5000')" style="padding: 8px 14px; background: linear-gradient(90deg, #38bdf8, #0ea5e9); border: none; border-radius: 8px; color: #0f172a; font-size: 0.7rem; font-weight: 800; cursor: pointer;">Reclamar ⚡</button>
+        </div>
+    </div>
+</div>
+
     <div class="vault-studio-container">
 
     <div class="vault-header" style="display: flex; justify-content: space-between; align-items: center;">
@@ -8298,112 +8362,175 @@ function sincronizarSaldosVault() {
     }
 }
 
-// ==========================================
-// 2. FUNCIÓN DE CANJE ADAPTADA A TU "STATE"
-// ==========================================
+// =========================================================================
+// 1. CONFIGURACIONES GENERALES E INICIALIZADORES (LO QUE YA TENÍAS)
+// =========================================================================
+const VAULT_PREMIOS = [
+    { id: "v_premium_30", titulo: "Premium 30 Días", precio: 1500, moneda: "puntos" },
+    { id: "v_pack_gemas", titulo: "Megapack Gemas", precio: 500, moneda: "diamantes" },
+    { id: "v_avatar_custom", titulo: "Avatar Personalizado", precio: 200, moneda: "diamantes" }
+];
+
+let vault_diamantes = parseInt(localStorage.getItem("gplus_saldo_diamantes")) || 100;
+
+function sincronizarSaldosVault() {
+    const saldoPuntosActual = (state.user && state.user.balance !== undefined) ? state.user.balance : 0;
+    localStorage.setItem("gplus_saldo_diamantes", vault_diamantes);
+    if (document.getElementById("vault-txt-puntos")) document.getElementById("vault-txt-puntos").innerText = saldoPuntosActual;
+    if (document.getElementById("vault-txt-diamantes")) document.getElementById("vault-txt-diamantes").innerText = vault_diamantes;
+}
+
+// =========================================================================
+// 2. FUNCIÓN DE RECLAMAR PREMIOS (TU FUNCIÓN PRINCIPAL)
+// =========================================================================
 function reclamarPremioBasico(idPremio) {
     const premio = VAULT_PREMIOS.find(p => p.id === idPremio);
     if (!premio) return;
 
     const esPuntos = premio.moneda === "puntos";
-    
-    // Extraemos el saldo dinámicamente según la moneda requerida
-    const saldoActual = esPuntos 
-        ? ((state.user && state.user.balance !== undefined) ? state.user.balance : 0)
-        : vault_diamantes;
-        
+    const saldoActual = esPuntos ? ((state.user && state.user.balance !== undefined) ? state.user.balance : 0) : vault_diamantes;
     const nombreMoneda = esPuntos ? "Puntos" : "Gemas/Diamantes";
 
-    // 1. VALIDACIÓN DE BALANCE
     if (saldoActual < premio.precio) {
         alert(`❌ Saldo insuficiente. Necesitas ${premio.precio} ${nombreMoneda} y tienes ${saldoActual}.`);
         return;
     }
 
-    // 2. MODAL DE CONFIRMACIÓN DE DESCUENTO
     const mensajeConfirmacion = `¿Confirmar canje de "${premio.titulo}"?\nSe restarán ${premio.precio} ${nombreMoneda} de tu cuenta.`;
     const usuarioAcepto = confirm(mensajeConfirmacion);
 
     if (usuarioAcepto) {
-        // 3. DEDUCCIÓN DEL CRÉDITO
         if (esPuntos) {
-            // Restamos directamente a tu objeto de estado global
             state.user.balance -= premio.precio;
-            
-            // Sincronizar inmediatamente los elementos nativos de tu Web App
-            const balanceHeader = document.getElementById("header-balance");
-            if (balanceHeader) {
-                balanceHeader.innerText = state.user.balance;
-            }
-
-            const balanceProfile = document.getElementById("profile-balance") || document.getElementById("drawer-balance");
-            if (balanceProfile) {
-                balanceProfile.innerText = state.user.balance;
-            }
-            
-            // Si manejas persistencia en LocalStorage para todo el objeto "state", puedes guardarlo aquí:
-            // localStorage.setItem("gplus_user_state", JSON.stringify(state));
+            if (document.getElementById("header-balance")) document.getElementById("header-balance").innerText = state.user.balance;
+            if (document.getElementById("profile-balance")) document.getElementById("profile-balance").innerText = state.user.balance;
+            if (document.getElementById("drawer-balance")) document.getElementById("drawer-balance").innerText = state.user.balance;
         } else {
             vault_diamantes -= premio.precio;
         }
 
-        // Actualizar los marcadores específicos de la sección de premios
         sincronizarSaldosVault();
 
-        // 4. PLANTILLA DE TEXTO E INYECCIÓN DIRECTA AL CHAT
-        const textoMensaje = 
-            `🛒 NUEVO PEDIDO DIRECTO\n` +
-            `=========================\n` +
-            `▪️ Premio: ${premio.titulo}\n` +
-            `▪️ Coste: ${premio.precio} ${nombreMoneda.toUpperCase()}\n` +
-            `▪️ Estado: 🟡 EN PROGRESO\n` +
-            `=========================\n` +
-            `👉 Envía este mensaje para procesar tu entrega.\n` +
-            `👤 ID de Usuario: [Escribe tu ID de Telegram aquí]`;
-
-        // Tu alias configurado correctamente
-        const tuAliasTelegram = "Airdayz"; 
-        const urlTelegram = `https://t.me/${tuAliasTelegram}?text=${encodeURIComponent(textoMensaje)}`;
-        
-        // Abrir el chat privado con el texto ya escrito en el cuadro de entrada
-        window.open(urlTelegram, '_blank');
-        
-    } else {
-        console.log("Canje cancelado por el usuario.");
+        const textoMensaje = `🛒 NUEVO PEDIDO DIRECTO\n=========================\n▪️ Premio: ${premio.titulo}\n▪️ Coste: ${premio.precio} ${nombreMoneda.toUpperCase()}\n▪️ Estado: 🟡 EN PROGRESO\n=========================\n👉 Envía este mensaje para procesar tu entrega.\n👤 ID de Usuario: [Escribe tu ID de Telegram aquí]`;
+        window.open(`https://t.me/Airdayz?text=${encodeURIComponent(textoMensaje)}`, '_blank');
     }
 }
-        // =========================================================
-// 2. 🔥 AQUÍ SE AGREGA TU NUEVA FUNCIÓN DE FILTRADO
-// =========================================================
+
+// =========================================================================
+// 3. FUNCIÓN DE FILTRADO DE CATÁLOGO (LA QUE AGREGAMOS ANTES)
+// =========================================================================
 function filtrarCatalogoVault(categoria) {
-    // Quita la clase activa de todos los botones de filtro
     const botones = document.querySelectorAll(".vault-filter-btn");
     botones.forEach(btn => btn.classList.remove("active"));
 
-    // Añade la clase activa al botón específico que tocaste
     const eventoActual = window.event;
     if (eventoActual && eventoActual.target) {
         eventoActual.target.classList.add("active");
     }
 
-    // Busca todas las tarjetas de premios
     const tarjetas = document.querySelectorAll(".vault-card");
-    
-    // Oculta o muestra según corresponda
     tarjetas.forEach(tarjeta => {
         const monedaTarjeta = tarjeta.getAttribute("data-moneda");
-
         if (categoria === "all" || monedaTarjeta === categoria) {
-            tarjeta.style.display = "flex"; // Se muestra
+            tarjeta.style.display = "flex";
         } else {
-            tarjeta.style.display = "none"; // Se oculta
+            tarjeta.style.display = "none";
         }
     });
 }
 
-// ==========================================
-// 3. INICIALIZADORES AL CARGAR LA APP
-// ==========================================
+// =========================================================================
+// 4. 🔥 AQUÍ AGREGAS EL NUEVO BLOQUE AUTOMÁTICO DE RECARGAS (GEMS & ENERGY)
+// =========================================================================
+
+// CONFIGURACIÓN MAESTRA DE CLAVES AUTOMATIZADAS (ID_CLAVE)
+const VAULT_CLAVES_AUTORIZADAS = {
+    "12345678_GEMAS100": 100,
+    "76543210_SUPER500": 500,
+    "Airdayz_CREADOR99": 9999
+};
+
+const VAULT_CLAVES_PUNTOS = {
+    "12345678_ENERGIA500": 500,
+    "76543210_POWER2000": 2000,
+    "Airdayz_MASTER99": 50000
+};
+
+// EXTRAER ID AUTOMÁTICO
+function obtenerTelegramIdAutomatico() {
+    if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user) {
+        return window.Telegram.WebApp.initDataUnsafe.user.id.toString();
+    }
+    return "Airdayz"; 
+}
+
+// PEDIDO DE GEMAS
+function procesarPedidoGemas(idPack) {
+    const packs = { "pack_g_100": "Saco de 100 Gemas", "pack_g_500": "Cofre de 500 Gemas", "pack_g_1000": "Carga de 1000 Gemas" };
+    const nombrePack = packs[idPack] || "Pack Especial";
+    const idTelegramAuto = obtenerTelegramIdAutomatico();
+    const claveInput = document.getElementById("v-gems-auth-key").value.trim();
+
+    if (!claveInput) {
+        alert("❌ Por favor, introduce la Clave Única de tu compra.");
+        return;
+    }
+
+    let mensajeEstadoGemas = "Pendiente de Pago / Verificación Manual";
+    const combinacionBuscar = `${idTelegramAuto}_${claveInput}`;
+
+    if (VAULT_CLAVES_AUTORIZADAS[combinacionBuscar] !== undefined) {
+        const gemasOtorgadas = VAULT_CLAVES_AUTORIZADAS[combinacionBuscar];
+        vault_diamantes += gemasOtorgadas;
+        sincronizarSaldosVault();
+        alert(`✅ ¡Autenticación Exitosa! Se han cargado +${gemasOtorgadas} Gemas a tu balance.`);
+        mensajeEstadoGemas = `🟢 APROBADO AUTOMÁTICAMENTE (+${gemasOtorgadas} Gemas Entregadas)`;
+    } else {
+        alert("⚠️ Clave incorrecta o no vinculada a tu cuenta de Telegram. El pedido se enviará a revisión.");
+        mensajeEstadoGemas = "🔴 Clave Inválida - Pendiente de Verificación de Recibo";
+    }
+
+    const textoMensaje = `💎 SOLICITUD DE RECARGA DE GEMAS\n=========================\n▪️ Paquete: ${nombrePack}\n▪️ ID Cliente (Auto): ${idTelegramAuto}\n▪️ Clave Validada: ${claveInput}\n▪️ Estado: ${mensajeEstadoGemas}\n=========================\nHola Airdayz, envío los datos verificados de mi cuenta para la recarga.`;
+    window.open(`https://t.me/Airdayz?text=${encodeURIComponent(textoMensaje)}`, '_blank');
+}
+
+// PEDIDO DE PUNTOS
+function procesarPedidoPuntos(idPack) {
+    const packs = { "pack_p_500": "Batería de 500 Puntos", "pack_p_2000": "Célula de 2000 Puntos", "pack_p_5000": "Megavatio de 5000 Puntos" };
+    const nombrePack = packs[idPack] || "Pack Especial";
+    const idTelegramAuto = obtenerTelegramIdAutomatico();
+    const claveInput = document.getElementById("v-pts-auth-key").value.trim();
+
+    if (!claveInput) {
+        alert("❌ Por favor, introduce la Clave Única de tu compra.");
+        return;
+    }
+
+    let mensajeEstadoPuntos = "Pendiente de Pago / Verificación Manual";
+    const combinacionBuscar = `${idTelegramAuto}_${claveInput}`;
+
+    if (VAULT_CLAVES_PUNTOS[combinacionBuscar] !== undefined) {
+        const puntosOtorgados = VAULT_CLAVES_PUNTOS[combinacionBuscar];
+        if (!state.user) state.user = {};
+        state.user.balance = (state.user.balance || 0) + puntosOtorgados;
+        
+        if (document.getElementById("header-balance")) document.getElementById("header-balance").innerText = state.user.balance;
+        if (document.getElementById("profile-balance")) document.getElementById("profile-balance").innerText = state.user.balance;
+        if (document.getElementById("drawer-balance")) document.getElementById("drawer-balance").innerText = state.user.balance;
+        
+        sincronizarSaldosVault();
+        alert(`✅ ¡Autenticación Exitosa! Se han cargado +${puntosOtorgados} Puntos de Energía.`);
+        mensajeEstadoPuntos = `🟢 APROBADO AUTOMÁTICAMENTE (+${puntosOtorgados} Pts Entregados)`;
+    } else {
+        alert("⚠️ Clave incorrecta o no vinculada a tu cuenta de Telegram. El pedido se enviará a revisión.");
+        mensajeEstadoPuntos = "🔴 Clave Inválida - Pendiente de Verificación de Recibo";
+    }
+
+    const textoMensaje = `⚡ SOLICITUD DE RECARGA DE ENERGÍA\n=========================\n▪️ Paquete: ${nombrePack}\n▪️ ID Cliente (Auto): ${idTelegramAuto}\n▪️ Clave Validada: ${claveInput}\n▪️ Estado: ${mensajeEstadoPuntos}\n=========================\nHola Airdayz, envío los datos de energía validados por el sistema.`;
+    window.open(`https://t.me/Airdayz?text=${encodeURIComponent(textoMensaje)}`, '_blank');
+}
+
+// Escuchador de carga inicial
 document.addEventListener("DOMContentLoaded", sincronizarSaldosVault);
 
     </script>
