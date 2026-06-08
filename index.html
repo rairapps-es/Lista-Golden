@@ -2248,6 +2248,56 @@
     border-radius: 99px;
 }
 
+        /* ==========================================
+   ESTILOS PREMIUM - GPLUS QR STUDIO
+   ========================================== */
+
+/* Animación de latido y desvanecimiento para el reloj de arena */
+@keyframes qrPulse {
+    0% {
+        transform: scale(1);
+        opacity: 0.7;
+        color: #9ca3af;
+    }
+    100% {
+        transform: scale(1.18);
+        opacity: 1;
+        color: #10b981;
+    }
+}
+
+/* Transiciones fluidas para los campos del formulario al cambiar de pestaña */
+#qr-input-block-url,
+#qr-input-block-tel,
+#qr-input-block-mail {
+    animation: qrFadeIn 0.25s ease-out forwards;
+}
+
+@keyframes qrFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Efecto Hover interactivo para el botón de descarga */
+#qr-btn-download:hover {
+    background: rgba(255, 255, 255, 0.08) !important;
+    border-color: rgba(255, 255, 255, 0.2) !important;
+    color: #10b981 !important;
+}
+
+/* Enfoque estético para los inputs de datos */
+.qr-container input:focus {
+    border-color: rgba(16, 185, 129, 0.4) !important;
+    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.1);
+    background: #161e2e !important;
+}
+
     </style>
 </head>
 <body>
@@ -3342,6 +3392,73 @@
     <button onclick="switchView('crm-dashboard')" data-mision="explorar_crm">📊 Panel & CRM</button>
     
 <a href="#" onclick="switchView('favorites'); return false;" data-mision="explorar_favoritos">⭐ Mis Favoritos</a>
+    <div style="text-align: center; margin-bottom: 20px;">
+    <button onclick="toggleQRStudio()" id="btn-toggle-qr" style="padding: 10px 20px; background: rgba(16, 185, 129, 0.1); border: 1px solid #10b981; color: #10b981; border-radius: 8px; font-weight: 700; font-size: 0.8rem; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s;">
+        <span>🔮</span> Abrir GPlus QR Studio
+    </button>
+</div>
+
+<div id="gplus-qr-wrapper" class="qr-container" style="display: none; font-family: system-ui, -apple-system, sans-serif; background: #0b0f19; color: #fff; padding: 20px; border-radius: 16px; max-width: 400px; margin: 0 auto; box-sizing: border-box; border: 1px solid rgba(255,255,255,0.05);">
+    
+    <div style="margin-bottom: 20px; text-align: center;">
+        <h2 style="margin: 0; font-size: 1.3rem; font-weight: 800; color: #f3f4f6; display: flex; align-items: center; justify-content: center; gap: 8px;">
+            <span style="color: #10b981;">🔮</span> GPlus QR Studio
+        </h2>
+        <p style="font-size: 0.75rem; color: #9ca3af; margin: 4px 0 0 0;">Genera códigos QR profesionales al instante</p>
+    </div>
+
+    <div style="display: flex; background: rgba(255,255,255,0.03); padding: 4px; border-radius: 10px; margin-bottom: 16px; gap: 4px; border: 1px solid rgba(255,255,255,0.05);">
+        <button onclick="cambiarTipoQR('url')" id="qr-tab-url" style="flex: 1; padding: 6px; border: none; border-radius: 6px; font-weight: 700; font-size: 0.7rem; cursor: pointer; background: #10b981; color: #0f172a;">URL</button>
+        <button onclick="cambiarTipoQR('tel')" id="qr-tab-tel" style="flex: 1; padding: 6px; border: none; border-radius: 6px; font-weight: 700; font-size: 0.7rem; cursor: pointer; background: transparent; color: #9ca3af;">Teléfono</button>
+        <button onclick="cambiarTipoQR('mail')" id="qr-tab-mail" style="flex: 1; padding: 6px; border: none; border-radius: 6px; font-weight: 700; font-size: 0.7rem; cursor: pointer; background: transparent; color: #9ca3af;">Correo</button>
+    </div>
+
+    <div style="margin-bottom: 16px;">
+        <div id="qr-input-block-url">
+            <label style="font-size: 0.7rem; color: #9ca3af; font-weight: 700; display: block; margin-bottom: 6px; text-transform: uppercase;">Dirección Web (URL)</label>
+            <input type="url" id="qr-val-url" placeholder="https://ejemplo.com" style="width: 100%; padding: 10px; background: #111827; border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; color: #fff; font-size: 0.8rem; box-sizing: border-box; outline: none;">
+        </div>
+        
+        <div id="qr-input-block-tel" style="display: none;">
+            <label style="font-size: 0.7rem; color: #9ca3af; font-weight: 700; display: block; margin-bottom: 6px; text-transform: uppercase;">Número Telefónico</label>
+            <input type="tel" id="qr-val-tel" placeholder="+34600000000" style="width: 100%; padding: 10px; background: #111827; border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; color: #fff; font-size: 0.8rem; box-sizing: border-box; outline: none;">
+        </div>
+
+        <div id="qr-input-block-mail" style="display: none;">
+            <label style="font-size: 0.7rem; color: #9ca3af; font-weight: 700; display: block; margin-bottom: 6px; text-transform: uppercase;">Correo Electrónico</label>
+            <input type="email" id="qr-val-mail" placeholder="contacto@correo.com" style="width: 100%; padding: 10px; background: #111827; border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; color: #fff; font-size: 0.8rem; box-sizing: border-box; outline: none;">
+        </div>
+    </div>
+
+    <button onclick="procesarYGenerarQR()" style="width: 100%; padding: 12px; background: linear-gradient(90deg, #10b981, #3b82f6); color: #0f172a; border: none; border-radius: 8px; font-weight: 800; font-size: 0.8rem; cursor: pointer; margin-bottom: 16px;">
+        Procesar y Generar QR ⚡
+    </button>
+
+    <div id="qr-display-zone" style="background: #111827; border: 1px solid rgba(255,255,255,0.06); padding: 16px; border-radius: 12px; min-height: 250px; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative;">
+        <div id="qr-placeholder-text" style="text-align: center; color: #4b5563; font-size: 0.75rem; font-weight: 600;">
+            <div style="font-size: 2rem; margin-bottom: 6px;">📲</div>
+            Introduce los datos arriba para comenzar
+        </div>
+
+        <div id="qr-loader-container" style="display: none; width: 100%; text-align: center; padding: 0 20px; box-sizing: border-box;">
+            <div style="font-size: 1.8rem; margin-bottom: 8px; animation: qrPulse 1s infinite alternate;">⏳</div>
+            <div id="qr-countdown-txt" style="font-size: 1.1rem; font-weight: 900; color: #10b981; margin-bottom: 4px;">3.0s</div>
+            <p style="margin: 0 0 12px 0; font-size: 0.65rem; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.5px;">Cifrando Matriz de Datos</p>
+            <div style="width: 100%; height: 5px; background: rgba(255,255,255,0.05); border-radius: 10px; overflow: hidden;">
+                <div id="qr-progress-bar" style="width: 0%; height: 100%; background: #10b981; transition: width 3s linear;"></div>
+            </div>
+        </div>
+
+        <div id="qr-final-block" style="display: none; flex-direction: column; align-items: center; gap: 14px; width: 100%;">
+            <div id="qrResult" style="background: #fff; padding: 10px; border-radius: 10px; display: inline-block;"></div>
+            
+            <button id="qr-btn-download" style="padding: 8px 16px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); color: #fff; border-radius: 6px; font-size: 0.72rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+                📥 Descargar Archivo Image
+            </button>
+        </div>
+    </div>
+</div>
+
     <nav class="tab-bar">
         <div class="tab-item active-tab" id="tab-home" onclick="switchView('home')">
             <i data-lucide="home"></i><span>Inicio</span>
@@ -7644,5 +7761,207 @@ console.log("🚀 Módulo CRM completamente blindado, persistente y expuesto en 
 }
 </style>
 
+    <script>
+        // ==========================================
+// 1. VARIABLES GLOBALES DE CONFIGURACIÓN
+// ==========================================
+let qrTipoActivo = "url";
+let objetoInstanciaQR = null;
+
+// ==========================================
+// 2. CONMUTADOR DINÁMICO DE CONTENIDO (TABS)
+// ==========================================
+function cambiarTipoQR(tipo) {
+    qrTipoActivo = tipo;
+
+    // Actualizar visualmente los botones de las pestañas
+    const mapeoTabs = { url: "qr-tab-url", tel: "qr-tab-tel", mail: "qr-tab-mail" };
+    Object.keys(mapeoTabs).forEach(key => {
+        const btn = document.getElementById(mapeoTabs[key]);
+        if (btn) {
+            btn.style.background = key === tipo ? "#10b981" : "transparent";
+            btn.style.color = key === tipo ? "#0f172a" : "#9ca3af";
+        }
+    });
+
+    // Alternar los bloques de entrada del formulario
+    const mapeoInputs = { url: "qr-input-block-url", tel: "qr-input-block-tel", mail: "qr-input-block-mail" };
+    Object.keys(mapeoInputs).forEach(key => {
+        const bloque = document.getElementById(mapeoInputs[key]);
+        if (bloque) {
+            bloque.style.display = key === tipo ? "block" : "none";
+        }
+    });
+}
+
+// ==========================================
+// 3. EXTRACCIÓN Y FORMATEO SEGURO DE DATOS
+// ==========================================
+function obtenerTextoFormateadoQR() {
+    let textoFinal = "";
+
+    if (qrTipoActivo === "url") {
+        const urlInput = document.getElementById("qr-val-url").value.trim();
+        if (!urlInput) return null;
+        
+        // Auto-completar protocolo si el usuario lo olvida
+        textoFinal = urlInput.match(/^https?:\/\//i) ? urlInput : `https://${urlInput}`;
+
+    } else if (qrTipoActivo === "tel") {
+        const telInput = document.getElementById("qr-val-tel").value.trim();
+        if (!telInput) return null;
+        
+        // Formato estándar para llamadas directas desde QR
+        textoFinal = `tel:${telInput}`;
+
+    } else if (qrTipoActivo === "mail") {
+        const mailInput = document.getElementById("qr-val-mail").value.trim();
+        if (!mailInput) return null;
+        
+        // Formato estándar para envío de correos electronicos
+        textoFinal = `mailto:${mailInput}`;
+    }
+
+    return textoFinal;
+}
+
+        // ==========================================
+// 4. MOTOR DE CARGA, GENERACIÓN Y DESCARGA
+// ==========================================
+function procesarYGenerarQR() {
+    const datosTexto = obtenerTextoFormateadoQR();
+    
+    // Validación de seguridad básica si los campos están vacíos
+    if (!datosTexto) {
+        if (typeof showToast === "function") {
+            showToast("Por favor, rellena el campo seleccionado", "error");
+        } else {
+            alert("Por favor, rellena el campo seleccionado");
+        }
+        return;
+    }
+
+    const txtPlaceholder = document.getElementById("qr-placeholder-text");
+    const contenedorLoader = document.getElementById("qr-loader-container");
+    const bloqueFinal = document.getElementById("qr-final-block");
+    const barraProgreso = document.getElementById("qr-progress-bar");
+    const txtContador = document.getElementById("qr-countdown-txt");
+    const contenedorResultado = document.getElementById("qrResult");
+
+    // Resetear estados visuales previos
+    if (txtPlaceholder) txtPlaceholder.style.display = "none";
+    if (bloqueFinal) bloqueFinal.style.display = "none";
+    if (contenedorResultado) contenedorResultado.innerHTML = "";
+    if (barraProgreso) barraProgreso.style.width = "0%";
+    
+    // Activar pantalla de carga simulación (3 segundos totales)
+    if (contenedorLoader) contenedorLoader.style.display = "block";
+
+    let tiempoRestante = 3.0;
+    if (txtContador) txtContador.innerText = `${tiempoRestante.toFixed(1)}s`;
+
+    // Animación fluida de la barra verde mediante CSS Transition
+    setTimeout(() => {
+        if (barraProgreso) barraProgreso.style.width = "100%";
+    }, 50);
+
+    // Cuenta atrás visual interna (Intervalo cada 100ms)
+    const intervaloCuentaAtras = setInterval(() => {
+        tiempoRestante -= 0.1;
+        if (tiempoRestante <= 0) {
+            tiempoRestante = 0;
+            clearInterval(intervaloCuentaAtras);
+        }
+        if (txtContador) txtContador.innerText = `${tiempoRestante.toFixed(1)}s`;
+    }, 100);
+
+    // Clímax de los 3 segundos: Generar QR real mediante qrcode.js
+    setTimeout(() => {
+        clearInterval(intervaloCuentaAtras);
+        
+        if (contenedorLoader) contenedorLoader.style.display = "none";
+        if (bloqueFinal) bloqueFinal.style.display = "flex";
+
+        try {
+            // Invocar la librería instanciando en tu elemento limpio qrResult
+            objetoInstanciaQR = new QRCode(contenedorResultado, {
+                text: datosTexto,
+                width: 200,
+                height: 200,
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+            });
+
+            // Configurar el disparador de descarga una vez inyectado el QR
+            configurarBotonDescargaQR();
+
+        } catch (error) {
+            console.error("Error crítico ejecutando qrcode.min.js:", error);
+        }
+    }, 3000);
+}
+
+// ==========================================
+// 5. MANIPULACIÓN DEL CANVAS PARA DESCARGA
+// ==========================================
+function configurarBotonDescargaQR() {
+    const btnDescargar = document.getElementById("qr-btn-download");
+    if (!btnDescargar) return;
+
+    btnDescargar.onclick = () => {
+        const contenedorQR = document.getElementById("qrResult");
+        // qrcode.js suele renderizar tanto un elemento <canvas> como una <img>. Extraemos el canvas prioritariamente.
+        const elementoCanvas = contenedorQR.querySelector("canvas");
+        const elementoImg = contenedorQR.querySelector("img");
+
+        let urlImagenDescarga = "";
+
+        if (elementoCanvas) {
+            urlImagenDescarga = elementoCanvas.toDataURL("image/png");
+        } else if (elementoImg && elementoImg.src) {
+            urlImagenDescarga = elementoImg.src;
+        }
+
+        if (!urlImagenDescarga) {
+            alert("No se pudo estructurar el archivo de imagen para la descarga.");
+            return;
+        }
+
+        // Crear ancla oculta temporal para disparar la descarga nativa en el explorador
+        const enlaceTemporal = document.createElement("a");
+        enlaceTemporal.href = urlImagenDescarga;
+        enlaceTemporal.download = `GPlus_QR_${Date.now()}.png`;
+        document.body.appendChild(enlaceTemporal);
+        enlaceTemporal.click();
+        document.body.removeChild(enlaceTemporal);
+    };
+}
+// ==========================================
+// CONTROL DE VISIBILIDAD DEL QR STUDIO
+// ==========================================
+function toggleQRStudio() {
+    const contenedorQR = document.getElementById("gplus-qr-wrapper");
+    const botonToggle = document.getElementById("btn-toggle-qr");
+    if (!contenedorQR || !botonToggle) return;
+
+    if (contenedorQR.style.display === "none") {
+        // Mostrar el módulo con flex para mantener alineación estructural
+        contenedorQR.style.display = "block";
+        botonToggle.innerHTML = `<span>❌</span> Cerrar QR Studio`;
+        botonToggle.style.background = "rgba(239, 68, 68, 0.1)";
+        botonToggle.style.borderColor = "#ef4444";
+        botonToggle.style.color = "#ef4444";
+    } else {
+        // Ocultar el módulo por completo
+        contenedorQR.style.display = "none";
+        botonToggle.innerHTML = `<span>🔮</span> Abrir GPlus QR Studio`;
+        botonToggle.style.background = "rgba(16, 185, 129, 0.1)";
+        botonToggle.style.borderColor = "#10b981";
+        botonToggle.style.color = "#10b981";
+    }
+}
+
+    </script>
 </body>
 </html>
