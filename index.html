@@ -7904,23 +7904,22 @@ function procesarYGenerarQR() {
 }
 
 // ==========================================
-// CONTROL DE DESCARGA ADAPTADO 100% A TELEGRAM (CONVERSIÓN BINARIA)
+// SOLUCIÓN DEFINITIVA PARA COPIAR/GUARDAR DENTRO DE TELEGRAM
 // ==========================================
 function configurarBotonDescargaQR() {
     const btnDescargar = document.getElementById("qr-btn-download");
     if (!btnDescargar) return;
 
-    // Cambiamos el texto para indicar que se compartirá/guardará de forma nativa
-    btnDescargar.innerHTML = `🚀 Compartir / Guardar QR`;
+    // Cambiamos el texto para guiar perfectamente al usuario dentro de Telegram
+    btnDescargar.innerHTML = `📱 Guardar / Expandir QR`;
 
-    btnDescargar.onclick = async () => {
+    btnDescargar.onclick = () => {
         const contenedorQR = document.getElementById("qrResult");
         const elementoCanvas = contenedorQR.querySelector("canvas");
         const elementoImg = contenedorQR.querySelector("img");
 
         let urlImagenDescarga = "";
 
-        // Extraer el Base64 generado por la librería
         if (elementoCanvas) {
             urlImagenDescarga = elementoCanvas.toDataURL("image/png");
         } else if (elementoImg && elementoImg.src) {
@@ -7932,37 +7931,39 @@ function configurarBotonDescargaQR() {
             return;
         }
 
-        try {
-            // 1. Convertimos el "data:image/png;base64,..." en un archivo binario real (.png) en la memoria del tlf
-            const respuesta = await fetch(urlImagenDescarga);
-            const blobImagen = await respuesta.blob();
-            const archivoImagen = new File([blobImagen], `GPlus_QR_${Date.now()}.png`, { type: "image/png" });
+        // Creación de una interfaz flotante nativa simulada que Telegram no puede bloquear
+        const pantallaCompleta = document.createElement("div");
+        pantallaCompleta.id = "gplus-tg-canvas-fix";
+        pantallaCompleta.style.cssText = `
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: #000000; z-index: 9999999; display: flex;
+            flex-direction: column; justify-content: center; align-items: center;
+            font-family: system-ui, -apple-system, sans-serif; color: #fff; padding: 20px; box-sizing: border-box;
+        `;
 
-            // 2. Comprobamos si el dispositivo soporta el menú de compartir nativo con archivos (iOS y Android modernos lo hacen)
-            if (navigator.canShare && navigator.canShare({ files: [archivoImagen] })) {
-                await navigator.share({
-                    files: [archivoImagen],
-                    title: 'GPlus QR Studio',
-                    text: 'Aquí tienes tu código QR generado.'
-                });
-            } 
-            // 3. Plan de contingencia A: Si está dentro de Telegram WebApp y tenemos la SDK activa, usamos su alerta interactiva
-            else if (window.Telegram && window.Telegram.WebApp) {
-                window.Telegram.WebApp.showPopup({
-                    title: 'Dispositivo Restringido',
-                    message: 'Telegram bloquea la descarga directa de este formato. Por favor, realiza una captura de pantalla (pantallazo) al código QR para guardarlo en tu galería.',
-                    buttons: [{ type: 'ok', text: 'Entendido' }]
-                });
-            } 
-            // 4. Plan de contingencia B: Navegador clásico
-            else {
-                alert("Tu dispositivo no soporta la transferencia de archivos directos. Por favor, toma una captura de pantalla del QR.");
-            }
+        pantallaCompleta.innerHTML = `
+            <div style="margin-bottom: 30px; text-align: center;">
+                <span style="font-size: 1.8rem;">📲</span>
+                <h3 style="margin: 8px 0 4px 0; font-size: 1rem; font-weight: 800; color: #10b981; text-transform: uppercase; letter-spacing: 0.5px;">Cifrado Completado</h3>
+                <p style="margin: 0; font-size: 0.72rem; color: #9ca3af; max-width: 240px; line-height: 1.4;">
+                    Mantén presionado el centro del código QR o realiza una <b>captura de pantalla</b> rápida.
+                </p>
+            </div>
+            
+            <div style="background: #ffffff; padding: 20px; border-radius: 24px; box-shadow: 0 0 40px rgba(16, 185, 129, 0.2);">
+                <img src="${urlImagenDescarga}" style="width: 220px; height: 220px; display: block; -webkit-touch-callout: default;" alt="GPlus QR NATIVO"/>
+            </div>
+            
+            <p style="font-size: 0.68rem; color: #4b5563; margin-top: 25px; font-weight: 600;">
+                GPlus Studio v2.6 • Conexión Asegurada
+            </p>
 
-        } catch (error) {
-            console.error("Error en el procesado del archivo de salida:", error);
-            alert("Por seguridad, toma una captura de pantalla de tu código QR para guardarlo.");
-        }
+            <button onclick="document.getElementById('gplus-tg-canvas-fix').remove();" style="margin-top: 40px; padding: 12px 28px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); color: #fff; font-weight: 700; font-size: 0.75rem; border-radius: 10px; cursor: pointer; transition: background 0.2s;">
+                ← Volver al Editor
+            </button>
+        `;
+
+        document.body.appendChild(pantallaCompleta);
     };
 }
 
