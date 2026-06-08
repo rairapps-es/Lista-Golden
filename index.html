@@ -8056,26 +8056,27 @@ function reclamarPremioBasico(idPremio) {
         sincronizarSaldosVault();
 
         // 4. GENERAR DATOS Y ENVIAR AL CHAT PRIVADO DE TELEGRAM
-        const mensajeTelegram = encodeURIComponent(
+                // 4. GENERAR DATOS Y CONFIGURAR CHAT PRIVADO DIRECTO
+        const textoLimpio = 
             `🛒 NUEVO PEDIDO DIRECTO\n` +
             `=========================\n` +
             `▪️ Premio: ${premio.titulo}\n` +
             `▪️ Coste: ${premio.precio} ${nombreMoneda.toUpperCase()}\n` +
             `▪️ Estado: 🟡 EN PROGRESO\n` +
             `=========================\n` +
-            `Por favor, escribe abajo tu ID de Telegram o datos de cuenta para la entrega:\n` +
-            `👉 ID Telegram: `
-        );
+            `👉 Por favor, envíame este mensaje y escribe aquí tu ID o detalles de tu cuenta para la entrega.`;
 
-        // Reemplaza "TuChatPrivado_bot" o "TuUsuarioTelegram" por tu enlace directo
-        const urlTelegram = `https://t.me/share/url?url=${mensajeTelegram}`;
+        // OPCIÓN A: Si usas un BOT propio (Recomendado para Mini Apps)
+        // Al pulsar "Iniciar / Start", el bot recibe el código de abajo automáticamente
+            const urlTelegram = `https://t.me/Airdayz?text=${encodeURIComponent(textoLimpio)}`;
         
-        // Abrir Telegram
+        // Abrir el chat privado directamente
         window.open(urlTelegram, '_blank');
     } else {
         // Si cancela, simplemente se cierra el aviso y no hace nada
         console.log("Canje cancelado por el usuario.");
     }
+
 }
 
 // Inicializar al cargar la página
