@@ -3413,44 +3413,6 @@
     </div>
 
     <div class="vault-grid">
-        
-        <div class="vault-card" data-moneda="puntos">
-            <div style="margin-bottom: 12px;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                    <span style="font-size: 1.4rem;">👑</span>
-                    <span class="vault-price-tag pts">1500 ⚡</span>
-                </div>
-                <h4 style="margin: 0; font-size: 0.85rem; font-weight: 800; color: #fff;">Premium 30 Días</h4>
-                <p style="margin: 4px 0 0 0; font-size: 0.65rem; color: #9ca3af; line-height: 1.3;">Acceso VIP completo a todas las funciones y canales.</p>
-            </div>
-            <button class="vault-btn-reclaim" onclick="reclamarPremioBasico('v_premium_30')">Reclamar</button>
-        </div>
-
-        <div class="vault-card" data-moneda="diamantes">
-            <div style="margin-bottom: 12px;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                    <span style="font-size: 1.4rem;">📦</span>
-                    <span class="vault-price-tag gms">500 💎</span>
-                </div>
-                <h4 style="margin: 0; font-size: 0.85rem; font-weight: 800; color: #fff;">Megapack Gemas</h4>
-                <p style="margin: 4px 0 0 0; font-size: 0.65rem; color: #9ca3af; line-height: 1.3;">Pack expansivo de gemas para activaciones inmediatas.</p>
-            </div>
-            <button class="vault-btn-reclaim" onclick="reclamarPremioBasico('v_pack_gemas')">Reclamar</button>
-        </div>
-
-        <div class="vault-card" data-moneda="diamantes" style="grid-column: span 2;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                <div style="display: flex; align-items: center; gap: 10px;">
-                    <span style="font-size: 1.5rem;">🎨</span>
-                    <div>
-                        <h4 style="margin: 0; font-size: 0.85rem; font-weight: 800; color: #fff;">Avatar Personalizado</h4>
-                        <p style="margin: 2px 0 0 0; font-size: 0.65rem; color: #9ca3af;">Diseño corporativo o gaming a medida para tu perfil.</p>
-                    </div>
-                </div>
-                <span class="vault-price-tag gms" style="white-space: nowrap;">200 💎</span>
-            </div>
-            <button class="vault-btn-reclaim" onclick="reclamarPremioBasico('v_avatar_custom')">Reclamar Premio Especial</button>
-        </div>
 
         <div class="vault-card" data-moneda="puntos">
     <div style="margin-bottom: 12px;">
@@ -8528,9 +8490,7 @@ function filtrarCatalogoVault(categoria) {
 // 1. CONFIGURACIONES GENERALES E INICIALIZADORES (LO QUE YA TENÍAS)
 // =========================================================================
 const VAULT_PREMIOS = [
-    { id: "v_premium_30", titulo: "Premium 30 Días", precio: 1500, moneda: "puntos" },
-    { id: "v_pack_gemas", titulo: "Megapack Gemas", precio: 500, moneda: "diamantes" },
-    { id: "v_avatar_custom", titulo: "Avatar Personalizado", precio: 200, moneda: "diamantes" }
+    // ⚡ PREMIOS POR PUNTOS DE ENERGÍA
     { id: "v_grupo_privado", titulo: "Acceso al Grupo Privado", precio: 1000, moneda: "puntos" },
     { id: "v_fotos_ia", titulo: "Transformar Fotos por IA", precio: 500, moneda: "puntos" },
     { id: "v_optimizar_canal", titulo: "Optimización de Canal Telegram", precio: 2000, moneda: "puntos" },
